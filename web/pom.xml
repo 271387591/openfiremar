@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ozstrategy</groupId>
+        <artifactId>openfiremar</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>oopenfiremar-web</artifactId>
+    <packaging>war</packaging>
+    <name>openfire - Web (Spring MVC)</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <version>6.1.20</version>
+        <configuration>
+          <contextPath>/openfiremar</contextPath>
+          <!--<webAppSourceDirectory>webapp</webAppSourceDirectory>-->
+          <!--<webDefaultXml>webdefault.xml</webDefaultXml>-->
+          <scanIntervalSeconds>0</scanIntervalSeconds>
+          <scanTargetPatterns>
+            <scanTargetPattern>
+              <directory>src/main/webapp/WEB-INF</directory>
+              <excludes>
+                <exclude>**/*.jsp</exclude>
+              </excludes>
+              <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+              </includes>
+            </scanTargetPattern>
+          </scanTargetPatterns>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+            </manifestEntries>
+          </archive>
+          <dependentWarExcludes>
+            **/jdbc.properties,**/hibernate.cfg.xml,**/sql-map-config.xml,**/web.xml,WEB-INF/classes/META-INF/**,**/license.bin
+          </dependentWarExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native2ascii-maven-plugin</artifactId>
+        <version>1.0-alpha-1</version>
+        <configuration>
+          <dest>target/classes</dest>
+          <src>src/main/resources</src>
+        </configuration>
+        <executions>
+          <execution>
+            <id>native2ascii-utf8</id>
+            <goals>
+              <goal>native2ascii</goal>
+            </goals>
+            <configuration>
+              <encoding>UTF8</encoding>
+              <includes>
+                ApplicationResources_ko.properties,
+                ApplicationResources_no.properties,
+                ApplicationResources_tr.properties,
+                ApplicationResources_zh*.properties
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>native2ascii-8859_1</id>
+            <goals>
+              <goal>native2ascii</goal>
+            </goals>
+            <configuration>
+              <encoding>8859_1</encoding>
+              <includes>
+                ApplicationResources_de.properties,ApplicationResources_fr.properties,ApplicationResources_nl.properties,ApplicationResources_pt*.properties
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>ApplicationResources_de.properties</exclude>
+          <exclude>ApplicationResources_fr.properties</exclude>
+          <exclude>ApplicationResources_ko.properties</exclude>
+          <exclude>ApplicationResources_nl.properties</exclude>
+          <exclude>ApplicationResources_no.properties</exclude>
+          <exclude>ApplicationResources_pt*.properties</exclude>
+          <exclude>ApplicationResources_tr.properties</exclude>
+          <exclude>ApplicationResources_zh*.properties</exclude>
+          <exclude>applicationContext-resources.xml</exclude>
+        </excludes>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>applicationContext-resources.xml</include>
+        </includes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/main/webapp</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+      </testResource>
+    </testResources>
+  </build>
+  <profiles>
+    <profile>
+        <id>prod</id>
+        <activation>
+            <property>
+                <name>!dev</name>
+            </property>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>yuicompressor-maven-plugin</artifactId>
+                    <version>1.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compress</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <nosuffix>true</nosuffix>
+                        <jswarn>false</jswarn>
+                        <gzip>false</gzip>
+                        <preserveAllSemiColons>true</preserveAllSemiColons>
+                        <disableOptimizations>false</disableOptimizations>
+                        <nomunge>false</nomunge>
+                        <excludes>
+                            <exclude>**/*.xml</exclude>
+                            <exclude>**/ext/**</exclude>
+                            <exclude>deploy/**</exclude>
+                            <exclude>**/mxgraph/css/explorer.css</exclude>
+                        </excludes>
+                        <resources>
+                            <resource>${basedir}/src/main/webapp/**/*</resource>
+                        </resources>
+                        <aggregations>
+                            <aggregation>
+                                <removeIncluded>true</removeIncluded>
+                                <!--insert new line after each concatenation (default: false)-->
+                                <insertNewLine>false</insertNewLine>
+                                <output>${project.build.directory}/${project.build.finalName}/demo/demo.js</output>
+                                <inputDir>${project.build.directory}/${project.build.finalName}/</inputDir>
+                                <!--files to include, path relative to output's directory or absolute path-->
+                                <includes>
+
+                                    <include>scripts/ux/Ext/ux/utils/Utils.js</include>
+                                    
+                                    <include>scripts/ux/Ext/ux/statusbar/StatusBar.js</include>
+                                    <include>scripts/ux/Ext/ux/statusbar/ValidationStatus.js</include>
+                                    
+                                    
+                                    <include>scripts/ux/Ext/ux/data/AvailableStore.js</include>
+                                    <include>scripts/ux/Ext/ux/data/PagingMemoryProxy.js</include>
+                                    
+                                    <include>scripts/ux/Ext/ux/dd/DragZone.js</include>
+                                    <include>scripts/ux/Ext/ux/dd/DropZone.js</include>
+<!---->
+                                    <include>scripts/ux/Ext/ux/form/SearchField.js</include>
+                                    <include>scripts/ux/Ext/ux/form/field/DateTimePicker.js</include>
+                                    <include>scripts/ux/Ext/ux/form/field/DateTimeField.js</include>
+                                    <include>scripts/ux/Ext/ux/form/field/PropertyGrid.js</include>
+                                    <include>scripts/ux/Ext/ux/form/SearchField.js</include>
+                                    <include>scripts/ux/Ext/ux/form/MultiSelect.js</include>
+                                    <include>scripts/ux/Ext/ux/form/FormDataCustomFiled.js</include>
+                                    <include>scripts/ux/Ext/ux/form/ItemSelector.js</include>
+                                    <include>scripts/ux/Ext/ux/form/TagInput.js</include>
+<!---->
+                                    <include>scripts/ux/Ext/ux/window/Notification.js</include>
+                                    
+                                    <include>scripts/ux/Ext/ux/grid/feature/Detail.js</include>
+                                    <include>scripts/ux/Ext/ux/grid/feature/Search.js</include>
+<!---->
+                                    <include>scripts/desktop/js/Module.js</include>
+                                    <include>scripts/desktop/js/ShortcutModel.js</include>
+                                    <include>scripts/desktop/js/StartMenu.js</include>
+                                    <include>scripts/desktop/js/TaskBar.js</include>
+                                    <include>scripts/desktop/js/Video.js</include>
+                                    <include>scripts/desktop/js/Wallpaper.js</include>
+                                    <include>scripts/desktop/js/Desktop.js</include>
+                                    <include>scripts/desktop/js/App.js</include>
+<!---->
+                                    <include>scripts/ux/Oz/access/RoleAccess.js</include>
+                                    <include>scripts/ux/Oz/app/TabMenu.js</include>
+                                    <include>scripts/ux/Oz/app/Tabs.js</include>
+                                    <include>scripts/ux/Oz/app/ThumbList.js</include>
+                                    <include>scripts/ux/Oz/data/DwrProxy.js</include>
+                                    <include>scripts/ux/Oz/desktop/Module.js</include>
+                                    
+                                    
+                                    <include>scripts/ozstrategy/global.js</include>
+                                    
+                                    <include>scripts/ozstrategy/Constants.js</include>
+
+                                    <include>scripts/ozstrategy/model/LabelValue.js</include>
+                                    <include>scripts/ozstrategy/model/WallpaperModel.js</include>
+
+                                    <include>scripts/ozstrategy/store/Base.js</include>
+
+                                    <!--user-->
+                                    <include>scripts/ozstrategy/user/model/User.js</include>
+                                    <include>scripts/ozstrategy/user/model/Role.js</include>
+                                    <include>scripts/ozstrategy/user/model/SimpleRole.js</include>
+                                    <include>scripts/ozstrategy/user/model/Feature.js</include>
+                                    <include>scripts/ozstrategy/user/model/SystemView.js</include>
+                                    
+                                    <!--system-->
+                                    <include>scripts/ozstrategy/system/model/GlobalType.js</include>
+                                    <include>scripts/ozstrategy/system/model/SystemMessage.js</include>
+                                    
+
+                                    <!--user store-->
+                                    <include>scripts/ozstrategy/user/store/SystemView.js</include>
+                                    <include>scripts/ozstrategy/user/store/Users.js</include>
+                                    <include>scripts/ozstrategy/user/store/Roles.js</include>
+                                    <include>scripts/ozstrategy/user/store/AllFeatures.js</include>
+                                    <include>scripts/ozstrategy/user/store/RoleTree.js</include>
+
+
+                                    <!--system store-->
+                                    <include>scripts/ozstrategy/system/store/GlobalTypes.js</include>
+                                    <include>scripts/ozstrategy/system/store/GlobalTypeTree.js</include>
+                                    <include>scripts/ozstrategy/system/store/SystemMessage.js</include>
+
+                                    <!--user view-->
+                                    <include>scripts/ozstrategy/user/view/UserForm.js</include>
+                                    <include>scripts/ozstrategy/user/view/UserView.js</include>
+                                    <include>scripts/ozstrategy/user/view/RoleForm.js</include>
+                                    <include>scripts/ozstrategy/user/view/RoleView.js</include>
+                                    <include>scripts/ozstrategy/user/view/FeatureForm.js</include>
+                                    <include>scripts/ozstrategy/user/view/FeatureView.js</include>
+                                    <include>scripts/ozstrategy/user/view/UserSelector.js</include>
+                                    <include>scripts/ozstrategy/user/view/RoleSelector.js</include>
+
+                                    <!--system view-->
+                                    <include>scripts/ozstrategy/system/view/GlobalTypeForm.js</include>
+                                    <include>scripts/ozstrategy/system/view/GlobalTypeLeftTree.js</include>
+                                    <include>scripts/ozstrategy/system/view/GlobalTypeTree.js</include>
+                                    <include>scripts/ozstrategy/system/view/GlobalTypeView.js</include>
+                                    <include>scripts/ozstrategy/system/view/SystemMessageView.js</include>
+
+                                    
+                                    <include>scripts/ozstrategy/Settings.js</include>
+                                    <include>scripts/ozstrategy/ChangePassword.js</include>
+                                    <include>scripts/ozstrategy/UnitUserView.js</include>
+                                    <include>scripts/ozstrategy/SystemBaseDataView.js</include>
+                                    <include>scripts/ozstrategy/App.js</include>
+                                    
+                                    <include>scripts/ozstrategy/Constants.js</include>
+                                    <include>scripts/ozstrategy/global.js</include>
+                                </includes>
+                            </aggregation>
+                        </aggregations>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.2</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-deploy</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <tasks>
+                                    <copy todir="${project.build.directory}/${project.build.finalName}/WEB-INF/" overwrite="true">
+                                        <fileset dir="${basedir}/src/main/webapp/deploy"/>
+                                    </copy>
+                                    <echo>Copy deploy file ...</echo>
+                                </tasks>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <configuration>
+                        <warSourceExcludes>
+                            deploy/**,markup/**,mxgraph/js/*.js,mxgraph/src/js/*.js,scripts/login/*.js,scripts/ux/**,scripts/desktop/**/*.js,scripts/ozstrategy/**/*.js,scripts/ext/ext-all-*.js,scripts/ext/ext-c*.js,scripts/ext/ext-d*.js,scripts/ext/ext-f*.js,scripts/ext/ext.js,scripts/ext/boot*.js,scripts/ext/src/**,**/*debug*.js
+                        </warSourceExcludes>
+                        <packagingExcludes>scripts/ux/**,scripts/desktop/*.js,scripts/desktop/js/*.js,scripts/ozstrategy/**</packagingExcludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+  </profiles>
+
+  <!-- Dependencies calculated by AppFuse when running full-source plugin -->
+  <dependencies>
+      <dependency>
+          <groupId>com.ozstrategy</groupId>
+          <artifactId>openfiremar-core</artifactId>
+          <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+          <version>${servlet.version}</version>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>jstl</artifactId>
+          <version>${jstl.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>jsp-api</artifactId>
+          <version>${jsp.version}</version>
+          <scope>provided</scope>
+      </dependency>
+    <dependency>
+      <groupId>org.tuckey</groupId>
+      <artifactId>urlrewritefilter</artifactId>
+      <version>${urlrewrite.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>ant</artifactId>
+          <groupId>ant</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>taglibs</groupId>
+      <artifactId>standard</artifactId>
+      <version>${jstl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+      <dependency>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+          <version>1.4.01</version>
+      </dependency>
+      
+  </dependencies>
+</project>
