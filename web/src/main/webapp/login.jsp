@@ -36,7 +36,7 @@
         </c:if>
         </c:if>
         var loginRes = {
-            formAction: '<c:url value="/security/login"/>',
+            formAction: '<c:url value="/app/login"/>',
             appsName: '<fmt:message key="webapp.name" />',
             title: '<fmt:message key="login.title" />',
             username: '<fmt:message key="login.username" />',

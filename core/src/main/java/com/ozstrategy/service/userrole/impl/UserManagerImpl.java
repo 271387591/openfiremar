@@ -1,9 +1,15 @@
 package com.ozstrategy.service.userrole.impl;
 
+import com.ozstrategy.Constants;
+import com.ozstrategy.dao.openfire.OpenfireUserDao;
+import com.ozstrategy.dao.project.ProjectUserDao;
 import com.ozstrategy.dao.userrole.SystemViewDao;
 import com.ozstrategy.dao.userrole.UserDao;
 import com.ozstrategy.dao.userrole.UserRoleDao;
+import com.ozstrategy.exception.UserNotAuthenticationException;
+import com.ozstrategy.exception.UserNotFoundException;
 import com.ozstrategy.model.openfire.OpenfireUser;
+import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.SystemView;
 import com.ozstrategy.model.userrole.User;
@@ -34,6 +40,12 @@ public class UserManagerImpl implements UserManager {
     private UserRoleDao userRoleDao;
     @Autowired
     private SystemViewDao systemViewDao;
+    @Autowired
+    private ProjectUserDao projectUserDao;
+    @Autowired
+    private OpenfireUserDao openfireUserDao;
+    
+    
     
 
     public List<User> listUsers(Map<String, Object> map, Integer start, Integer limit) {
@@ -119,6 +131,16 @@ public class UserManagerImpl implements UserManager {
                 userRoleDao.saveUserRole(map);
             }
         }
+        Set<ProjectUser> projects=user.getProjectUsers();
+        if(projects!=null && projects.size()>0){
+            for(ProjectUser projectUser : projects){
+                projectUser.setUser(user);
+                projectUserDao.save(projectUser);
+            }
+        }
+        OpenfireUser openfireUser=new OpenfireUser();
+        openfireUser=openfireUser.copy(user);
+        openfireUserDao.save(openfireUser);
     }
 
     public List<SystemView> listSystemView() {
@@ -130,6 +152,13 @@ public class UserManagerImpl implements UserManager {
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user=userDao.getUserByUsername(username);
+        if(user==null){
+            throw new UserNotFoundException(Constants.USER_NOT_Found); 
+        }
+        if(!user.getAuthentication()){
+            throw new UserNotAuthenticationException(Constants.USER_NOT_Authentication);
+        }
         return userDao.getUserByUsername(username);
     }
 } 

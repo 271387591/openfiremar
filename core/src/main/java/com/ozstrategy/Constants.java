@@ -17,4 +17,6 @@ public interface Constants {
     public static final String TASK_USER_TYPE = "userTask";
     public static final String END_EVENT_TYPE = "endEvent";
     public static final String START_EVENT_TYPE = "startEvent";
+    public final static String USER_NOT_Found="USER_NOT_Found";
+    public final static String USER_NOT_Authentication="USER_NOT_Authentication";
 } 

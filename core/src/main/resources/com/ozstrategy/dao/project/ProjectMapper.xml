@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ozstrategy.dao.project.ProjectDao">
+    <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>-->
+    <resultMap id="ProjectResult" type="com.ozstrategy.model.project.Project" autoMapping="true">
+        <id column="id" property="id" javaType="long"/>
+        <collection property="users" column="id" select="com.ozstrategy.dao.project.ProjectUserDao.listProjectUserByProjectId" fetchType="lazy"/>
+    </resultMap>
+    
+    <select id="listProjects" resultMap="ProjectResult" parameterType="Map">
+        select f.* from ext_project f where 1=1 
+        <if test="name!=null and name!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
+        <if test="serialNumber!=null and serialNumber!=''">and f.serialNumber =#{serialNumber}</if>
+        order by f.createDate desc
+    </select>
+    <select id="listProjectsCount" resultType="java.lang.Integer" parameterType="Map">
+        select count(id) from ext_project f where 1=1
+        <if test="name!=null and name!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
+        <if test="serialNumber!=null and serialNumber!=''">and f.serialNumber =#{serialNumber}</if>
+    </select>
+    <select id="getProjectById" resultMap="ProjectResult" parameterType="long">
+        SELECT * from ext_project where id=#{id}
+    </select>
+    <select id="getNoCascadeProjectById" resultType="com.ozstrategy.model.project.Project" parameterType="long">
+        SELECT * from ext_project where id=#{id}
+    </select>
+    
+    
+    
+</mapper>

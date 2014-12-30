@@ -10,7 +10,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>oopenfiremar-web</artifactId>
+    <artifactId>openfiremar-web</artifactId>
     <packaging>war</packaging>
     <name>openfire - Web (Spring MVC)</name>
 
@@ -192,7 +192,6 @@
                                     
                                     <include>scripts/ux/Ext/ux/dd/DragZone.js</include>
                                     <include>scripts/ux/Ext/ux/dd/DropZone.js</include>
-<!---->
                                     <include>scripts/ux/Ext/ux/form/SearchField.js</include>
                                     <include>scripts/ux/Ext/ux/form/field/DateTimePicker.js</include>
                                     <include>scripts/ux/Ext/ux/form/field/DateTimeField.js</include>
@@ -202,12 +201,10 @@
                                     <include>scripts/ux/Ext/ux/form/FormDataCustomFiled.js</include>
                                     <include>scripts/ux/Ext/ux/form/ItemSelector.js</include>
                                     <include>scripts/ux/Ext/ux/form/TagInput.js</include>
-<!---->
                                     <include>scripts/ux/Ext/ux/window/Notification.js</include>
                                     
                                     <include>scripts/ux/Ext/ux/grid/feature/Detail.js</include>
                                     <include>scripts/ux/Ext/ux/grid/feature/Search.js</include>
-<!---->
                                     <include>scripts/desktop/js/Module.js</include>
                                     <include>scripts/desktop/js/ShortcutModel.js</include>
                                     <include>scripts/desktop/js/StartMenu.js</include>
@@ -216,7 +213,6 @@
                                     <include>scripts/desktop/js/Wallpaper.js</include>
                                     <include>scripts/desktop/js/Desktop.js</include>
                                     <include>scripts/desktop/js/App.js</include>
-<!---->
                                     <include>scripts/ux/Oz/access/RoleAccess.js</include>
                                     <include>scripts/ux/Oz/app/TabMenu.js</include>
                                     <include>scripts/ux/Oz/app/Tabs.js</include>

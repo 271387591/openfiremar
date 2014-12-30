@@ -2,6 +2,8 @@ package com.ozstrategy.model.userrole;
 
 import com.ozstrategy.Constants;
 import com.ozstrategy.model.BaseObject;
+import com.ozstrategy.model.project.Project;
+import com.ozstrategy.model.project.ProjectUser;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -57,7 +59,8 @@ public class User extends BaseObject implements UserDetails {
     private Integer   version;
     @Column
     private String   nickName;
-    
+    @Column
+    private Boolean   authentication=Boolean.FALSE;
     @Column
     private String   website;
     @Column(columnDefinition = "char",length = 1)
@@ -78,6 +81,8 @@ public class User extends BaseObject implements UserDetails {
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "defaultRoleId")
     private Role defaultRole;
+    
+    private Set<ProjectUser> projectUsers=new HashSet<ProjectUser>();
     
     @Transient
     private String fullName;
@@ -286,6 +291,22 @@ public class User extends BaseObject implements UserDetails {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public Set<ProjectUser> getProjectUsers() {
+        return projectUsers;
+    }
+
+    public void setProjectUsers(Set<ProjectUser> projectUsers) {
+        this.projectUsers = projectUsers;
+    }
+
+    public Boolean getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(Boolean authentication) {
+        this.authentication = authentication;
     }
 
     @Override

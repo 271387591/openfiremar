@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ozstrategy.dao.openfire.OpenfireUserDao">
+    <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>-->
+    <resultMap id="OpenfireUserResult" type="com.ozstrategy.model.openfire.OpenfireUser" autoMapping="true">
+    </resultMap>
+    <insert id="save" parameterType="com.ozstrategy.model.openfire.OpenfireUser" flushCache="true">
+        insert into ofUser(username,plainPassword,encryptedPassword,name,email,creationDate,modificationDate)
+        VALUES (#{username},#{plainPassword},#{encryptedPassword},${name},${email},${creationDate},${modificationDate})
+    </insert>
+</mapper>

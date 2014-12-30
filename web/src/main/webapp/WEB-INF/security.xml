@@ -8,12 +8,13 @@
     <http pattern="/images/**" security="none"/>
     <http pattern="/styles/**" security="none"/>
     <http pattern="/scripts/**" security="none"/>
-    <http pattern="/security/register" security="none"/>
+    <http pattern="/app/register" security="none"/>
+    <http pattern="/app/getProjects" security="none"/>
 
     <http use-expressions="true"  >
         <expression-handler ref="expressionHandler"/>
-        <intercept-url pattern="/service/desktop" access="authenticatedContext('manager')"/>
-        <intercept-url pattern="/service/userview" access="authenticatedContext('user')"/>
+        <intercept-url pattern="/service/desktop" access="isAuthenticated()"/>
+        <!--<intercept-url pattern="/service/userview" access="authenticatedContext('user')"/>-->
         <!--<intercept-url pattern="/service/*" access="hasAnyRole('ROLE_USER,ROLE_ADMIN')"/>-->
         <!--<intercept-url pattern="/app/passwordHint*" access="hasFeature('sss')"/>-->
         <!--<intercept-url pattern="/app/signup*" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>-->

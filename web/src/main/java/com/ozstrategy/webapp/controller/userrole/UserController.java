@@ -1,7 +1,10 @@
 package com.ozstrategy.webapp.controller.userrole;
 
+import com.ozstrategy.model.project.Project;
+import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.User;
+import com.ozstrategy.service.project.ProjectManager;
 import com.ozstrategy.service.userrole.RoleManager;
 import com.ozstrategy.service.userrole.UserManager;
 import com.ozstrategy.webapp.Constants;
@@ -24,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by lihao on 7/4/14.
@@ -35,6 +40,9 @@ public class UserController extends BaseController {
     private UserManager userManager = null;
     @Autowired 
     private RoleManager roleManager = null;
+    @Autowired 
+    private ProjectManager projectManager = null;
+    
     protected final transient Log log = LogFactory.getLog(getClass());
     @RequestMapping(params = "method=listUsers")
     @ResponseBody
@@ -307,17 +315,38 @@ public class UserController extends BaseController {
         String gender=request.getParameter("gender");
         String email=request.getParameter("email");
         String mobile=request.getParameter("mobile");
+        String nickName=request.getParameter("nickName");
+        String projectId=request.getParameter("projectId");
+        String activationCode=request.getParameter("activationCode");
+        
         if(!save){
             if(checkIsNotNumber(id)){
                 return new BaseResultCommand(getMessage("message.error.id.null",request),Boolean.FALSE);
             }
         }
-        if(checkIsEmpty(email)){
-            return new BaseResultCommand(getMessage("message.error.email.null",request),Boolean.FALSE);
+        if(checkIsEmpty(nickName)){
+            return new BaseResultCommand(getMessage("message.error.nickName.null",request),Boolean.FALSE);
         }
-        if(checkIsEmpty(mobile)){
-            return new BaseResultCommand(getMessage("message.error.mobile.null",request),Boolean.FALSE);
+        if(checkIsEmpty(projectId)){
+            return new BaseResultCommand(getMessage("message.error.projectId.null",request),Boolean.FALSE);
         }
+        if(checkIsEmpty(activationCode)){
+            return new BaseResultCommand(getMessage("message.error.activationCode.null",request),Boolean.FALSE);
+        }
+        
+        Long projectIdL=parseLong(projectId);
+        if(projectIdL==null){
+            return new BaseResultCommand(getMessage("message.error.projectId.notNumber",request),Boolean.FALSE);
+        }
+        Project project=projectManager.getProjectById(projectIdL);
+        if(project==null){
+            return new BaseResultCommand(getMessage("message.error.project.not.found",request),Boolean.FALSE);
+        }
+        if(!StringUtils.equals(project.getActivationCode(),activationCode)){
+            return new BaseResultCommand(getMessage("message.error.project.activationCode.not.same",request),Boolean.FALSE);
+        }
+        
+        
         
         if(save){
             if(checkIsEmpty(username)){
@@ -326,29 +355,18 @@ public class UserController extends BaseController {
             if(checkIsEmpty(password)){
                 return new BaseResultCommand(getMessage("message.error.password.null",request),Boolean.FALSE);
             }
+            Pattern pattern=Pattern.compile("^[a-zA-Z0-9_]{3,16}$");
+            Matcher matcher = pattern.matcher(username);
+            if(!matcher.matches()){
+                return new BaseResultCommand(getMessage("message.error.username.unlawful",request),Boolean.FALSE);
+            }
             if(userManager.getUserByUsername(username)!=null){
                 return new BaseResultCommand(getMessage("message.error.username.exist",request),Boolean.FALSE);
-            }
-            if(userManager.getUserByMobile(mobile)!=null){
-                return new BaseResultCommand(getMessage("message.error.getMobileUser.error",request),Boolean.FALSE);
-            }
-            if(userManager.getUserByEmail(email)!=null){
-                return new BaseResultCommand(getMessage("message.error.getEmailUser.error",request),Boolean.FALSE);
             }
         }
         try{
             if(!save){
                 user=userManager.getUserById(parseLong(id));
-                if(!StringUtils.equals(mobile,user.getMobile())){
-                    if(userManager.getUserByMobile(mobile)!=null){
-                        return new BaseResultCommand(getMessage("message.error.getMobileUser.exist",request),Boolean.FALSE);
-                    }
-                }
-                if(!StringUtils.equals(email,user.getEmail())){
-                    if(userManager.getUserByEmail(email)!=null){
-                        return new BaseResultCommand(getMessage("message.error.getEmailUser.exist",request),Boolean.FALSE);
-                    }
-                }
                 user.setVersion(user.getVersion()+1);
             }else{
                 user=new User();
@@ -378,6 +396,11 @@ public class UserController extends BaseController {
                     }
                 }
             }
+            ProjectUser projectUser=new ProjectUser();
+            projectUser.setProject(project);
+            user.getProjectUsers().clear();
+            user.getProjectUsers().add(projectUser);
+            
             user.getRoles().clear();
             user.getRoles().addAll(roleSet);
             userManager.saveOrUpdate(user);

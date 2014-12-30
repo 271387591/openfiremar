@@ -11,13 +11,33 @@
             </list>
         </property>
     </bean>
-    <bean id="jmsMessageListener" class="com.ozstrategy.jms.JmsMessageListener"/>
-
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${jdbc.driverClassName}"/>
-        <property name="url" value="${jdbc.url}"/>
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
+        <!--<property name="idleConnectionTestPeriodInMinutes" value="60"/>-->
+        <!--<property name="idleMaxAgeInMinutes" value="240"/>-->
+        <!--<property name="maxConnectionsPerPartition" value="100"/>-->
+        <!--<property name="minConnectionsPerPartition" value="30"/>-->
+        <!--<property name="partitionCount" value="5"/>-->
+        <!--<property name="acquireIncrement" value="10"/>-->
+        <!--<property name="statementsCacheSize" value="1000"/>-->
+        <!--<property name="releaseHelperThreads" value="5"/>-->
+
+        <property name="idleConnectionTestPeriodInMinutes" value="60"/>
+        <property name="idleMaxAgeInMinutes" value="240"/>
+        <property name="maxConnectionsPerPartition" value="30"/>
+        <property name="minConnectionsPerPartition" value="10"/>
+        <property name="partitionCount" value="2"/>
+        <property name="acquireIncrement" value="2"/>
+        <property name="statementsCacheSize" value="100"/>
+        <property name="releaseHelperThreads" value="3"/>
+        <!--<property name="closeConnectionWatch" value="true" />-->
+    </bean>
+    
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
     
 

@@ -21,9 +21,10 @@ Ext.define('FlexCenter.user.view.RoleForm',{
     autoShow: true,
     modal: true,
     width: 600,
-    autoHeight: true,
     border:false,
     minWidth: 600,
+    maxHeight:600,
+    autoScroll:true,
     getSystemViewStore:function (){
         var systemViewStore = Ext.StoreManager.lookup('systemViewStore');
         if (!systemViewStore) {
@@ -48,6 +49,7 @@ Ext.define('FlexCenter.user.view.RoleForm',{
                   xtype: 'form',
                   frame:true,
                   bodyPadding: 5,
+                  autoScroll:true,
                   layout: 'anchor',
                   defaults: {
                       anchor: '100%'
@@ -118,8 +120,7 @@ Ext.define('FlexCenter.user.view.RoleForm',{
                           xtype: 'fieldset',
                           title: userRoleRes.selectFeature,
                           checkboxToggle: false,
-                          height: 250,
-                          autoHeight: true,
+                          height: 400,
                           defaults: {               // defaults are applied to items, not the container
                               anchor: '100%'
                           },

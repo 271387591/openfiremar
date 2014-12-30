@@ -39,6 +39,8 @@
 		<mapper resource="com/ozstrategy/dao/userrole/FeatureMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/RoleFeatureMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/system/GlobalTypeMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/system/SystemMessageMapper.xml"/>
+		<mapper resource="com/ozstrategy/dao/project/ProjectMapper.xml"/>
+		<mapper resource="com/ozstrategy/dao/project/ProjectUserMapper.xml"/>
+		<mapper resource="com/ozstrategy/dao/openfire/OpenfireUserMapper.xml"/>
 	</mappers>
 </configuration>

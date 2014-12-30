@@ -10,6 +10,9 @@ import java.util.Date;
 public class BaseObjectCommand {
     private Date createDate;
     private Date lastUpdateDate;
+    public BaseObjectCommand(){
+        
+    }
     public BaseObjectCommand(BaseObject baseObject){
         this.createDate=baseObject.getCreateDate();
         this.lastUpdateDate=baseObject.getLastUpdateDate();

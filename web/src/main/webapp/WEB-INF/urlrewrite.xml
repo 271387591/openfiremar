@@ -14,14 +14,17 @@
         <to>/j_security_check</to>
     </rule>
     <rule>
-        <from>/security/login</from>
+        <from>/app/login</from>
         <to>/j_security_check</to>
     </rule>
     <rule>
-        <from>/security/register</from>
+        <from>/app/register</from>
         <to>/service/userController.do?method=saveUser</to>
     </rule>
-    
+    <rule>
+        <from>/app/getProjects</from>
+        <to>/service/projectController.do?method=listAllProjects</to>
+    </rule>
     
     <rule>
         <from>/login*</from>

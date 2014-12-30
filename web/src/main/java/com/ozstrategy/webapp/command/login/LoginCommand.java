@@ -1,8 +1,10 @@
 package com.ozstrategy.webapp.command.login;
 
+import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Feature;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.User;
+import com.ozstrategy.webapp.command.project.ProjectUserCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +19,12 @@ public class LoginCommand {
     private String email;
     private String mobile;
     private String nickName;
-    private Boolean  credentialsExpired=Boolean.FALSE;
+    private Boolean  authentication=Boolean.FALSE;
     private String   gender;
     private List<LoginRoleCommand> roles=new ArrayList<LoginRoleCommand>();
     private List<LoginFeatureCommand> features=new ArrayList<LoginFeatureCommand>();
     private LoginRoleCommand defaultRole=null;
+    private List<ProjectUserCommand> projects=new ArrayList<ProjectUserCommand>();
 
     public LoginCommand() {
     }
@@ -31,7 +34,7 @@ public class LoginCommand {
         this.username= user.getUsername();
         this.email= user.getEmail();
         this.mobile= user.getMobile();
-        this.credentialsExpired=user.getCredentialsExpired();
+        this.authentication=user.getAuthentication();
         this.gender=user.getGender();
         this.nickName=user.getNickName();
         Set<Role> roleSet=user.getRoles();
@@ -43,6 +46,12 @@ public class LoginCommand {
         Role role=user.getDefaultRole();
         if(role!=null){
             this.defaultRole=new LoginRoleCommand(role);
+        }
+        Set<ProjectUser> projectUsers=user.getProjectUsers();
+        if(projectUsers!=null && projectUsers.size()>0){
+            for(ProjectUser projectUser:projectUsers){
+                this.projects.add(new ProjectUserCommand(projectUser));
+            }
         }
     }
     public LoginCommand populateFeatures(List<Feature> features) {
@@ -84,12 +93,12 @@ public class LoginCommand {
         this.mobile = mobile;
     }
 
-    public Boolean getCredentialsExpired() {
-        return credentialsExpired;
+    public Boolean getAuthentication() {
+        return authentication;
     }
 
-    public void setCredentialsExpired(Boolean credentialsExpired) {
-        this.credentialsExpired = credentialsExpired;
+    public void setAuthentication(Boolean authentication) {
+        this.authentication = authentication;
     }
 
     public String getGender() {
@@ -130,5 +139,13 @@ public class LoginCommand {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public List<ProjectUserCommand> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<ProjectUserCommand> projects) {
+        this.projects = projects;
     }
 }

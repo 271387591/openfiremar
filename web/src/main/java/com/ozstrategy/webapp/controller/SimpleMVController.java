@@ -5,7 +5,6 @@ import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.userrole.FeatureManager;
 import com.ozstrategy.service.userrole.UserManager;
 import com.ozstrategy.webapp.command.userrole.UserCommand;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -41,11 +40,11 @@ public class SimpleMVController implements InitializingBean {
         if (user == null) {
             return new ModelAndView("redirect:login");
         }
-        String url = user.getDefaultRole().getSystemView().getUrl();
-        if (StringUtils.isNotEmpty(url)) {
-            return new ModelAndView("redirect:" + url);
-        }
-        return new ModelAndView("redirect:login");
+//        String url = user.getDefaultRole().getSystemView().getUrl();
+//        if (StringUtils.isNotEmpty(url)) {
+//            return new ModelAndView("redirect:" + url);
+//        }
+        return new ModelAndView("redirect:desktop");
     }
 
     @RequestMapping("/desktopRes.js")

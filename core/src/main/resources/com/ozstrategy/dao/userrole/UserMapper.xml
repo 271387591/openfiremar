@@ -8,6 +8,7 @@
         <association property="address" resultMap="addressResult" javaType="com.ozstrategy.model.userrole.Address"/>
         <association property="defaultRole" select="com.ozstrategy.dao.userrole.RoleDao.getRoleById" column="defaultRoleId" javaType="com.ozstrategy.model.userrole.Role"/>
         <collection property="roles" column="id" select="com.ozstrategy.dao.userrole.RoleDao.getRoleByUserId" fetchType="lazy"/>
+        <collection property="projectUsers" column="id" select="com.ozstrategy.dao.project.ProjectUserDao.listProjectUserByUserId" fetchType="lazy"/>
     </resultMap>
     <resultMap id="userNoCascadeResult" type="com.ozstrategy.model.userrole.User" autoMapping="true">
         <id property="id" column="id"/>
@@ -50,7 +51,7 @@
         select u.* from ext_user u join ext_userrole ur on u.id=ur.userId where ur.roleId=#{roleId}
     </select>
     <select id="getNoCascadeUserById" parameterType="long" resultMap="userNoCascadeResult">
-        select u.* from ext_user u join User where u.id=#{id}
+        select u.* from ext_user u  where u.id=#{id}
     </select>
     
     
@@ -82,6 +83,7 @@
         u.website=#{website} ,  
         u.gender=#{gender} ,  
         u.mobile=#{mobile} ,  
+        u.authentication=#{authentication} ,  
         u.createDate=#{createDate} ,  
         u.lastUpdateDate=#{lastUpdateDate} ,  
         u.defaultRoleId=#{defaultRole.id},  
@@ -117,6 +119,7 @@
         #{website},
         #{gender},
         #{mobile},
+        #{authentication},
         #{createDate},
         #{lastUpdateDate},
         #{defaultRole.id},
@@ -164,6 +167,7 @@
              website,
              gender,
              mobile,
+             authentication,
              createDate,
              lastUpdateDate,
              defaultRoleId,

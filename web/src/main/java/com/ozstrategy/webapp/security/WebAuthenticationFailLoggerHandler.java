@@ -1,9 +1,8 @@
 package com.ozstrategy.webapp.security;
 
 
+import com.ozstrategy.Constants;
 import com.ozstrategy.webapp.command.BaseResultCommand;
-import com.ozstrategy.webapp.command.JsonReaderSingleResponse;
-import com.ozstrategy.webapp.command.login.LoginCommand;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -18,6 +17,11 @@ import java.io.IOException;
  */
 public class WebAuthenticationFailLoggerHandler extends WebAuthenticationLoggerHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        String platform=request.getParameter("platform");
+        if(StringUtils.equals(PLATFORM,platform)){
+            response.sendRedirect("login?error=true");
+            return;
+        }
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
@@ -26,7 +30,15 @@ public class WebAuthenticationFailLoggerHandler extends WebAuthenticationLoggerH
             response.getWriter().print(objectMapper.writeValueAsString(command));
             return;
         }
+        String msg = exception.getMessage();
+        if(StringUtils.equals(msg,Constants.USER_NOT_Authentication)){
+            BaseResultCommand command=new BaseResultCommand("用户未认证",false);
+            response.getWriter().print(objectMapper.writeValueAsString(command));
+            return;
+        }
         BaseResultCommand command=new BaseResultCommand("无效用户名或密码，请重试。",false);
         response.getWriter().print(objectMapper.writeValueAsString(command));
+        return;
+        
     }
 }
