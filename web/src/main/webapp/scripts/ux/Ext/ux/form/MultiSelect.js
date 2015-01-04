@@ -1,6 +1,3 @@
-/**
- * A control that allows selection of multiple items in a list.
- */
 Ext.define('Ext.ux.form.MultiSelect', {
         extend: 'Ext.form.field.Base',
 
@@ -46,6 +43,7 @@ Ext.define('Ext.ux.form.MultiSelect', {
 
         selectedStore: undefined,
         priorityFiled: undefined,
+        displayInfo: false,
 
         height: 200,
 
@@ -91,7 +89,7 @@ Ext.define('Ext.ux.form.MultiSelect', {
                 },
                 availableStore = Ext.create('Ext.ux.data.AvailableStore',
                     Ext.applyIf(availableStoreCfg,
-                            this.filterMode == 'local' ?
+                        this.filterMode == 'local' ?
                         {
                             pageSize: this.pageSize,
                             reader: me.store.reader,
@@ -280,9 +278,9 @@ Ext.define('Ext.ux.form.MultiSelect', {
                         //pageSize: 10,
                         store: availableStore,
                         displayMsg: '{0} - {1} of {2}',
-                        displayInfo: true
+                        displayInfo: me.displayInfo
                     })
-                }, me.availableCfg, commonConfig, {flex: me.availableCfg && me.availableCfg.flex ? me.availableCfg.flex : 1 });
+                }, me.availableCfg, commonConfig, {flex: me.availableCfg && me.availableCfg.flex ? me.availableCfg.flex : 1});
 
             if (!availableStore.proxy.__data) {
                 availableStore.proxy.__data = [];

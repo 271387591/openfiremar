@@ -663,7 +663,7 @@
         <web.framework>spring</web.framework>
         <amp.genericCore>true</amp.genericCore>
         <amp.fullSource>true</amp.fullSource>
-        <db.name>openfireTest</db.name>
+        <db.name>openfiremar</db.name>
 
         <!-- Framework dependency versions -->
         <appfuse.version>2.1.1-SNAPSHOT</appfuse.version>

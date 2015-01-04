@@ -91,6 +91,35 @@ public class UserController extends BaseController {
         int count = userManager.listUsersCount(map);
         return new JsonReaderResponse<UserCommand>(userCommands,count);
     }
+    @RequestMapping(params = "method=listProjectUsers")
+    @ResponseBody
+    public JsonReaderResponse<UserCommand> listProjectUsers(HttpServletRequest request){
+        List<UserCommand> commands=new ArrayList<UserCommand>();
+        Integer start=parseInteger(request.getParameter("start"));
+        Integer limit=parseInteger(request.getParameter("limit"));
+        Long projectId=parseLong(request.getParameter("projectId"));
+        List<User> projects=userManager.listUsersByProjectId(projectId, start, limit);
+        if(projects!=null && projects.size()>0){
+            for(User project : projects){
+                commands.add(new UserCommand(project));
+            }
+        }
+        int count = userManager.listUsersByProjectIdCount(projectId);
+        return new JsonReaderResponse<UserCommand>(commands,"",count);
+    }
+    @RequestMapping(params = "method=listAvailableUsers")
+    @ResponseBody
+    public JsonReaderResponse<UserCommand> listAvailableUsers(HttpServletRequest request){
+        List<UserCommand> commands=new ArrayList<UserCommand>();
+        List<User> projects=userManager.listAvailableUsers();
+        if(projects!=null && projects.size()>0){
+            for(User project : projects){
+                commands.add(new UserCommand(project));
+            }
+        }
+        return new JsonReaderResponse<UserCommand>(commands,true,"");
+    }
+    
     
     
     @RequestMapping(params = "method=saveUser")
@@ -153,7 +182,7 @@ public class UserController extends BaseController {
     @ResponseBody 
     public BaseResultCommand disableUser(HttpServletRequest request) {
         try {
-            return enableOrDisableUser(request,false);
+            return enableOrDisableUser(request, false);
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
@@ -169,6 +198,25 @@ public class UserController extends BaseController {
         }
         return new BaseResultCommand(getMessage("message.error.unEnable.error",request),Boolean.FALSE);
     }
+    @RequestMapping(params = "method=authorizationUser")
+    @ResponseBody 
+    public BaseResultCommand authorizationUser(HttpServletRequest request) {
+        String id=request.getParameter("id");
+        if(checkIsNotNumber(id)){
+            return new BaseResultCommand(getMessage("message.error.id.null",request),Boolean.FALSE);
+        }
+        User    targetUser  = userManager.getUserById(Long.parseLong(id));
+        targetUser.setAuthentication(Boolean.TRUE);
+        targetUser.setLastUpdateDate(new Date());
+        try {
+            userManager.authorizationUser(targetUser);
+        } catch (Exception e) {
+            logger.error("authorization user",e);
+            new BaseResultCommand(getMessage("message.error.unEnable.error",request),Boolean.FALSE);
+        }
+        return new BaseResultCommand(Boolean.TRUE);
+    }
+    
     
     @RequestMapping(params = "method=getUserById")
     @ResponseBody
@@ -318,6 +366,7 @@ public class UserController extends BaseController {
         String nickName=request.getParameter("nickName");
         String projectId=request.getParameter("projectId");
         String activationCode=request.getParameter("activationCode");
+        String userNo=request.getParameter("userNo");
         
         if(!save){
             if(checkIsNotNumber(id)){
@@ -382,6 +431,9 @@ public class UserController extends BaseController {
             user.setEnabled(Boolean.TRUE);
             user.setMobile(mobile);
             user.setEmail(email);
+            user.setDefaultProject(project);
+            user.setNickName(nickName);
+            user.setUserNo(userNo);
             if(!checkIsNotNumber(defaultRoleId)){
                Role role=roleManager.getRoleById(parseLong(defaultRoleId));
                user.setDefaultRole(role);

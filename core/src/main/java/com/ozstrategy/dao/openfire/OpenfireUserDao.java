@@ -7,4 +7,6 @@ import com.ozstrategy.model.openfire.OpenfireUser;
  */
 public interface OpenfireUserDao {
     void save(OpenfireUser user);
+    void update(OpenfireUser user);
+    
 }

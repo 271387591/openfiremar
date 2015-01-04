@@ -1,9 +1,12 @@
 package com.ozstrategy.webapp.command.userrole;
 
+import com.ozstrategy.model.project.Project;
+import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Feature;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.RoleFeature;
 import com.ozstrategy.model.userrole.User;
+import com.ozstrategy.webapp.command.project.ProjectUserCommand;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,109 +14,92 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-
-/**
- * Created by IntelliJ IDEA. User: yongliu Date: 3/22/12 Time: 3:34 PM To change this template use File | Settings |
- * File Templates.
- *
- * @author   $author$
- * @version  $Revision$, $Date$
- */
 public class UserCommand {
-  //~ Instance fields --------------------------------------------------------------------------------------------------
 
-  private boolean accountLocked;
-
-    
-  private Date createDate;
-
-
-  private boolean enabled;
-
-
-  private String firstName;
-  private String lastName;
-
-  private Long id;
-
-
-  private String password;
-
-
-  private String roleDisplayName;
-
-
-  private Long roleId;
-
-
-  private List<Long> roleIds = new ArrayList<Long>();
-
-
-  private String                  roleName;
-  private List<SimpleRoleCommand> simpleRoles = new ArrayList<SimpleRoleCommand>();
-
-
-  private String username;
-
+    private boolean accountLocked;
+    private Date createDate;
+    private boolean enabled;
+    private String firstName;
+    private String lastName;
+    private Long id;
+    private String password;
+    private String roleDisplayName;
+    private Long roleId;
+    private List<Long> roleIds = new ArrayList<Long>();
+    private String roleName;
+    private List<SimpleRoleCommand> simpleRoles = new ArrayList<SimpleRoleCommand>();
+    private String username;
     private Boolean admin = false;
     private Set<String> features = new LinkedHashSet<String>();
-    
     private String defaultRoleName;
     private String defaultRoleDisplayName;
     private Long defaultRoleId;
     private String fullName;
     private String email;
     private String mobile;
-    private String   gender;
+    private String gender;
     private Integer taskCount;
     private String nickName;
+    private String userNo;
+    private Boolean authentication;
+    private List<ProjectUserCommand> projects=new ArrayList<ProjectUserCommand>();
+    private Long projectId;
+    private String projectName;
+    private String activationCode;
 
-  //~ Constructors -----------------------------------------------------------------------------------------------------
 
-  /**
-   * Creates a new ReportTaskCommand object.
-   */
-  public UserCommand() { }
-
-  /**
-   * Creates a new ReportTaskCommand object.
-   *
-   * @param  user  DOCUMENT ME!
-   */
-  public UserCommand(User user) {
-    this.id            = user.getId();
-    this.username      = user.getUsername();
-    this.firstName     = user.getFirstName();
-      this.lastName= user.getLastName();
-    this.enabled       = user.isEnabled();
-    this.createDate    = user.getCreateDate();
-    this.accountLocked = user.getAccountLocked();
-      this.nickName=user.getNickName();
-      this.admin=user.isAdmin();
-      Role defaultRole=user.getDefaultRole();
-      if(defaultRole!=null){
-          this.defaultRoleDisplayName=defaultRole.getDisplayName();
-          this.defaultRoleId=defaultRole.getId();
-          this.defaultRoleName=defaultRole.getName();
-      }
-      this.fullName=user.getFullName();
-      this.email= user.getEmail();
-      this.mobile= user.getMobile();
-      this.gender= user.getGender();
-
-    if ((user.getRoles() != null) && (user.getRoles().size() > 0)) {
-      for (Role role : user.getRoles()) {
-        this.roleId          = role.getId();
-        this.roleName        = role.getName();
-        this.roleDisplayName = role.getDisplayName();
-        SimpleRoleCommand simpleRoleCommand = new SimpleRoleCommand();
-        simpleRoleCommand.setId(roleId);
-        simpleRoleCommand.setDisplayName(roleDisplayName);
-        simpleRoleCommand.setName(roleName);
-        this.simpleRoles.add(simpleRoleCommand);
-      }
+    public UserCommand() {
     }
-  }
+
+    public UserCommand(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.enabled = user.isEnabled();
+        this.createDate = user.getCreateDate();
+        this.accountLocked = user.getAccountLocked();
+        this.nickName = user.getNickName();
+        this.admin = user.isAdmin();
+        this.userNo=user.getUserNo();
+        this.authentication=user.getAuthentication();
+        this.fullName = user.getFullName();
+        this.email = user.getEmail();
+        this.mobile = user.getMobile();
+        this.gender = user.getGender();
+        Project project=user.getDefaultProject();
+        if(project!=null){
+            this.projectId=project.getId();
+            this.projectName=project.getName();
+            this.activationCode=project.getActivationCode();
+        }
+        
+        Role defaultRole = user.getDefaultRole();
+        if (defaultRole != null) {
+            this.defaultRoleDisplayName = defaultRole.getDisplayName();
+            this.defaultRoleId = defaultRole.getId();
+            this.defaultRoleName = defaultRole.getName();
+        }
+        if ((user.getRoles() != null) && (user.getRoles().size() > 0)) {
+            for (Role role : user.getRoles()) {
+                this.roleId = role.getId();
+                this.roleName = role.getName();
+                this.roleDisplayName = role.getDisplayName();
+                SimpleRoleCommand simpleRoleCommand = new SimpleRoleCommand();
+                simpleRoleCommand.setId(roleId);
+                simpleRoleCommand.setDisplayName(roleDisplayName);
+                simpleRoleCommand.setName(roleName);
+                this.simpleRoles.add(simpleRoleCommand);
+            }
+        }
+        Set<ProjectUser> projectUsers=user.getProjectUsers();
+        if(projectUsers!=null && projectUsers.size()>0){
+            for(ProjectUser projectUser : projectUsers){
+                this.projects.add(new ProjectUserCommand(projectUser));
+            }
+        }
+    }
+
     public UserCommand populate(List<RoleFeature> roleFeatures) {
         for (RoleFeature rf : roleFeatures) {
             Feature feature = rf.getFeature();
@@ -121,13 +107,14 @@ public class UserCommand {
         }
         return this;
     }
+
     public UserCommand populateFeatures(List<Feature> features) {
         for (Feature feature : features) {
             this.features.add(feature.getName());
         }
         return this;
     }
-    
+
 
     public String getLastName() {
         return lastName;
@@ -320,4 +307,52 @@ public class UserCommand {
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }
-} // end class UserCommand
+
+    public String getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(String userNo) {
+        this.userNo = userNo;
+    }
+
+    public Boolean getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(Boolean authentication) {
+        this.authentication = authentication;
+    }
+
+    public List<ProjectUserCommand> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<ProjectUserCommand> projects) {
+        this.projects = projects;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
+    }
+} 

@@ -21,9 +21,38 @@
     <select id="getProjectById" resultMap="ProjectResult" parameterType="long">
         SELECT * from ext_project where id=#{id}
     </select>
+    <select id="getProjectByName" resultMap="ProjectResult" parameterType="string">
+        SELECT * from ext_project u where u.name=#{name}
+    </select>
+    
     <select id="getNoCascadeProjectById" resultType="com.ozstrategy.model.project.Project" parameterType="long">
         SELECT * from ext_project where id=#{id}
     </select>
+    <insert id="save" parameterType="com.ozstrategy.model.project.Project" flushCache="true">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into ext_project(id,name,serialNumber,description,activationCode,createDate,lastUpdateDate) values(
+        #{id},
+        #{name},
+        #{serialNumber},
+        #{description},
+        #{activationCode},
+        #{createDate},
+        #{lastUpdateDate}
+        )
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.project.Project" flushCache="true">
+        UPDATE ext_project u set 
+        u.name=#{name},
+        u.serialNumber=#{serialNumber},
+        u.description=#{description},
+        u.activationCode=#{activationCode},
+        u.lastUpdateDate=#{lastUpdateDate} WHERE u.id=#{id}
+    </update>
+    <delete id="delete" flushCache="true" parameterType="long">
+        DELETE from ext_project where id=#{id}
+    </delete>
     
     
     

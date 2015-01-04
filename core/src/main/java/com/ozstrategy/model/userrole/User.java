@@ -9,83 +9,36 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Entity
 public class User extends BaseObject implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long     id;
-    @Column(columnDefinition = "char",length = 1)
-    private Boolean  accountExpired=Boolean.FALSE;
-    @Column(columnDefinition = "char",length = 1)
-    private Boolean  accountLocked=Boolean.FALSE;
-    @Column(columnDefinition = "char",length = 1)
-    private Boolean  credentialsExpired=Boolean.FALSE;
-    @Column(columnDefinition = "char",length = 1)
-    private Boolean  enabled=Boolean.TRUE;
-    @Embedded
-    private Address address            = new Address();
-    @Column(unique = true)
-    private String   email;
-    @Column
-    private String   firstName;
-    @Column
-    private String   lastName;
-    @Column
-    private String   password;
-    @Column
-    private String   passwordHint;
-    @Column
-    private String   phoneNumber;
-    @Column(unique = true,length = 32)
-    private String   username;
-    @Column
-    private Integer   version;
-    @Column
-    private String   nickName;
-    @Column
-    private Boolean   authentication=Boolean.FALSE;
-    @Column
-    private String   website;
-    @Column(columnDefinition = "char",length = 1)
-    private String   gender;
-    @Column(unique = true)
-    private String   mobile;
-    @JoinTable(
-            name               = "UserRole",
-            joinColumns        = { @JoinColumn(name = "userId") },
-            inverseJoinColumns = @JoinColumn(name = "roleId")
-    )
-    @ManyToMany(
-            fetch   = FetchType.LAZY,
-            cascade = {CascadeType.REFRESH}
-    )
-    private Set<Role> roles              = new HashSet<Role>();
-    
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "defaultRoleId")
+    private Long id;
+    private Boolean accountExpired = Boolean.FALSE;
+    private Boolean accountLocked = Boolean.FALSE;
+    private Boolean credentialsExpired = Boolean.FALSE;
+    private Boolean enabled = Boolean.TRUE;
+    private Address address = new Address();
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String password;
+    private String passwordHint;
+    private String phoneNumber;
+    private String username;
+    private Integer version;
+    private String nickName;
+    private String userNo;
+    private Boolean authentication = Boolean.FALSE;
+    private String website;
+    private String gender;
+    private String mobile;
+    private Set<Role> roles = new HashSet<Role>();
     private Role defaultRole;
-    
-    private Set<ProjectUser> projectUsers=new HashSet<ProjectUser>();
-    
-    @Transient
+    private Set<ProjectUser> projectUsers = new HashSet<ProjectUser>();
     private String fullName;
+    private Project defaultProject;
 
     public User() {
     }
@@ -165,7 +118,7 @@ public class User extends BaseObject implements UserDetails {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    @Transient 
+
     public Set<GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new LinkedHashSet<GrantedAuthority>();
         authorities.addAll(roles);
@@ -201,23 +154,22 @@ public class User extends BaseObject implements UserDetails {
         return username;
     }
 
-    @Transient 
     public boolean isAccountNonExpired() {
         return !getAccountExpired();
     }
-    @Transient 
+
     public boolean isAccountNonLocked() {
         return !getAccountLocked();
     }
-    @Transient 
+
     public boolean isCredentialsNonExpired() {
         return !getCredentialsExpired();
     }
-    @Transient
+
     public boolean isEnabled() {
         return enabled;
     }
-    @Transient
+
     public boolean isAdmin() {
         for (Object obj : getRoles()) {
             Role role = (Role) obj;
@@ -230,7 +182,7 @@ public class User extends BaseObject implements UserDetails {
     }
 
     public String getFullName() {
-        return firstName+lastName;
+        return firstName + lastName;
     }
 
     public Role getDefaultRole() {
@@ -309,6 +261,22 @@ public class User extends BaseObject implements UserDetails {
         this.authentication = authentication;
     }
 
+    public String getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(String userNo) {
+        this.userNo = userNo;
+    }
+
+    public Project getDefaultProject() {
+        return defaultProject;
+    }
+
+    public void setDefaultProject(Project defaultProject) {
+        this.defaultProject = defaultProject;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -317,10 +285,10 @@ public class User extends BaseObject implements UserDetails {
 
         User user = (User) o;
         return new EqualsBuilder()
-                .append(id,user.id)
-                .append(username,user.username)
-                .append(mobile,user.mobile)
-                .append(email,user.email)
+                .append(id, user.id)
+                .append(username, user.username)
+                .append(mobile, user.mobile)
+                .append(email, user.email)
                 .isEquals();
     }
 
@@ -332,6 +300,6 @@ public class User extends BaseObject implements UserDetails {
                 .append(mobile)
                 .append(email)
                 .hashCode();
-        
+
     }
 } 

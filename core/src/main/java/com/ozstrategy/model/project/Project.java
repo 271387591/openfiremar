@@ -16,8 +16,8 @@ public class Project extends BaseObject implements Serializable {
     private String serialNumber;
     private String name;
     private String description;
-    private Integer peoples;
     private String  activationCode;
+    
     private Set<ProjectUser> users=new HashSet<ProjectUser>();
 
     public Long getId() {
@@ -50,14 +50,6 @@ public class Project extends BaseObject implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Integer getPeoples() {
-        return peoples;
-    }
-
-    public void setPeoples(Integer peoples) {
-        this.peoples = peoples;
     }
 
     public String getActivationCode() {

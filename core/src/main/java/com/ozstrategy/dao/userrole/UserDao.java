@@ -1,6 +1,5 @@
 package com.ozstrategy.dao.userrole;
 
-import com.ozstrategy.model.openfire.OpenfireUser;
 import com.ozstrategy.model.userrole.User;
 import org.apache.ibatis.session.RowBounds;
 
@@ -21,6 +20,6 @@ public interface UserDao {
     User getUserByEmail(String email);
     User getUserByMobile(String mobile);
     
-    void saveOpenfireUser(OpenfireUser user);
-    void updateOpenfireUser(OpenfireUser user);
+    List<User> listAvailableUsers();
+    void updateUserByProjectId(Long projectId);
 } 

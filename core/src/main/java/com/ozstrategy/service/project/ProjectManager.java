@@ -13,5 +13,10 @@ public interface ProjectManager {
     List<Project> listAllProjects();
     Integer listProjectsCount(Map<String,Object> map);
     Project getProjectById(Long id);
+    Project getProjectByName(String name);
+    void save(Project project);
+    void update(Project project);
+    void delete(Long id);
+    
     
 }

@@ -16,7 +16,6 @@ public class ProjectCommand extends BaseObjectCommand {
     private String serialNumber;
     private String name;
     private String description;
-    private Integer peoples;
     private String  activationCode;
     private List<ProjectUserCommand> users=new ArrayList<ProjectUserCommand>();
     public ProjectCommand() {
@@ -26,7 +25,6 @@ public class ProjectCommand extends BaseObjectCommand {
         this.id=project.getId();
         this.name=project.getName();
         this.description=project.getDescription();
-        this.peoples=project.getPeoples();
         this.activationCode=project.getActivationCode();
         Set<ProjectUser> userSet=project.getUsers();
         if(userSet!=null && userSet.size()>0){
@@ -68,14 +66,6 @@ public class ProjectCommand extends BaseObjectCommand {
         this.description = description;
     }
 
-    public Integer getPeoples() {
-        return peoples;
-    }
-
-    public void setPeoples(Integer peoples) {
-        this.peoples = peoples;
-    }
-
     public String getActivationCode() {
         return activationCode;
     }
@@ -91,4 +81,5 @@ public class ProjectCommand extends BaseObjectCommand {
     public void setUsers(List<ProjectUserCommand> users) {
         this.users = users;
     }
+
 }

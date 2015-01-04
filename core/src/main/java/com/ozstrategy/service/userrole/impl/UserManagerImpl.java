@@ -108,7 +108,6 @@ public class UserManagerImpl implements UserManager {
     public void saveOrUpdate(User user) throws Exception{
         boolean save=true;
         if(user.getId()!=null){
-            userDao.updateOpenfireUser(new OpenfireUser().copy(user));
             userDao.updateUser(user);
             save=false;
         }else{
@@ -116,7 +115,6 @@ public class UserManagerImpl implements UserManager {
             if(StringUtils.isNotEmpty(password)){
                 user.setPassword(passwordEncoder.encodePassword(user.getPassword(), null));
             }
-            userDao.saveOpenfireUser(new OpenfireUser().copy(user));
             userDao.saveUser(user);
         }
         Set<Role> roleSet=user.getRoles();
@@ -133,6 +131,9 @@ public class UserManagerImpl implements UserManager {
         }
         Set<ProjectUser> projects=user.getProjectUsers();
         if(projects!=null && projects.size()>0){
+            if(!save){
+                projectUserDao.removeByUserId(user.getId());
+            }
             for(ProjectUser projectUser : projects){
                 projectUser.setUser(user);
                 projectUserDao.save(projectUser);
@@ -140,7 +141,11 @@ public class UserManagerImpl implements UserManager {
         }
         OpenfireUser openfireUser=new OpenfireUser();
         openfireUser=openfireUser.copy(user);
-        openfireUserDao.save(openfireUser);
+        if(!save){
+            openfireUserDao.update(openfireUser);
+        }else{
+            openfireUserDao.save(openfireUser); 
+        }
     }
 
     public List<SystemView> listSystemView() {
@@ -149,6 +154,23 @@ public class UserManagerImpl implements UserManager {
 
     public SystemView getSystemViewById(Long id) {
         return systemViewDao.getSystemViewById(id);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void authorizationUser(User user) {
+        userDao.updateUser(user);
+    }
+
+    public List<User> listUsersByProjectId(Long projectId, Integer start, Integer limit) {
+        return projectUserDao.listUsersByProjectId(projectId,new RowBounds(start,limit));
+    }
+
+    public Integer listUsersByProjectIdCount(Long projectId) {
+        return projectUserDao.listUsersByProjectIdCount(projectId);
+    }
+
+    public List<User> listAvailableUsers() {
+        return userDao.listAvailableUsers();
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

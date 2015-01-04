@@ -7,6 +7,7 @@
         <result column="defaultRoleId" javaType="java.lang.Long"/>
         <association property="address" resultMap="addressResult" javaType="com.ozstrategy.model.userrole.Address"/>
         <association property="defaultRole" select="com.ozstrategy.dao.userrole.RoleDao.getRoleById" column="defaultRoleId" javaType="com.ozstrategy.model.userrole.Role"/>
+        <association property="defaultProject" select="com.ozstrategy.dao.project.ProjectDao.getNoCascadeProjectById" column="projectId" javaType="com.ozstrategy.model.project.Project"/>
         <collection property="roles" column="id" select="com.ozstrategy.dao.userrole.RoleDao.getRoleByUserId" fetchType="lazy"/>
         <collection property="projectUsers" column="id" select="com.ozstrategy.dao.project.ProjectUserDao.listProjectUserByUserId" fetchType="lazy"/>
     </resultMap>
@@ -27,12 +28,12 @@
     
     <select id="listUsers" resultMap="userResult" parameterType="string">
         select u.* from ext_user u where u.enabled=1 and u.username != 'admin' 
-        <if test="keyword!=null and keyword!=''">and (u.username like CONCAT(CONCAT('%', #{keyword}), '%') or u.firstName like CONCAT(CONCAT('%', #{keyword}), '%') or u.lastName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
+        <if test="keyword!=null and keyword!=''">and (u.username like CONCAT(CONCAT('%', #{keyword}), '%') or u.nikeName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
         order by u.createDate desc
     </select>
     <select id="listUsersCount" resultType="java.lang.Integer" parameterType="string">
         select count(*) from ext_user u where u.enabled=1 and u.username != 'admin' 
-        <if test="keyword!=null and keyword!=''">and (u.username like CONCAT(CONCAT('%', #{keyword}), '%') or u.firstName like CONCAT(CONCAT('%', #{keyword}), '%') or u.lastName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
+        <if test="keyword!=null and keyword!=''">and (u.username like CONCAT(CONCAT('%', #{keyword}), '%') or u.firstName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
     </select>
     
     <select id="getUserById" parameterType="long" resultMap="userResult">
@@ -53,6 +54,10 @@
     <select id="getNoCascadeUserById" parameterType="long" resultMap="userNoCascadeResult">
         select u.* from ext_user u  where u.id=#{id}
     </select>
+    <select id="listAvailableUsers" resultType="com.ozstrategy.model.userrole.User">
+        select u.* from ext_user u
+    </select>
+    
     
     
     <update id="enabledUser" parameterType="Long" flushCache="true">
@@ -61,6 +66,10 @@
     <update id="updateUserPassword" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
         update ext_user u set u.password=#{password} where u.id=#{id}
     </update>
+    <update id="updateUserByProjectId" parameterType="long" flushCache="true">
+        update ext_user u set u.projectId=null where u.projectId=#{projectId}
+    </update>
+    
     <update id="updateUser" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
         update ext_user u set 
         u.accountExpired=#{accountExpired} ,  
@@ -87,6 +96,8 @@
         u.createDate=#{createDate} ,  
         u.lastUpdateDate=#{lastUpdateDate} ,  
         u.defaultRoleId=#{defaultRole.id},  
+        u.projectId=#{defaultProject.id},  
+        u.userNo=#{userNo},  
         u.nickName=#{nickName}  
         where u.id=#{id}
     </update>
@@ -123,27 +134,12 @@
         #{createDate},
         #{lastUpdateDate},
         #{defaultRole.id},
+        #{defaultProject.id},
+        #{userNo},
         #{nickName}
         )
     </insert>
-    <insert id="saveOpenfireUser" parameterType="com.ozstrategy.model.openfire.OpenfireUser" flushCache="true">
-        INSERT INTO ofUser (username,plainPassword,encryptedPassword,name,email,creationDate,modificationDate) VALUES (
-        #{username},
-        #{plainPassword},
-        #{encryptedPassword},
-        #{name},
-        #{email},
-        #{creationDate},
-        #{modificationDate})
-    </insert>
-    <update id="updateOpenfireUser" parameterType="com.ozstrategy.model.openfire.OpenfireUser" flushCache="true">
-        update ofUser u set
-        u.name=#{name} ,
-        u.encryptedPassword=#{encryptedPassword} ,
-        u.email=#{email} ,
-        u.modificationDate=#{modificationDate} 
-        where u.username=#{username}
-    </update>
+
     
     <sql id="userColumns">
              id,
@@ -171,6 +167,8 @@
              createDate,
              lastUpdateDate,
              defaultRoleId,
+             projectId,
+             userNo,
              nickName
     </sql>
     

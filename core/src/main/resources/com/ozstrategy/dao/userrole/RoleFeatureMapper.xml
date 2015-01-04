@@ -13,7 +13,7 @@
         <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
             select LAST_INSERT_ID()
         </selectKey>
-        insert into ext_rolefeature(id,featureId,roleId,createDate,lastUpdateDate) values (#{id},#{feature.id},#{role.id},#{createDate},#{lastUpdateDate})
+        insert into ext_rolefeature(id,featureId,roleId) values (#{id},#{feature.id},#{role.id})
     </insert>
     <delete id="deleteRoleFeature" flushCache="true" parameterType="Map">
         delete from ext_rolefeature where featureId=#{featureId} and roleId=#{roleId}

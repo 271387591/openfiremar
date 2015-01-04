@@ -100,18 +100,6 @@ Ext.define('FlexCenter.user.view.RoleForm',{
                                   return true;
                               }
                           },{
-                              fieldLabel: '<font color="red">*</font>'+userRoleRes.header.defaultContext,
-                              name: 'systemViewId',
-                              xtype: 'combo',
-                              allowBlank: false,
-                              itemId: 'typeId',
-                              mode: 'local',
-                              editable: false,
-                              triggerAction: 'all',
-                              valueField : 'id',
-                              displayField : 'name',
-                              store: me.getSystemViewStore()
-                          },{
                               name: 'description',
                               fieldLabel: '&nbsp;&nbsp;'+userRoleRes.header.description
                           }]
@@ -120,7 +108,7 @@ Ext.define('FlexCenter.user.view.RoleForm',{
                           xtype: 'fieldset',
                           title: userRoleRes.selectFeature,
                           checkboxToggle: false,
-                          height: 400,
+                          height: 330,
                           defaults: {               // defaults are applied to items, not the container
                               anchor: '100%'
                           },

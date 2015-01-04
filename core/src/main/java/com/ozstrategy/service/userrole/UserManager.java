@@ -22,4 +22,8 @@ public interface UserManager extends UserDetailsService {
     void saveOrUpdate(User user)throws Exception;
     List<SystemView> listSystemView();
     SystemView getSystemViewById(Long id);
-} // end interface UserManager
+    void authorizationUser(User user);
+    List<User> listUsersByProjectId(Long projectId,Integer start,Integer limit);
+    Integer listUsersByProjectIdCount(Long projectId);
+    List<User> listAvailableUsers();
+} 

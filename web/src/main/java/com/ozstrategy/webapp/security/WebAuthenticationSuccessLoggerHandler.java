@@ -43,7 +43,9 @@ public class WebAuthenticationSuccessLoggerHandler extends WebAuthenticationLogg
       if (user == null) {
         return;
       }
+      AppSessionManager.put(user.getUsername(),request.getRequestedSessionId());
       LoginCommand command = new LoginCommand(user);
+      command.setSessionId(request.getRequestedSessionId());
       List<Feature> roleFeatures = featureManager.getUserFeaturesByUsername(request.getRemoteUser());
       command = command.populateFeatures(roleFeatures);
       JsonReaderSingleResponse<LoginCommand> jsonReaderSingleResponse=new JsonReaderSingleResponse<LoginCommand>(command);

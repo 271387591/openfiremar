@@ -11,7 +11,4 @@
     <!-- Activates scanning of @Repository and @Service -->
     <context:component-scan base-package="com.ozstrategy"/>
 
-    <!-- Add new DAOs here -->
-
-    <!-- Add new Managers here -->
 </beans>

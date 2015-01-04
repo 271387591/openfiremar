@@ -6,6 +6,14 @@
     </resultMap>
     <insert id="save" parameterType="com.ozstrategy.model.openfire.OpenfireUser" flushCache="true">
         insert into ofUser(username,plainPassword,encryptedPassword,name,email,creationDate,modificationDate)
-        VALUES (#{username},#{plainPassword},#{encryptedPassword},${name},${email},${creationDate},${modificationDate})
+        VALUES (#{username},#{plainPassword},#{encryptedPassword},#{name},#{email},#{creationDate},#{modificationDate})
     </insert>
+    <update id="update" parameterType="com.ozstrategy.model.openfire.OpenfireUser" flushCache="true">
+        update ofUser u set
+        u.name=#{name} ,
+        u.encryptedPassword=#{encryptedPassword} ,
+        u.email=#{email} ,
+        u.modificationDate=#{modificationDate}
+        where u.username=#{username}
+    </update>
 </mapper>

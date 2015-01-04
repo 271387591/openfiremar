@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ozstrategy.dao.openfire.OpenfireMucRoomDao">
+    <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>-->
+    <insert id="save" parameterType="com.ozstrategy.model.openfire.OpenfireMucRoom" flushCache="true">
+        insert into ofMucRoom(serviceID,roomID,creationDate,modificationDate,name,naturalName,description,lockedDate,emptyDate,canChangeSubject,maxUsers,publicRoom,moderated,membersOnly,canInvite,roomPassword,canDiscoverJID,logEnabled,subject,rolesToBroadcast,useReservedNick,canChangeNick,canRegister)
+        VALUES (#{serviceID},#{roomID},#{creationDate},#{modificationDate},#{name},#{naturalName},#{description},#{lockedDate},#{emptyDate},#{canChangeSubject},#{maxUsers},#{publicRoom},#{moderated},#{membersOnly},#{canInvite},#{roomPassword},#{canDiscoverJID},#{logEnabled},#{subject},#{rolesToBroadcast},#{useReservedNick},#{canChangeNick},#{canRegister})
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.openfire.OpenfireMucRoom" flushCache="true">
+        update ofMucRoom u set
+        u.name=#{name} ,
+        u.naturalName=#{naturalName} ,
+        u.maxUsers=#{maxUsers} ,
+        u.subject=#{subject} ,
+        u.modificationDate=#{modificationDate}
+        where u.roomID=#{roomID}
+    </update>
+    <delete id="delete" flushCache="true" parameterType="long">
+        DELETE FROM  ofMucRoom WHERE roomID=#{id}
+    </delete>
+</mapper>

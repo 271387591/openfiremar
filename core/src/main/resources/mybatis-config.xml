@@ -42,5 +42,6 @@
 		<mapper resource="com/ozstrategy/dao/project/ProjectMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/project/ProjectUserMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/openfire/OpenfireUserMapper.xml"/>
+		<mapper resource="com/ozstrategy/dao/openfire/OpenfireMucRoomMapper.xml"/>
 	</mappers>
 </configuration>

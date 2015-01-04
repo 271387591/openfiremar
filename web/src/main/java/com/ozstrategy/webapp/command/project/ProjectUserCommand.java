@@ -14,6 +14,7 @@ public class ProjectUserCommand {
     private Long projectId;
     private Long userId;
     private Boolean manager;
+    private String nickName;
     public ProjectUserCommand(ProjectUser projectUser){
         this.id=projectUser.getId();
         this.manager=projectUser.getManager();
@@ -21,6 +22,7 @@ public class ProjectUserCommand {
         if(user!=null){
             this.userId=user.getId();
             this.username=user.getUsername();
+            this.nickName=user.getNickName();
         }
         Project project=projectUser.getProject();
         if(project!=null) {
@@ -75,5 +77,13 @@ public class ProjectUserCommand {
 
     public void setManager(Boolean manager) {
         this.manager = manager;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

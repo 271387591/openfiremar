@@ -52,7 +52,7 @@ Ext.define('Oz.LoginWindow', {
         items: [{
             xtype:'hidden',
             name:'platform',
-            value:'PCddd'
+            value:'PC'
             
         },{
           fieldLabel: loginRes.username,

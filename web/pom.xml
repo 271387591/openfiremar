@@ -223,7 +223,6 @@
                                     
                                     <include>scripts/ozstrategy/global.js</include>
                                     
-                                    <include>scripts/ozstrategy/Constants.js</include>
 
                                     <include>scripts/ozstrategy/model/LabelValue.js</include>
                                     <include>scripts/ozstrategy/model/WallpaperModel.js</include>
@@ -279,8 +278,6 @@
                                     <include>scripts/ozstrategy/SystemBaseDataView.js</include>
                                     <include>scripts/ozstrategy/App.js</include>
                                     
-                                    <include>scripts/ozstrategy/Constants.js</include>
-                                    <include>scripts/ozstrategy/global.js</include>
                                 </includes>
                             </aggregation>
                         </aggregations>

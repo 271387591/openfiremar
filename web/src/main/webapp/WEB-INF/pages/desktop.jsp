@@ -41,7 +41,7 @@
 //      };
     var theme = Ext.util.Cookies.get('FlexCenter_Ext_Theme');
     if(theme){
-        Ext.util.CSS.swapStyleSheet("FlexCenter_Ext_Theme", extTheme + theme + ".css");
+        Ext.util.CSS.swapStyleSheet("FlexCenter_Ext_Theme", extTheme + ".css");
     }
     Ext.Loader.setConfig({
           enabled: true,

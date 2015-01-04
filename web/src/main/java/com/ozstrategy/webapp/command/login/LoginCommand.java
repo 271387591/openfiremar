@@ -21,10 +21,12 @@ public class LoginCommand {
     private String nickName;
     private Boolean  authentication=Boolean.FALSE;
     private String   gender;
+    private String sessionId;
     private List<LoginRoleCommand> roles=new ArrayList<LoginRoleCommand>();
     private List<LoginFeatureCommand> features=new ArrayList<LoginFeatureCommand>();
     private LoginRoleCommand defaultRole=null;
     private List<ProjectUserCommand> projects=new ArrayList<ProjectUserCommand>();
+    
 
     public LoginCommand() {
     }
@@ -147,5 +149,13 @@ public class LoginCommand {
 
     public void setProjects(List<ProjectUserCommand> projects) {
         this.projects = projects;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

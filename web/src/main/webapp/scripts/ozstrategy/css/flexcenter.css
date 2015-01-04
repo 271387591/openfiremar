@@ -557,6 +557,12 @@ html{
     width: 16px;
     height: 16px;
 }
+.project-in{
+    background-image: url(icons/project_in.png);
+    width: 32px;
+    height: 16px;
+}
+
 
 
 
