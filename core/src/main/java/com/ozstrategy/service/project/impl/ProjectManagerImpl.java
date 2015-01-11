@@ -7,7 +7,6 @@ import com.ozstrategy.dao.userrole.UserDao;
 import com.ozstrategy.model.openfire.OpenfireMucRoom;
 import com.ozstrategy.model.project.Project;
 import com.ozstrategy.model.project.ProjectUser;
-import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.project.ProjectManager;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +54,10 @@ public class ProjectManagerImpl implements ProjectManager {
         return projectDao.getProjectByName(name);
     }
 
+    public Project getProjectBySno(String serialNumber) {
+        return projectDao.getProjectBySno(serialNumber);
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void save(Project project) {
         projectDao.save(project);
@@ -63,11 +66,6 @@ public class ProjectManagerImpl implements ProjectManager {
             for(ProjectUser projectUser : projectUsers){
                 projectUser.setProject(project);
                 projectUserDao.save(projectUser);
-                User user = projectUser.getUser();
-                if(user!=null){
-                    user.setDefaultProject(project);
-                    userDao.updateUser(user);
-                }
             }
         }
         OpenfireMucRoom room=new OpenfireMucRoom().copy(project);
@@ -77,17 +75,11 @@ public class ProjectManagerImpl implements ProjectManager {
     public void update(Project project) {
         projectDao.update(project);
         projectUserDao.removeByProjectId(project.getId());
-        
         Set<ProjectUser> projectUsers=project.getUsers();
         if(projectUsers!=null && projectUsers.size()>0){
             for(ProjectUser projectUser : projectUsers){
                 projectUser.setProject(project);
                 projectUserDao.save(projectUser);
-                User user = projectUser.getUser();
-                if(user!=null){
-                    user.setDefaultProject(project);
-                    userDao.updateUser(user);
-                }
             }
         }
         openfireMucRoomDao.update(new OpenfireMucRoom().copy(project));
@@ -95,8 +87,30 @@ public class ProjectManagerImpl implements ProjectManager {
     @Transactional(rollbackFor = Throwable.class)
     public void delete(Long id) {
         projectUserDao.removeByProjectId(id);
-        userDao.updateUserByProjectId(id);
         projectDao.delete(id);
         openfireMucRoomDao.delete(id);
+    }
+    @Transactional(rollbackFor = Throwable.class)
+    public void saveProjectUser(List<ProjectUser> projectUsers) {
+        if(projectUsers!=null && projectUsers.size()>0){
+            for(ProjectUser projectUser : projectUsers){
+                projectUserDao.removeUser(projectUser.getUser().getId(),projectUser.getProject().getId());
+                projectUserDao.save(projectUser);
+            }
+        }
+        
+        
+    }
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateManager(Long userId, Long projectId,Boolean manager) {
+        projectUserDao.updateManager(userId,projectId,manager);
+    }
+    @Transactional(rollbackFor = Throwable.class)
+    public void removeUser(Set<Long> userIds, Long projectId) {
+        if(userIds!=null && userIds.size()>0){
+            for(Long userId:userIds){
+                projectUserDao.removeUser(userId,projectId);
+            }
+        }
     }
 }

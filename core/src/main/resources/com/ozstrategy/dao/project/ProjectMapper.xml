@@ -24,6 +24,10 @@
     <select id="getProjectByName" resultMap="ProjectResult" parameterType="string">
         SELECT * from ext_project u where u.name=#{name}
     </select>
+    <select id="getProjectBySno" resultMap="ProjectResult" parameterType="string">
+        SELECT * from ext_project u where u.serialNumber=#{serialNumber}
+    </select>
+    
     
     <select id="getNoCascadeProjectById" resultType="com.ozstrategy.model.project.Project" parameterType="long">
         SELECT * from ext_project where id=#{id}

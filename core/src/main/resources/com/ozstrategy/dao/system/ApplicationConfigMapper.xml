@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ozstrategy.dao.system.ApplicationConfigDao">
+    <select id="get" resultType="java.lang.String" parameterType="Map">
+        SELECT value from ext_applicationConfig a WHERE a.key=#{key}
+    </select>
+    <update id="put" parameterType="Map" flushCache="true">
+        update ext_applicationConfig f set 
+        f.value=#{value}  
+        where f.key=#{key}
+    </update>
+    <insert id="insertJobLog" parameterType="com.ozstrategy.model.system.JobLog" flushCache="true">
+        insert ext_jobLog(id,job,success,exception,createDate,lastUpdateDate) values(#{id},#{job},#{success},#{exception},#{createDate},#{lastUpdateDate})
+    </insert>
+    
+</mapper>

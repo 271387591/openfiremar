@@ -1,10 +1,12 @@
 package com.ozstrategy.service;
 
+import com.ozstrategy.dao.userrole.UserDao;
 import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.userrole.UserManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.quartz.CronScheduleBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
@@ -16,10 +18,20 @@ public class UserManagerTest extends BaseManagerTestCase {
     @Autowired
     private UserManager userManager;
     @Autowired
+    private UserDao userDao;
+    
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     
     
+    @Test
+    public void testQuartz(){
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("0 10 3 ? * *");
+        while (true){
+            
+        }
+    }
     
     @Test
     @Rollback(value = false)
@@ -36,8 +48,12 @@ public class UserManagerTest extends BaseManagerTestCase {
 
     @Test
     public void testGetUser() throws Exception {
-        User user=userManager.getUserByUsername("admin");
-        System.out.println("sd");
+        User user=userDao.getUserById(1L);
+        System.out.println(user.getId());
+        System.out.println("sdfdsf");
+//        System.out.println(user.getDefaultRole().getDisplayName());
+//        System.out.println(user.getRoles().size());
+//        System.out.println("sd");
         
 //        Map<String,Object> map=new HashMap<String, Object>();
 //        map.put("username","admin");

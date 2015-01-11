@@ -56,9 +56,6 @@
 </style>
 <script type="text/javascript">
     var apps = {};
-    
-
-
     var flexCenterApp;
   var treeRegister;
   var surveyRegister;

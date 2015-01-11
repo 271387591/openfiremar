@@ -15,6 +15,7 @@ public interface ProjectDao {
     Project getProjectById(Long id);
     Project getNoCascadeProjectById(Long id);
     Project getProjectByName(String name);
+    Project getProjectBySno(String serialNumber);
     void save(Project project);
     void update(Project project);
     void delete(Long id);

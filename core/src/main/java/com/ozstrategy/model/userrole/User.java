@@ -2,7 +2,6 @@ package com.ozstrategy.model.userrole;
 
 import com.ozstrategy.Constants;
 import com.ozstrategy.model.BaseObject;
-import com.ozstrategy.model.project.Project;
 import com.ozstrategy.model.project.ProjectUser;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -30,7 +29,7 @@ public class User extends BaseObject implements UserDetails {
     private Integer version;
     private String nickName;
     private String userNo;
-    private Boolean authentication = Boolean.FALSE;
+    private Boolean authentication = Boolean.TRUE;
     private String website;
     private String gender;
     private String mobile;
@@ -38,7 +37,6 @@ public class User extends BaseObject implements UserDetails {
     private Role defaultRole;
     private Set<ProjectUser> projectUsers = new HashSet<ProjectUser>();
     private String fullName;
-    private Project defaultProject;
 
     public User() {
     }
@@ -267,14 +265,6 @@ public class User extends BaseObject implements UserDetails {
 
     public void setUserNo(String userNo) {
         this.userNo = userNo;
-    }
-
-    public Project getDefaultProject() {
-        return defaultProject;
-    }
-
-    public void setDefaultProject(Project defaultProject) {
-        this.defaultProject = defaultProject;
     }
 
     @Override

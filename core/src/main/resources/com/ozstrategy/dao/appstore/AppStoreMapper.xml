@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ozstrategy.dao.appstore.AppStoreDao">
+    <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>-->
+    <resultMap id="AppStoreResult" type="com.ozstrategy.model.appstore.AppStore" autoMapping="true">
+        <id column="id" property="id" javaType="long"/>
+    </resultMap>
+    
+    <select id="listAppStores" resultMap="AppStoreResult" parameterType="Map">
+        select f.* from ext_appstore f where 1=1 order by f.createDate desc
+    </select>
+    <select id="listAppStoresCount" resultType="java.lang.Integer" parameterType="Map">
+        select count(id) from ext_appstore f where 1=1
+    </select>
+    <select id="getAppStoreById" resultMap="AppStoreResult" parameterType="long">
+        SELECT * from ext_appstore where id=#{id}
+    </select>
+    <insert id="save" parameterType="com.ozstrategy.model.appstore.AppStore" flushCache="true">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into ext_appstore(id,url,filePath,description,version,platform,createDate,lastUpdateDate) values(
+        #{id},
+        #{url},
+        #{filePath},
+        #{description},
+        #{version},
+        #{platform,typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{createDate},
+        #{lastUpdateDate}
+        )
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.appstore.AppStore" flushCache="true">
+        UPDATE ext_appstore u set 
+        u.url=#{url},
+        u.filePath=#{filePath},
+        u.description=#{description},
+        u.version=#{version},
+        u.platform=#{platform,typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        u.lastUpdateDate=#{lastUpdateDate} WHERE u.id=#{id}
+    </update>
+    <delete id="delete" flushCache="true" parameterType="long">
+        DELETE from ext_appstore where id=#{id}
+    </delete>
+    
+    
+    
+</mapper>

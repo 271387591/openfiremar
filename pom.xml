@@ -15,20 +15,8 @@
     <repositories>
         <repository>
             <id>appfuse-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/appfuse-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <url>http://oss.sonatype.org/content/repositories</url>
         </repository>
-        
-        <repository>
-            <id>springsource-milestone</id>
-            <url>http://maven.springframework.org/milestone</url>
-        </repository>
-        
         <repository>
             <id>atlassian-m2-repository</id>
             <url>https://m2proxy.atlassian.com/repository/public</url>
@@ -502,6 +490,17 @@
             <artifactId>ehcache-web</artifactId>
             <version>${ehcache-web.version}</version>
         </dependency>
+    <!--quartz-->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.quartz-scheduler</groupId>-->
+            <!--<artifactId>quartz-jobs</artifactId>-->
+            <!--<version>2.2.0</version>-->
+        <!--</dependency>-->
 
     </dependencies>
 
@@ -777,6 +776,8 @@
         <icu4j.version>3.8</icu4j.version>
         <jaxen.version>1.1-beta-11</jaxen.version>
         <xmlParserAPIs.version>2.6.2</xmlParserAPIs.version>
+        <lucene.version>4.4.0</lucene.version>
+        <jakarta-regexp.version>1.4</jakarta-regexp.version>
 
         <!--<javassist.version>3.4.GA</javassist.version>-->
     </properties>

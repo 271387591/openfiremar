@@ -1,0 +1,210 @@
+<Transplants>
+  <portfolioElements>
+    <PortfolioElement>
+      <portfolioParams>
+        <accountExportLayouts/>
+        <columnDataTypeViews/>
+        <contactResults/>
+        <coreAgentDispositionChannelCodes>
+          <CoreAgentDispositionChannelCode>
+            <shortCode>I</shortCode>
+            <coreAgentDispositionChannel>Inbound Call</coreAgentDispositionChannel>
+            <portfolioAgentDispositionCode>NOA</portfolioAgentDispositionCode>
+          </CoreAgentDispositionChannelCode>
+        </coreAgentDispositionChannelCodes>
+        <coreAgentDispositionChannels/>
+        <disclosureEvents/>
+        <etlFileLayouts/>
+        <exportConfigurationViews/>
+        <flexSelectConfigs/>
+        <hotSpots/>
+        <portfolioAccountOverallStatusDetails/>
+        <portfolioAccountStatusDetails/>
+        <portfolioAddressTypes/>
+        <portfolioAgentDispositionCodes/>
+        <portfolioAgentDispositionConfigurations>
+          <PortfolioAgentDispositionConfiguration>
+            <actionCode>OT</actionCode>
+            <addAccountStatus/>
+            <channelCID>false</channelCID>
+            <defaultNextWorkDate>1</defaultNextWorkDate>
+            <guiWindowCode></guiWindowCode>
+            <maxNextWorkDate>61</maxNextWorkDate>
+            <minNextWorkDate>1</minNextWorkDate>
+            <portfolioAgentDispositionCode>BKR</portfolioAgentDispositionCode>
+            <removeAccountStatus/>
+            <resultCode>BA</resultCode>
+            <coreAgentDispositionDestinationView>
+              <destination>Work</destination>
+              <phoneTypeName>WorkPhone</phoneTypeName>
+              <shortCode>W1</shortCode>
+              <phoneTypeView>
+                <name>WorkPhone</name>
+                <clientPhoneTypeAlias>21</clientPhoneTypeAlias>
+                <priority>2</priority>
+              </phoneTypeView>
+            </coreAgentDispositionDestinationView>
+            <destination>Work</destination>
+            <coreAgentDispositionSpokeToView>
+              <shortCode>PM</shortCode>
+              <spokeTo>Primary</spokeTo>
+            </coreAgentDispositionSpokeToView>
+            <spokeTo>Primary</spokeTo>
+            <portfolioAgentDispositionCodeView>
+              <portfolioName>Credit Card Portfolio</portfolioName>
+              <contactResults/>
+              <coreAgentDispositionCategory>
+                <defaultNextWorkDate>1</defaultNextWorkDate>
+                <description>Bankrupt</description>
+                <dispositionActionCode>
+                  <actionName>NORMAL</actionName>
+                </dispositionActionCode>
+                <dispositionCategory>X16</dispositionCategory>
+                <dispositionType>COLLECTIONS</dispositionType>
+                <maxNextWorkDate>1</maxNextWorkDate>
+                <minNextWorkDate>1</minNextWorkDate>
+              </coreAgentDispositionCategory>
+              <creatorName></creatorName>
+              <description>Bankrupt</description>
+              <dispositionCode>BKR</dispositionCode>
+              <lastUpdaterName></lastUpdaterName>
+              <status>ENABLE</status>
+              <portfolio>
+                <acceptedProgramShortTerm>false</acceptedProgramShortTerm>
+                <acceptProgramWithOutstandingPromise>false</acceptProgramWithOutstandingPromise>
+                <agentTimeZoneId>US/Eastern</agentTimeZoneId>
+                <allowCallOnSaturday>true</allowCallOnSaturday>
+                <allowCallOnSunday>true</allowCallOnSunday>
+                <allowDynamicProgram>false</allowDynamicProgram>
+                <allowMultiplePromises>false</allowMultiplePromises>
+                <allowSplitPayment>false</allowSplitPayment>
+                <allowSurvey>false</allowSurvey>
+                <awAllowReacceptOffer>false</awAllowReacceptOffer>
+                <awCancelOfferDeletePayment>false</awCancelOfferDeletePayment>
+                <awDateFormat>m/d/Y</awDateFormat>
+                <awDisplayAddressLine3>false</awDisplayAddressLine3>
+                <awDisplayOffersDocuments>false</awDisplayOffersDocuments>
+                <awDisplayOffersScore>false</awDisplayOffersScore>
+                <awDisplayProvince>true</awDisplayProvince>
+                <awInactiveAccountReadOnly>true</awInactiveAccountReadOnly>
+                <awMessageCount>5</awMessageCount>
+                <awReadOnly>false</awReadOnly>
+                <awTimeFormat>H:i</awTimeFormat>
+                <cancelProgram>true</cancelProgram>
+                <chargeOffDays>210</chargeOffDays>
+                <doNotContactApptDays>1</doNotContactApptDays>
+                <doNotContactDefaultDays>3</doNotContactDefaultDays>
+                <doNotContactPaymentDays>1</doNotContactPaymentDays>
+                <doNotContactPTPDays>5</doNotContactPTPDays>
+                <doNotContactRpcDays>5</doNotContactRpcDays>
+                <doNotContactWUPTPDays>2</doNotContactWUPTPDays>
+                <enablePaymentReminder>false</enablePaymentReminder>
+                <enableProgramTrackingConfig>false</enableProgramTrackingConfig>
+                <expressConsent>false</expressConsent>
+                <flexSiteAutoLoadPrioritySurvey>true</flexSiteAutoLoadPrioritySurvey>
+                <flexSiteSurveyAsPaymentConfirmation>false</flexSiteSurveyAsPaymentConfirmation>
+                <flexSiteSurveyAsProgramConfirmation>false</flexSiteSurveyAsProgramConfirmation>
+                <forcePromiseWithAcceptProgram>false</forcePromiseWithAcceptProgram>
+                <helpEmail>help@cmcassist.com</helpEmail>
+                <mraIndicator>true</mraIndicator>
+                <offerRestrictionDays>0</offerRestrictionDays>
+                <postChargeOffPayByDateValidate>false</postChargeOffPayByDateValidate>
+                <postChargeOffPayByDateValidateType>Warning</postChargeOffPayByDateValidateType>
+                <preChargeOffPayByDateValidate>false</preChargeOffPayByDateValidate>
+                <preChargeOffPayByDateValidateType>Warning</preChargeOffPayByDateValidateType>
+                <recentActivitiesNumber>20</recentActivitiesNumber>
+                <saveReminderEmail>false</saveReminderEmail>
+                <sendMQRequest>false</sendMQRequest>
+                <showApptComment>true</showApptComment>
+                <speedBump>false</speedBump>
+                <surveyDefaultLocale>English</surveyDefaultLocale>
+                <updateMraContactInformation>false</updateMraContactInformation>
+                <allowCredit>true</allowCredit>
+                <allowDebit>true</allowDebit>
+                <allowHotSpot>false</allowHotSpot>
+                <allowSPOC>true</allowSPOC>
+                <apptEndDaysFromNow>30</apptEndDaysFromNow>
+                <apptEndHoursFromNow>0</apptEndHoursFromNow>
+                <apptEndTime>20:00</apptEndTime>
+                <apptLanguages>English, Spanish</apptLanguages>
+                <apptStartDaysFromNow>0</apptStartDaysFromNow>
+                <apptStartHoursFromNow>6</apptStartHoursFromNow>
+                <apptStartTime>08:00</apptStartTime>
+                <client>
+                  <comments></comments>
+                  <createDate class="sql-timestamp">2007-05-16 00:00:00.0</createDate>
+                  <lastUpdateDate class="sql-timestamp">2007-05-16 00:00:00.0</lastUpdateDate>
+                  <name>Bank A</name>
+                </client>
+                <defaultCountry>US</defaultCountry>
+                <defaultPaymentReminderDays>10</defaultPaymentReminderDays>
+                <description>Bank A Credit Card</description>
+                <duration>30</duration>
+                <hours>Monday - Thursday 9am-9pm EST, Friday 9am-6pm and Saturday 8am-Noon</hours>
+                <industry>
+                  <comments></comments>
+                  <createDate class="sql-timestamp">2007-05-16 00:00:00.0</createDate>
+                  <industryName>Credit Card</industryName>
+                  <lastUpdateDate class="sql-timestamp">2007-05-16 00:00:00.0</lastUpdateDate>
+                </industry>
+                <ivrAgentPhoneNum>8008915564</ivrAgentPhoneNum>
+                <ivrPhoneNum>8007595321</ivrPhoneNum>
+                <letterSignerName>Vytas Kisielius</letterSignerName>
+                <logoName>CMC</logoName>
+                <minPayment>25.00</minPayment>
+                <name>Credit Card Portfolio</name>
+                <originalCreditor>Bank A</originalCreditor>
+                <payableName>Collections Marketing Center, LLC</payableName>
+                <paymentAddress1>PO Box 4610</paymentAddress1>
+                <paymentAdvanceDays>90</paymentAdvanceDays>
+                <paymentCity>Newark</paymentCity>
+                <paymentCountry>US</paymentCountry>
+                <paymentPostalCode>19715</paymentPostalCode>
+                <paymentProvince>DE</paymentProvince>
+                <paymentServiceProvider>
+                  <createDate class="sql-timestamp">2007-05-16 00:00:00.0</createDate>
+                  <lastUpdateDate class="sql-timestamp">2007-05-16 00:00:00.0</lastUpdateDate>
+                  <name>Dummy</name>
+                  <password>password</password>
+                  <processingFee>0.00</processingFee>
+                  <processorTimeOutMinutes>4</processorTimeOutMinutes>
+                  <retryConfirmDays>3</retryConfirmDays>
+                  <serviceUrl>No Need</serviceUrl>
+                  <userId>cmc</userId>
+                  <vendorId>1</vendorId>
+                </paymentServiceProvider>
+                <portfolioId>1</portfolioId>
+                <processingFee>20.00</processingFee>
+                <programFirstDueDate>5</programFirstDueDate>
+                <returnAddress1>PO Box 4610</returnAddress1>
+                <returnCity>Newark</returnCity>
+                <returnCountry>US</returnCountry>
+                <returnPostalCode>19715</returnPostalCode>
+                <returnProvince>DE</returnProvince>
+                <theme>bankacard</theme>
+                <timeZones>US/Eastern,US/Central,US/Mountain,US/Pacific</timeZones>
+                <totalProgramShown>3</totalProgramShown>
+                <webSiteUrl>www.cmcassist.com</webSiteUrl>
+              </portfolio>
+            </portfolioAgentDispositionCodeView>
+          </PortfolioAgentDispositionConfiguration>
+        </portfolioAgentDispositionConfigurations>
+        <portfolioCallTypes/>
+        <portfolioContactResultAccountLevelLimits/>
+        <portfolioContactResultPhoneTypeLevelDelays/>
+        <portfolioContactResultPhoneTypeLevelLimits/>
+        <portfolioEmailTypes/>
+        <portfolioFilterSorterVariables/>
+        <portfolioPhoneTypes/>
+        <portfolioProgramTypes/>
+        <portfolioVariables/>
+        <surveyFlowVariables/>
+        <workflowVariables/>
+        <ptpPaymentMethodConfigurations/>
+        <staticPages/>
+        <workflowUpdateVariables/>
+      </portfolioParams>
+    </PortfolioElement>
+  </portfolioElements>
+  <portfolios/>
+</Transplants>

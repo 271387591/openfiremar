@@ -25,6 +25,15 @@
         <from>/app/getProjects</from>
         <to>/service/projectController.do?method=listAllProjects</to>
     </rule>
+    <rule>
+        <from>/app/upload</from>
+        <to>/service/openfireController.do?method=upload</to>
+    </rule>
+    <rule>
+        <from>/app/download/*</from>
+        <to>/service/appStoreController.do?method=download&amp;id=$1</to>
+    </rule>
+    
     
     <rule>
         <from>/login*</from>

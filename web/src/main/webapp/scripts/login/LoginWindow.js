@@ -56,13 +56,13 @@ Ext.define('Oz.LoginWindow', {
             
         },{
           fieldLabel: loginRes.username,
-          name: 'j_username',
+          name: 'username',
           tabIndex : 1,
           id: 'username',
           allowBlank: false
         }, {
           fieldLabel: loginRes.password,
-          name: 'j_password',
+          name: 'password',
           tabIndex : 2,
           inputType: 'password',
           allowBlank: false,

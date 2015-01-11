@@ -65,7 +65,6 @@
     Ext.require([
       'FlexCenter.App',
       'Ext.ux.utils.Utils',
-      'FlexCenter.Constants',
       'Ext.data.ArrayStore',
       'Ext.util.CSS'
     ]);

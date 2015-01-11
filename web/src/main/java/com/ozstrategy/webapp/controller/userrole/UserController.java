@@ -431,7 +431,6 @@ public class UserController extends BaseController {
             user.setEnabled(Boolean.TRUE);
             user.setMobile(mobile);
             user.setEmail(email);
-            user.setDefaultProject(project);
             user.setNickName(nickName);
             user.setUserNo(userNo);
             if(!checkIsNotNumber(defaultRoleId)){

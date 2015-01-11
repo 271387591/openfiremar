@@ -1,0 +1,37 @@
+{
+  "data": {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@ozstrategy.com",
+    "mobile": "18583910581",
+    "nickName": null,
+    "authentication": true,
+    "gender": "M",
+    "sessionId": "5d554b0d-1555-4bec-a6bd-6496c79183a3",
+    "roles": [
+      {
+        "id": -1,
+        "name": "ROLE_ADMIN",
+        "displayName": "超级管理员",
+        "description": "超级管理员，具有管理的全部权限"
+      }
+    ],
+    "features": [],
+    "defaultRole": {
+      "id": -1,
+      "name": "ROLE_ADMIN",
+      "displayName": "超级管理员",
+      "description": "超级管理员，具有管理的全部权限"
+    },
+    "projects": []
+  },
+  "message": null,
+  "success": true
+}
+
+{"data":null,"extraResData":null,"message":"用户已存在","success":false}
+{success:true,msg:'上传成功!',path:http://27.9.202.205/im//root/apache-tomcat-7.0.57/webapps/im/pictures/56b68515-3549-4055-b9d3-7c4a0d066d96.xml}
+
+        
+        
+        

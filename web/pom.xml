@@ -202,6 +202,7 @@
                                     <include>scripts/ux/Ext/ux/form/ItemSelector.js</include>
                                     <include>scripts/ux/Ext/ux/form/TagInput.js</include>
                                     <include>scripts/ux/Ext/ux/window/Notification.js</include>
+                                    <include>scripts/ux/Ext/ux/TabCloseMenu.js</include>
                                     
                                     <include>scripts/ux/Ext/ux/grid/feature/Detail.js</include>
                                     <include>scripts/ux/Ext/ux/grid/feature/Search.js</include>
@@ -221,7 +222,9 @@
                                     <include>scripts/ux/Oz/desktop/Module.js</include>
                                     
                                     
+                                    
                                     <include>scripts/ozstrategy/global.js</include>
+                                    <include>scripts/ozstrategy/Constants.js</include>
                                     
 
                                     <include>scripts/ozstrategy/model/LabelValue.js</include>
@@ -238,7 +241,15 @@
                                     
                                     <!--system-->
                                     <include>scripts/ozstrategy/system/model/GlobalType.js</include>
-                                    <include>scripts/ozstrategy/system/model/SystemMessage.js</include>
+                                    <!--project-->
+                                    <include>scripts/ozstrategy/project/model/Project.js</include>
+                                    <include>scripts/ozstrategy/project/model/ProjectUser.js</include>
+                                    <!--app store-->
+                                    <include>scripts/ozstrategy/appstore/model/AppStore.js</include>
+                                    <!--history-->
+                                    <include>scripts/ozstrategy/history/model/HistoryMessage.js</include>
+                                    
+                                    
                                     
 
                                     <!--user store-->
@@ -252,7 +263,14 @@
                                     <!--system store-->
                                     <include>scripts/ozstrategy/system/store/GlobalTypes.js</include>
                                     <include>scripts/ozstrategy/system/store/GlobalTypeTree.js</include>
-                                    <include>scripts/ozstrategy/system/store/SystemMessage.js</include>
+                                    <!--project-->
+                                    <include>scripts/ozstrategy/project/store/Project.js</include>
+                                    <!--app store-->
+                                    <include>scripts/ozstrategy/appstore/store/AppStore.js</include>
+                                    <!--history-->
+                                    <include>scripts/ozstrategy/history/store/HistoryMessage.js</include>
+                                    
+
 
                                     <!--user view-->
                                     <include>scripts/ozstrategy/user/view/UserForm.js</include>
@@ -269,13 +287,25 @@
                                     <include>scripts/ozstrategy/system/view/GlobalTypeLeftTree.js</include>
                                     <include>scripts/ozstrategy/system/view/GlobalTypeTree.js</include>
                                     <include>scripts/ozstrategy/system/view/GlobalTypeView.js</include>
-                                    <include>scripts/ozstrategy/system/view/SystemMessageView.js</include>
+                                    <!--project-->
+                                    <include>scripts/ozstrategy/project/view/ProjectForm.js</include>
+                                    <include>scripts/ozstrategy/project/view/ProjectUserView.js</include>
+                                    <include>scripts/ozstrategy/project/view/ProjectView.js</include>
+                                    <!--appstore-->
+                                    <include>scripts/ozstrategy/appstore/view/AppStoreForm.js</include>
+                                    <include>scripts/ozstrategy/appstore/view/AppStoreView.js</include>
+                                    <!--history-->
+                                    <include>scripts/ozstrategy/history/view/HistoryMessageView.js</include>
+                                    
 
                                     
                                     <include>scripts/ozstrategy/Settings.js</include>
                                     <include>scripts/ozstrategy/ChangePassword.js</include>
                                     <include>scripts/ozstrategy/UnitUserView.js</include>
                                     <include>scripts/ozstrategy/SystemBaseDataView.js</include>
+                                    <include>scripts/ozstrategy/ProjectManager.js</include>
+                                    <include>scripts/ozstrategy/AppStoreManager.js</include>
+                                    <include>scripts/ozstrategy/HistoryMessageManager.js</include>
                                     <include>scripts/ozstrategy/App.js</include>
                                     
                                 </includes>
@@ -374,6 +404,7 @@
           <artifactId>xml-apis</artifactId>
           <version>1.4.01</version>
       </dependency>
+      
       
   </dependencies>
 </project>

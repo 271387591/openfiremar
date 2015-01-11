@@ -294,72 +294,27 @@ html{
     background-image: url(icons/type-48.png);
     /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
-.zoom {
-    background-image: url(../../../mxgraph/images/zoom.gif) !important;
-    width: 16px;
-    height: 16px;
+.appStore-shortcut img {
+    width: 48px;
+    height: 48px;
+    background-image: url(icons/app_store.png);
+    /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
-
-.zoomIn {
-    background-image: url(../../../mxgraph/images/zoomin.gif) !important;
-    width: 16px;
-    height: 16px;
+.project-shortcut img {
+    width: 48px;
+    height: 48px;
+    background-image: url(icons/project.png);
+    /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
-
-.zoomOut {
-    background-image: url(../../../mxgraph/images/zoomout.gif) !important;
-    width: 16px;
-    height: 16px;
-}
-
-.zoomActual {
-    background-image: url(../../../mxgraph/images/zoomactual.gif) !important;
-    width: 16px;
-    height: 16px;
-}
-
-.fit {
-    background-image: url(../../../mxgraph/images/fit.gif) !important;
-    width: 16px;
-    height: 16px;
+.search-shortcut img {
+    width: 48px;
+    height: 48px;
+    background-image: url(icons/search_manager.png);
+    /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
 
 
-.export {
-    background-image: url(../../../mxgraph/images/export.png) !important;
-    width: 16px;
-    height: 16px;
-}
 
-.import {
-    background-image: url(../../../mxgraph/images/import.png) !important;
-    width: 16px;
-    height: 16px;
-}
-
-.mxGraphRemove {
-    background-image: url(../../../mxgraph/images/delete2.png) !important;
-    width: 16px;
-    height: 16px;
-}
-
-.undo {
-    background-image: url(../../../mxgraph/images/undo.gif) !important;
-    width: 16px;
-    height: 16px;
-}
-
-.redo {
-    background-image: url(../../../mxgraph/images/redo.gif) !important;
-    width: 16px;
-    height: 16px;
-}
-
-.mxGraphRefresh {
-    background-image: url(../../../mxgraph/images/refresh.gif) !important;
-    width: 16px;
-    height: 16px;
-}
 .btn-flow-design {
     background-image: url(icons/flow_design.png) !important;
     width: 16px;
@@ -559,9 +514,10 @@ html{
 }
 .project-in{
     background-image: url(icons/project_in.png);
-    width: 32px;
+    width: 16px;
     height: 16px;
 }
+
 
 
 

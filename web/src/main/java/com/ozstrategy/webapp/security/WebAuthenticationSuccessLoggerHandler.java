@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,9 +44,11 @@ public class WebAuthenticationSuccessLoggerHandler extends WebAuthenticationLogg
       if (user == null) {
         return;
       }
-      AppSessionManager.put(user.getUsername(),request.getRequestedSessionId());
+      String sessionId= UUID.randomUUID().toString();
+      AppSessionManager.put(user.getUsername(),sessionId);
+      
       LoginCommand command = new LoginCommand(user);
-      command.setSessionId(request.getRequestedSessionId());
+      command.setSessionId(sessionId);
       List<Feature> roleFeatures = featureManager.getUserFeaturesByUsername(request.getRemoteUser());
       command = command.populateFeatures(roleFeatures);
       JsonReaderSingleResponse<LoginCommand> jsonReaderSingleResponse=new JsonReaderSingleResponse<LoginCommand>(command);

@@ -43,10 +43,6 @@ public class UserCommand {
     private String userNo;
     private Boolean authentication;
     private List<ProjectUserCommand> projects=new ArrayList<ProjectUserCommand>();
-    private Long projectId;
-    private String projectName;
-    private String activationCode;
-
 
     public UserCommand() {
     }
@@ -67,12 +63,6 @@ public class UserCommand {
         this.email = user.getEmail();
         this.mobile = user.getMobile();
         this.gender = user.getGender();
-        Project project=user.getDefaultProject();
-        if(project!=null){
-            this.projectId=project.getId();
-            this.projectName=project.getName();
-            this.activationCode=project.getActivationCode();
-        }
         
         Role defaultRole = user.getDefaultRole();
         if (defaultRole != null) {
@@ -332,27 +322,5 @@ public class UserCommand {
         this.projects = projects;
     }
 
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getActivationCode() {
-        return activationCode;
-    }
-
-    public void setActivationCode(String activationCode) {
-        this.activationCode = activationCode;
-    }
+    
 } 

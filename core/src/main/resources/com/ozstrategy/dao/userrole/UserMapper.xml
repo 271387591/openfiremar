@@ -7,7 +7,6 @@
         <result column="defaultRoleId" javaType="java.lang.Long"/>
         <association property="address" resultMap="addressResult" javaType="com.ozstrategy.model.userrole.Address"/>
         <association property="defaultRole" select="com.ozstrategy.dao.userrole.RoleDao.getRoleById" column="defaultRoleId" javaType="com.ozstrategy.model.userrole.Role"/>
-        <association property="defaultProject" select="com.ozstrategy.dao.project.ProjectDao.getNoCascadeProjectById" column="projectId" javaType="com.ozstrategy.model.project.Project"/>
         <collection property="roles" column="id" select="com.ozstrategy.dao.userrole.RoleDao.getRoleByUserId" fetchType="lazy"/>
         <collection property="projectUsers" column="id" select="com.ozstrategy.dao.project.ProjectUserDao.listProjectUserByUserId" fetchType="lazy"/>
     </resultMap>
@@ -96,7 +95,6 @@
         u.createDate=#{createDate} ,  
         u.lastUpdateDate=#{lastUpdateDate} ,  
         u.defaultRoleId=#{defaultRole.id},  
-        u.projectId=#{defaultProject.id},  
         u.userNo=#{userNo},  
         u.nickName=#{nickName}  
         where u.id=#{id}
@@ -134,7 +132,6 @@
         #{createDate},
         #{lastUpdateDate},
         #{defaultRole.id},
-        #{defaultProject.id},
         #{userNo},
         #{nickName}
         )
@@ -167,7 +164,6 @@
              createDate,
              lastUpdateDate,
              defaultRoleId,
-             projectId,
              userNo,
              nickName
     </sql>

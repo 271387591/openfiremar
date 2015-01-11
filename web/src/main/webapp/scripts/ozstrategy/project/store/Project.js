@@ -21,15 +21,5 @@ Ext.define('FlexCenter.project.store.Project', {
             writeAllFields: false,
             root: 'data'
         }
-    },
-    sorters: [
-        {
-            property: 'id',
-            direction: 'DESC'
-        }
-    ],
-    baseParams: {
-        roleName: ''
     }
-
 });

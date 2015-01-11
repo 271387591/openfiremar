@@ -13,9 +13,8 @@ Ext.define('FlexCenter.project.model.Project', {
         'users',
         {
             name: 'createDate', convert: function (v) {
-            return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
-        }
+                return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
+            }
         }
     ]
-    //hasMany: {model: 'FlexCenter.project.model.ProjectUser', name: 'users'}
 });

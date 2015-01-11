@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,18 +36,22 @@ public class PattonTest {
         Pattern pattern=Pattern.compile("^[a-zA-Z0-9_]{3,16}$");
         Matcher matcher = pattern.matcher("2233");
         System.out.println(matcher.matches());
+        String uid = UUID.randomUUID().toString();
+        System.out.println(uid);
+        
     }
     @Test
     public void testRegister() throws Exception{
-        String url="http://localhost:9095/openfiremar/app/register";
+//        String url="http://localhost:9095/openfiremar/app/register";
+        String url="http://120.24.234.71/im/app/register";
         HttpPost httpost = new HttpPost(url);
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
-        nvps.add(new BasicNameValuePair("username", "admins"));
+        nvps.add(new BasicNameValuePair("username", "admin"));
         nvps.add(new BasicNameValuePair("password", "tomcat"));
         nvps.add(new BasicNameValuePair("nickName", "李浩"));
         nvps.add(new BasicNameValuePair("projectId", "1"));
-        nvps.add(new BasicNameValuePair("activationCode", "111111"));
+        nvps.add(new BasicNameValuePair("activationCode", "111"));
 
         try {
             httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
@@ -79,21 +84,64 @@ public class PattonTest {
         httpclient.getConnectionManager().shutdown();
     }
     @Test
+    public void testLogin() throws Exception{
+        String url="http://120.24.234.71/im/app/login";
+//        String url="http://localhost:9095/openfiremar/app/login";
+        HttpPost httpost = new HttpPost(url);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+        nvps.add(new BasicNameValuePair("username", "admin"));
+        nvps.add(new BasicNameValuePair("password", "tomcat"));
+        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httpost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+        
+    }
+    @Test
+    public void testGetProjects() throws Exception{
+        String url="http://120.24.234.71/im/app/getProjects";
+//        String url="http://localhost:9095/openfiremar/app/login";
+        HttpPost httpost = new HttpPost(url);
+//        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+//        nvps.add(new BasicNameValuePair("username", "admin"));
+//        nvps.add(new BasicNameValuePair("password", "tomcat"));
+//        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httpost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+        
+    }
+    
+    
+    @Test
     public void testUpload() throws Exception{
-        String url="http://localhost:9095/openfiremar/app/upload";
+        String url="http://120.24.234.71/im/app/upload";
+//        String url="http://localhost:9095/openfiremar/app/upload";
         HttpPost httppost = new HttpPost(url);
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
-        nvps.add(new BasicNameValuePair("username", "admin1"));
-        nvps.add(new BasicNameValuePair("password", ""));
-        nvps.add(new BasicNameValuePair("nickName", "2222"));
-        nvps.add(new BasicNameValuePair("projectId", "1"));
-        nvps.add(new BasicNameValuePair("activationCode", "111111"));
         File file=new File("/Users/lihao/Downloads/codes.xml");
         FileBody bin = new FileBody(file);
         StringBody username = new StringBody("admin");
-        StringBody password = new StringBody("13696900475");
-        StringBody sessionId = new StringBody("5ia7zimnhl36");
+        StringBody sessionId = new StringBody("72c37e99-06fd-4f8a-91fd-c41c93ca1fde\"");
         MultipartEntity reqEntity = new MultipartEntity();
         reqEntity.addPart("username", username);
         reqEntity.addPart("sessionId", sessionId);

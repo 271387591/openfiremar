@@ -15,12 +15,16 @@
         select * from ext_project_user u where u.projectId=#{projectId} 
     </select>
     
-    <select id="listUsersByProjectId" parameterType="long" resultType="com.ozstrategy.model.userrole.User">
+    <select id="listUsersByProjectId" parameterType="long" resultMap="com.ozstrategy.dao.userrole.UserDao.userResult">
         select u.* from ext_user u join ext_project_user pu on u.id=pu.userId where pu.projectId=#{projectId}
     </select>
     <select id="listUsersByProjectIdCount" parameterType="long" resultType="int">
         select count(*) from ext_user u join ext_project_user pu on u.id=pu.userId where pu.projectId=#{projectId}
     </select>
+    
+    <update id="updateManager" parameterType="Map">
+        update ext_project_user set manager=#{manager} where userId=#{userId} and projectId=#{projectId}
+    </update>
     
     
     
@@ -41,6 +45,9 @@
     </delete>
     <delete id="removeByProjectId" parameterType="long" flushCache="true">
         delete from ext_project_user where projectId=#{projectId} 
+    </delete>
+    <delete id="removeUser" parameterType="Map" flushCache="true">
+        delete from ext_project_user where projectId=#{projectId} and userId=#{userId}
     </delete>
     
 </mapper>

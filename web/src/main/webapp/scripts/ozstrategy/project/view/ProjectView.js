@@ -12,12 +12,9 @@ Ext.define('FlexCenter.project.view.ProjectView', {
     ],
 
     getProjectStore: function () {
-        var store = Ext.StoreManager.lookup('ProjectStore');
-        if (!store) {
-            store = Ext.create('FlexCenter.project.store.Project', {
-                storeId: 'ProjectStore'
-            });
-        }
+        var store = store = Ext.create('FlexCenter.project.store.Project', {
+            storeId: 'ProjectStore'
+        });
         store.load();
         return store;
     },
@@ -68,7 +65,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
         ];
         me.features=[{
             ftype: 'search',
-            disableIndexes: ['id', 'serialNumber', 'activationCode', 'peoples', 'createDate'],
+            disableIndexes: ['id', 'serialNumber', 'activationCode', 'peoples', 'createDate','users','description'],
             paramNames: {
                 fields: 'fields',
                 query: 'keyword'
@@ -110,7 +107,6 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             },
             {
                 xtype:'actioncolumn',
-                dataIndex: 'assignee',
                 header:'进入',
                 width:40,
                 items:[
@@ -126,7 +122,6 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             },
             {
                 xtype:'actioncolumn',
-                dataIndex: 'assignee',
                 header:'编辑',
                 width:40,
                 items:[
@@ -135,14 +130,13 @@ Ext.define('FlexCenter.project.view.ProjectView', {
                         tooltip:'编辑',
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
-                            me.editClick();
+                            me.editClick(rec);
                         }
                     }
                 ]
             },
             {
                 xtype:'actioncolumn',
-                dataIndex: 'assignee',
                 header:'删除',
                 width:40,
                 items:[
@@ -151,7 +145,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
                         tooltip:'删除',
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
-                            
+                            me.onDeleteClick(rec);
                         }
                     }
                 ]
@@ -161,108 +155,75 @@ Ext.define('FlexCenter.project.view.ProjectView', {
         ];
         me.listeners={
             itemdblclick: function (view, record, item, index, e, eOpts) {
-                me.editClick();
+                me.editClick(record);
             }
         };
         me.callParent(arguments);
     },
     onAddClick:function(){
         var me=this;
-        ajaxPostRequest('userController.do?method=listAvailableUsers',{},function(result){
-            if(result.success){
-                var data=result.data;
-                var availableUserStore=Ext.create('FlexCenter.user.store.Users',{
-                    data:data,
-                    proxy: {
-                        type: 'memory',
-                        reader: {
-                            type: 'json',
-                            root: 'data',
-                            totalProperty: 'total',
-                            messageProperty: 'message'
-                        }
-                    }
-                });
-                var edit = Ext.widget('projectForm', {
-                    availableUserStore:availableUserStore,
-                    title:'添加工程'
-                });
-                edit.setActiveRecord(null);
-                edit.show();
-                me.mon(edit, 'create', function (win, data) {
-                    Ext.Ajax.request({
-                        url: 'projectController.do?method=saveProject',
-                        params: data,
-                        method: 'POST',
-                        success: function (response, options) {
-                            var result = Ext.decode(response.responseText);
-                            if (result.success) {
-                                me.getStore().load();
-                                me.editWin = win;
-                                Ext.Msg.alert(globalRes.title.prompt, globalRes.addSuccess, function () {
-                                    me.editWin.close();
-                                });
-                            } else {
-                                if (result.message) {
-                                    Ext.MessageBox.show({
-                                        title: globalRes.title.prompt,
-                                        width: 300,
-                                        msg: result.message,
-                                        buttons: Ext.MessageBox.OK,
-                                        icon: Ext.MessageBox.ERROR
-                                    });
-                                }
-                            }
-                        },
-                        failure: function (response, options) {
-                            Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout, response.status));
-                        }
-                    });
-                }, this);
-                
-            }
-            
+        var edit = Ext.widget('projectForm', {
+            title:'添加工程'
         });
-        
-        
-        
-    },
-    editClick: function () {
-        var me = this;
-        var selection = me.getView().getSelectionModel().getSelection()[0];
-        if (selection) {
-            var data=[],users=selection.get('users'),managerIds=[];
-            for(var i=0;i<users.length;i++){
-                var obj={};
-                obj.id=users[i].userId;
-                obj.username=users[i].username;
-                obj.nickName=users[i].nickName;
-                data.push(obj);
-                if(users[i].manager){
-                    managerIds.push(users[i].userId);
-                }
-            }
-            var datas={
-                data:data
-            }
-            var availableUserStore=Ext.create('FlexCenter.user.store.Users',{
-                data:datas,
-                proxy: {
-                    type: 'memory',
-                    reader: {
-                        type: 'json',
-                        root: 'data',
-                        totalProperty: 'total',
-                        messageProperty: 'message'
+        edit.setActiveRecord(null);
+        edit.show();
+        me.mon(edit, 'create', function (win, data) {
+            Ext.Ajax.request({
+                url: 'projectController.do?method=saveProject',
+                params: data,
+                method: 'POST',
+                success: function (response, options) {
+                    var result = Ext.decode(response.responseText);
+                    if (result.success) {
+                        me.getStore().load();
+                        me.editWin = win;
+                        Ext.Msg.alert(globalRes.title.prompt, globalRes.addSuccess, function () {
+                            me.editWin.close();
+                        });
+                    } else {
+                        if (result.message) {
+                            Ext.MessageBox.show({
+                                title: globalRes.title.prompt,
+                                width: 300,
+                                msg: result.message,
+                                buttons: Ext.MessageBox.OK,
+                                icon: Ext.MessageBox.ERROR
+                            });
+                        }
                     }
+                },
+                failure: function (response, options) {
+                    Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout, response.status));
                 }
             });
+        }, this);
+        
+        
+        
+        //ajaxPostRequest('userController.do?method=listAvailableUsers',{},function(result){
+        //    if(result.success){
+        //        var data=result.data;
+        //        var availableUserStore=Ext.create('FlexCenter.user.store.Users',{
+        //            data:data,
+        //            proxy: {
+        //                type: 'memory',
+        //                reader: {
+        //                    type: 'json',
+        //                    root: 'data',
+        //                    totalProperty: 'total',
+        //                    messageProperty: 'message'
+        //                }
+        //            }
+        //        });
+        //    }
+        //});
+    },
+    editClick: function (selection) {
+        var me = this;
+        if (selection) {
             var edit = Ext.widget('projectForm', {
-                availableUserStore:availableUserStore,
                 title:'编辑工程'
             });
-            selection.set('users',data);
-            selection.set('managerIds',managerIds.join(','))
             edit.setActiveRecord(selection);
             edit.show();
             me.mon(edit, 'update', function (win, data) {
@@ -306,33 +267,45 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             });
         }
     },
-    inProject:function(){
-        var me=this;
-        var selection = me.getView().getSelectionModel().getSelection()[0];
-        var projectUserView=Ext.widget('projectUserView',{
-            record:selection
-        });
-        projectUserView.setRecord(selection);
-        var win=Ext.widget('window',{
-            title:selection.get('name'),
-            width:800,
-            height:600,
-            layout:'fit',
-            modal: true,
-            items:[
-                projectUserView
-            ],
-            buttons:[
-                {
-                    xtype: 'button',
-                    text: globalRes.buttons.cancel,
-                    handler: function () {
-                        win.close();
-                    }
+    onDeleteClick: function (record) {
+        var me = this;
+        if (record) {
+            Ext.Msg.confirm('删除', Ext.String.format('确定要删除工程：{0}', record.data.name), function (txt) {
+                if (txt === 'yes') {
+                    Ext.Ajax.request({
+                        url: 'projectController.do?method=deleteProject',
+                        params: {id: record.data.id},
+                        method: 'POST',
+                        success: function (response, options) {
+                            var result = Ext.decode(response.responseText);
+                            if (result.success) {
+                                Ext.Msg.alert(globalRes.title.prompt, globalRes.removeSuccess);
+                                me.getStore().load();
+                            } else {
+                                Ext.MessageBox.show({
+                                    title: globalRes.title.prompt,
+                                    width: 300,
+                                    msg: result.message,
+                                    buttons: Ext.MessageBox.OK,
+                                    icon: Ext.MessageBox.ERROR
+                                });
+
+                            }
+                        },
+                        failure: function (response, options) {
+                            Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout, response.status));
+                        }
+                    });
                 }
-            ]
-        });
-        win.show();
+            });
+        } else {
+            Ext.MessageBox.show({
+                title: userRoleRes.removeRole,
+                width: 300,
+                msg: userRoleRes.editRole,
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.INFO
+            });
+        }
     }
-    
 });

@@ -42,6 +42,7 @@ Ext.define('FlexCenter.project.view.ProjectUserView', {
     initComponent: function () {
         var me = this;
         var userStore=me.getUserStore();
+        var sm = Ext.create('Ext.selection.CheckboxModel');
         me.items=[
             {
                 xtype:'form',
@@ -107,6 +108,7 @@ Ext.define('FlexCenter.project.view.ProjectUserView', {
                 forceFit: true,
                 autoScroll: true,
                 title:'工程人员',
+                selModel:sm,
                 dockedItems:[
                     {
                         xtype: 'pagingtoolbar',
@@ -122,20 +124,19 @@ Ext.define('FlexCenter.project.view.ProjectUserView', {
                         xtype: 'button',
                         text: '添加人员',
                         scope: this,
-                        handler: this.onAddClick
+                        handler: this.addUser
                     },
                     {
                         frame: true,
                         iconCls: 'user-edit',
                         xtype: 'button',
-                        text: '删除人员',
+                        text: '移除人员',
                         itemId: 'userEditBtn',
                         scope: this,
-                        handler: this.onEditClick
+                        handler: this.removeUser
                     }
                 ],
                 columns:[
-                    {xtype: 'rownumberer'},
                     {
                         header: '用户昵称',
                         dataIndex: 'nickName'
@@ -144,10 +145,6 @@ Ext.define('FlexCenter.project.view.ProjectUserView', {
                     {
                         header: userRoleRes.header.username,
                         dataIndex: 'username'
-                    },
-                    {
-                        header: userRoleRes.header.defaultRoleName,
-                        dataIndex: 'defaultRoleDisplayName'
                     },
                     {
                         header: userRoleRes.header.accountLocked,
@@ -164,8 +161,71 @@ Ext.define('FlexCenter.project.view.ProjectUserView', {
                         }
                     },
                     {
+                        header: '是否为管理员',
+                        dataIndex: 'projectId',
+                        renderer: function (v,m,rec) {
+                            var projectId=me.record.get('id');
+                            var projects=rec.get('projects');
+                            for(var i=0;i<projects.length;i++){
+                                if((projects[i].projectId==projectId) && (projects[i].manager==true)){
+                                    return '<font color="red">是</font>';
+                                }
+                            }
+                            return '否';
+                        }
+                    },
+                    {
                         header: globalRes.header.createDate,
                         dataIndex: 'createDate'
+                    },
+                    {
+                        xtype:'actioncolumn',
+                        header:'设置管理人员',
+                        width:80,
+                        dataIndex: 'projects',
+                        items:[
+                            {
+                                getClass: function(v, meta, record) {
+                                    var projectId=me.record.get('id');
+                                    for(var i=0;i<v.length;i++){
+                                        if((v[i].projectId==projectId) && (v[i].manager==true)){
+                                            return 'user-delete';
+                                        }
+                                    }
+                                    return 'user-add';
+                                },
+                                getTip:function(v,metadata,record,rowIndex,colIndex,store){
+                                    var projectId=me.record.get('id');
+                                    for(var i=0;i<v.length;i++){
+                                        if((v[i].projectId==projectId) && (v[i].manager==true)){
+                                            return '取消管理员';
+                                        }
+                                    }
+                                    return '设为管理人员';
+                                },
+                                handler:function(grid, rowIndex, colIndex){
+                                    var rec = grid.getStore().getAt(rowIndex);
+                                    var projectId=me.record.get('id');
+                                    var v=rec.get('projects');
+                                    for(var i=0;i<v.length;i++){
+                                        if((v[i].projectId==projectId) && (v[i].manager==true)){
+                                            Ext.Msg.confirm('提示', Ext.String.format('您确定要取消{0}管理员身份？', rec.get('nickName')), function (txt) {
+                                                if(txt=='yes'){
+                                                    me.updateManager(rec.get('id'),'false');
+                                                }
+                                            });
+                                            return;
+                                        }
+                                    }
+                                    Ext.Msg.confirm('提示', Ext.String.format('您确定要将{0}设为管理员？', rec.get('nickName')), function (txt) {
+                                        if(txt=='yes'){
+                                            me.updateManager(rec.get('id'),'true');
+                                        }
+                                    });
+                                    
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -178,5 +238,232 @@ Ext.define('FlexCenter.project.view.ProjectUserView', {
         if(record){
             me.down('form').getForm().loadRecord(record);
         }
+    },
+    addUser:function(){
+        var me=this;
+        ajaxPostRequest('userController.do?method=listAvailableUsers',{},function(result){
+            if(result.success){
+                var data=result.data;
+                var availableUserStore=Ext.create('FlexCenter.user.store.Users',{
+                    data:data,
+                    proxy: {
+                        type: 'memory',
+                        reader: {
+                            type: 'json',
+                            root: 'data',
+                            totalProperty: 'total',
+                            messageProperty: 'message'
+                        }
+                    }
+                });
+                var win=Ext.widget('window',{
+                    title:'添加人员',
+                    layout:'fit',
+                    height:410,
+                    width:600,
+                    modal:true,
+                    items:[
+                        {
+                            xtype:'form',
+                            border:false,
+                            height:390,
+                            listeners:{
+                                afterrender:function(f){
+                                    var form= f.getForm();
+                                    var store=me.down('grid').getStore();
+                                    var users=[];
+                                    store.each(function(rec){
+                                        var obj={};
+                                        obj.id=rec.get('id');
+                                        obj.nickName=rec.get('nickName');
+                                        obj.username=rec.get('username');
+                                        users.push(obj);
+                                    });
+                                    me.record.set('users',users);
+                                    form.loadRecord(me.record);
+                                }
+                            },
+                            defaults: {               
+                                anchor: '100%'
+                            },
+                            buttons:[
+                                {
+                                    text:'保存',
+                                    handler:function(){
+                                        var value=win.down('form').getForm().getValues();
+                                        me.insertUser(value,win);
+                                    }
+                                },{
+                                    text:'关闭',
+                                    handler:function(){
+                                        win.close();
+                                    }
+                                }
+                            ],
+                            items:[
+                                {
+                                    xtype: 'multiselect',
+                                    border: false,
+                                    name: 'users',
+                                    itemId: 'users',
+                                    hideLabel: true,
+                                    filterMode: 'local',
+                                    allowBlank: false,
+                                    store: availableUserStore,
+                                    availableTitle: '可选人员',
+                                    selectedTitle: '已选人员',
+                                    availableIdProperty: 'id',
+                                    selectedIdProperty: 'id',
+                                    availableCfg: {
+                                        features: [
+                                            {
+                                                id: 'searchRole',
+                                                ftype: 'search',
+                                                disableIndexes: ['id'],
+                                                searchMode: 'local'
+                                            }]
+                                    },
+                                    availableViewCfg: {
+                                        getRowClass: function (record) {
+                                            if (record.get('organizationRole')) {
+                                                return 'blue-grid-row';
+                                            }
+                                            return '';
+                                        }
+                                    },
+                                    selectedCfg: {
+                                        features: [
+                                            {
+                                                id: 'searchSelectedRole',
+                                                ftype: 'search',
+                                                disableIndexes: ['id'],
+                                                searchMode: 'local'
+                                            }]
+                                    },
+                                    selectedViewCfg: {
+                                        listeners: {
+                                            'refresh': function (view, eOpts) {
+                                                var selModel = view.ownerCt.getSelectionModel();
+                                                var store = view.ownerCt.store;
+                                            }
+                                        },
+                                        getRowClass: function (record) {
+                                            if (record.get('name')) {
+                                                return 'blue-grid-row';
+                                            }
+                                            return '';
+                                        }
+                                    },
+                                    columns: [
+                                        {
+                                            header: 'ID',
+                                            hidden: true,
+                                            sortable: false,
+                                            dataIndex: 'id'
+                                        }, {
+                                            header: '用户名',
+                                            flex: 1,
+                                            sortable: true,
+                                            dataIndex: 'username'
+                                        }, {
+                                            header: '昵称',
+                                            flex: 1,
+                                            sortable: true,
+                                            dataIndex: 'nickName'
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+                win.show();
+            }
+        });
+    },
+    insertUser:function(value,win){
+        var me=this;
+        var users=value.users;
+        var userIds=[],projectId=me.record.get('id');
+        for(var i=0;i<users.length;i++){
+            userIds.push(users[i].id);
+        }
+        var data={
+            userIds:userIds.join(','),
+            projectId:projectId
+        };
+        ajaxPostRequest('projectController.do?method=saveProjectUser',data,function(result){
+            if(result.success){
+                Ext.Msg.alert('提示','保存成功',function(txt){
+                    if(win){
+                        win.close();
+                    }
+                });
+                me.down('grid').getStore().load();
+                var projectView = Ext.ComponentQuery.query('#projectView')[0];
+                projectView.getStore().load();
+                
+            }else{
+                Ext.Msg.alert('提示','保存失败');
+            }
+        });
+    },
+    updateManager:function(userId,manager){
+        var me=this;
+        var projectId=me.record.get('id');
+        
+        var data={
+            userId:userId,
+            projectId:projectId,
+            manager:manager
+        };
+        ajaxPostRequest('projectController.do?method=updateManager',data,function(result){
+            if(result.success){
+                Ext.Msg.alert('提示','设置成功');
+                me.down('grid').getStore().load();
+                var projectView = Ext.ComponentQuery.query('#projectView')[0];
+                projectView.getStore().load();
+            }else{
+                Ext.Msg.alert('提示','保存失败');
+            }
+        });
+    },
+    removeUser:function(){
+        var me=this;
+        var record = me.down('grid').getSelectionModel().getSelection();
+        if(record.length<1){
+            Ext.Msg.alert('提示','请选择人员');
+            return;
+        }
+        var userIds=[],nickNames=[];
+        for(var i=0;i<record.length;i++){
+            userIds.push(record[i].get('id'));
+            nickNames.push(record[i].get('nickName'));
+        }
+        var projectId=me.record.get('id');
+        var data={
+            userIds:userIds.join(','),
+            projectId:projectId
+        };
+        Ext.Msg.confirm('提示', Ext.String.format('您确定要移除:{0}？', nickNames.join(',')), function (txt) {
+            if(txt=='yes'){
+                ajaxPostRequest('projectController.do?method=removeUser',data,function(result){
+                    if(result.success){
+                        Ext.Msg.alert('提示','移除成功');
+                        me.down('grid').getStore().load();
+                        var projectView = Ext.ComponentQuery.query('#projectView')[0];
+                        projectView.getStore().load();
+                        var projectView = Ext.ComponentQuery.query('#projectView')[0];
+                        projectView.getStore().load();
+                    }else{
+                        Ext.Msg.alert('提示','移除失败');
+                    }
+                });
+            }
+        });
+        
+        
+        
     }
+    
 });

@@ -3,6 +3,7 @@ package com.ozstrategy.dao.project;
 import com.ozstrategy.model.project.Project;
 import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.User;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface ProjectUserDao {
     void removeByProjectId(Long projectId);
     Integer listUsersByProjectIdCount(Long projectId);
     List<User> listUsersByProjectId(Long projectId,RowBounds rowBounds);
+    void updateManager(@Param("userId")Long userId,@Param("projectId")Long projectId,@Param("manager")Boolean manager);
+    void removeUser(@Param("userId")Long userId,@Param("projectId")Long projectId);
 }

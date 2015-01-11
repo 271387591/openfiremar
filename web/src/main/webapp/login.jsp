@@ -36,7 +36,7 @@
         </c:if>
         </c:if>
         var loginRes = {
-            formAction: '<c:url value="/app/login"/>',
+            formAction: '<c:url value="/j_security_check"/>',
             appsName: '<fmt:message key="webapp.name" />',
             title: '<fmt:message key="login.title" />',
             username: '<fmt:message key="login.username" />',
@@ -49,7 +49,7 @@
             picture: '<div class="product-logo"></div>'
         };
     </script>
-    <%--<script type="text/javascript" src="<c:url value='/scripts/lib/login.js'/>"></script>--%>
+    <script type="text/javascript" src="<c:url value='/scripts/lib/login.js'/>"></script>
 </head>
 <body id="login">
 <script type="text/javascript">

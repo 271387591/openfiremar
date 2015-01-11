@@ -25,13 +25,13 @@ import java.util.UUID;
 @Controller
 @RequestMapping("openfireController.do")
 public class OpenfireController extends BaseController {
-    private static final String fileDir="pictures";
+    private static final String picFileDir="pictures";
     @RequestMapping(params = "method=upload")
     public ModelAndView upload(HttpServletRequest request, HttpServletResponse response){
         String username = request.getParameter("username");
         String sessionId = request.getParameter("sessionId");
         response.setContentType("text/html;charset=utf-8");
-        if(!StringUtils.equals(AppSessionManager.get(username),sessionId)){
+        if(!StringUtils.equals(AppSessionManager.get(username), sessionId)){
             try {
                 response.getWriter().print("{success:false,msg:'上传出错!请先登录。'}");
             } catch (IOException e) {
@@ -39,14 +39,9 @@ public class OpenfireController extends BaseController {
             return null;
         }
 
-        String attachFilesDirStr = request.getRealPath("/") + "/"+fileDir+"/";
-        String host=request.getRemoteHost();
-        String serverName=request.getServerName();
-        String uri = request.getRequestURI();
-        String addr=request.getRemoteAddr();
-        String path=request.getServletPath();
+        String attachFilesDirStr = request.getRealPath("/") + "/"+picFileDir+"/";
+        String host=request.getServerName();
         String contextPath=request.getContextPath();
-        String url=request.getRequestURL().toString();
         attachFilesDirStr= FilenameUtils.normalize(attachFilesDirStr);
         File fileDir = new File(attachFilesDirStr);
         if (fileDir.exists() == false) {
@@ -73,7 +68,10 @@ public class OpenfireController extends BaseController {
                     fileOnServer = new File(attachFilesDirStr);
                 }
                 fileItem.write(fileOnServer);
-                String httpPath="http://"+host+contextPath+"/"+fileDir+"/"+str+"."+ext;
+                if(contextPath.indexOf("/")!=-1){
+                    contextPath=contextPath.substring(0,contextPath.length());
+                }
+                String httpPath="http://"+host+contextPath+"/"+picFileDir+"/"+str+"."+ext;
                 
                 response.getWriter().print("{success:true,msg:'上传成功!',path:"+httpPath+"}");
             }

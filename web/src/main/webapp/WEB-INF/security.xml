@@ -10,6 +10,7 @@
     <http pattern="/scripts/**" security="none"/>
     <http pattern="/app/register" security="none"/>
     <http pattern="/app/getProjects" security="none"/>
+    <http pattern="/app/download/*" security="none"/>
 
     <http use-expressions="true"  >
         <expression-handler ref="expressionHandler"/>
@@ -21,7 +22,9 @@
         <!--<intercept-url pattern="/app/**" access="ROLE_ADMIN,ROLE_USER"/>-->
         <form-login login-page="/login" 
                     authentication-failure-url="/login?error=true" 
-                    login-processing-url="/j_security_check" 
+                    login-processing-url="/j_security_check"
+                    username-parameter="username"
+                    password-parameter="password"
                     always-use-default-target="false"
                     authentication-success-handler-ref="authSuccessLogger"
                     authentication-failure-handler-ref="authFailLogger"/>

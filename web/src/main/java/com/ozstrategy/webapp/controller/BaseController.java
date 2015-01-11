@@ -35,7 +35,7 @@ public class BaseController {
     protected static final List emptyData= Collections.EMPTY_LIST;
     
     public String getMessage(String key,HttpServletRequest request) {
-        return context.getMessage(key, null, new Locale("zh_CN"));
+        return context.getMessage(key, null, Locale.SIMPLIFIED_CHINESE);
     }
     public String getMessage(String key, Object[] args) {
         return context.getMessage(key, args, Locale.getDefault());

@@ -22,9 +22,6 @@ Ext.define('FlexCenter.user.model.User', {
         'authentication',
         'enabled',
         'accountLocked',
-        'projectId',
-        'projectName',
-        'activationCode',
         {
             name: 'createDate', convert: function (v) {
             return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');

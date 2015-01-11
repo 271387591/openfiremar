@@ -9,7 +9,8 @@ Ext.define('FlexCenter.App', {
         'Ext.form.field.Text',
         'FlexCenter.UnitUserView',
         'FlexCenter.ProjectManager',
-        'FlexCenter.SystemBaseDataView',
+        'FlexCenter.AppStoreManager',
+        'FlexCenter.HistoryMessageManager',
         'Ext.util.Cookies',
         'FlexCenter.ChangePassword',
         'FlexCenter.Settings'
@@ -50,11 +51,16 @@ Ext.define('FlexCenter.App', {
             items.push(new FlexCenter.UnitUserView());
         }
         if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            items.push(new FlexCenter.SystemBaseDataView());
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
             items.push(new FlexCenter.ProjectManager());
         }
+        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
+            items.push(new FlexCenter.AppStoreManager());
+        }
+        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
+            items.push(new FlexCenter.HistoryMessageManager());
+        }
+        
+        
         
         return items;
     },
@@ -66,18 +72,27 @@ Ext.define('FlexCenter.App', {
         }
         if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
             shortcutDataArray.push({
-                name: systemRes.managerTitle,
-                iconCls: 'globalType-shortcut',
-                module: 'systemBaseDataView'
+                name: '工程管理',
+                iconCls: 'project-shortcut',
+                module: 'projectManager'
             });
         }
         if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
             shortcutDataArray.push({
-                name: '工程管理',
-                iconCls: 'globalType-shortcut',
-                module: 'projectManager'
+                name: '搜索管理',
+                iconCls: 'search-shortcut',
+                module: 'historyMessageManager'
             });
         }
+        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
+            shortcutDataArray.push({
+                name: '应用版本管理',
+                iconCls: 'appStore-shortcut',
+                module: 'appStoreManager'
+            });
+        }
+        
+        
         
         return Ext.apply(ret, {
             //cls: 'ux-desktop-black',
@@ -239,7 +254,7 @@ Ext.define('FlexCenter.App', {
             ],
             trayItems: [
                 {xtype: 'trayclock'}, '-',
-                languageCombo, '-',
+                //languageCombo, '-',
                 changeGraw
             ]
         });

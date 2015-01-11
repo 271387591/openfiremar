@@ -29,13 +29,14 @@ Ext.define('FlexCenter.ProjectManager', {
         var desktop = this.app.getDesktop(), win,projectView;
         win = desktop.getWindow('myProjectManager');
         projectView=Ext.widget('projectView',{
+            itemId:'projectView',
             title:'工程列表'
         });
         this.mon(projectView,'addTab',function(rec){
-            me.addPanel('projectUserView','prject_'+rec.get('id'),{
+            me.addPanel('projectUserView','project_'+rec.get('id'),{
                 title:rec.get('name'),
                 closable:true,
-                itemId:'prject_'+rec.get('id'),
+                itemId:'project_'+rec.get('id'),
                 
                 record:rec
             })
@@ -45,7 +46,7 @@ Ext.define('FlexCenter.ProjectManager', {
             win = desktop.createWindow({
                 id: 'myProjectManager',
                 title: '工程管理',
-                width: 1050,
+                width: 900,
                 height: 500,
                 shim: false,
                 border: false,

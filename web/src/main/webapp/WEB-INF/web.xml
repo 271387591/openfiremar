@@ -12,7 +12,7 @@
             classpath:/applicationContext-resources.xml
             classpath:/applicationContext-dao.xml
             classpath:/applicationContext-service.xml
-            <!--classpath:/applicationContext-filter.xml-->
+            classpath:/applicationContext-quartz.xml
             <!--classpath:/applicationContext-activemq.xml-->
             <!--classpath:/preview-client.xml-->
             classpath*:/applicationContext.xml
