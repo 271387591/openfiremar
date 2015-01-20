@@ -11,6 +11,7 @@ Ext.define('FlexCenter.App', {
         'FlexCenter.ProjectManager',
         'FlexCenter.AppStoreManager',
         'FlexCenter.HistoryMessageManager',
+        'FlexCenter.ExportManager',
         'Ext.util.Cookies',
         'FlexCenter.ChangePassword',
         'FlexCenter.Settings'
@@ -59,6 +60,10 @@ Ext.define('FlexCenter.App', {
         if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
             items.push(new FlexCenter.HistoryMessageManager());
         }
+        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
+            items.push(new FlexCenter.ExportManager());
+        }
+        
         
         
         
@@ -84,6 +89,14 @@ Ext.define('FlexCenter.App', {
                 module: 'historyMessageManager'
             });
         }
+        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
+            shortcutDataArray.push({
+                name: '数据导出',
+                iconCls: 'export-shortcut',
+                module: 'exportManager'
+            });
+        }
+        
         if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
             shortcutDataArray.push({
                 name: '应用版本管理',

@@ -16,8 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.UUID;
+import static com.ozstrategy.Constants.picFileDir;
 
 /**
  * Created by lihao on 12/28/14.
@@ -25,17 +27,23 @@ import java.util.UUID;
 @Controller
 @RequestMapping("openfireController.do")
 public class OpenfireController extends BaseController {
-    private static final String picFileDir="pictures";
+    
     @RequestMapping(params = "method=upload")
     public ModelAndView upload(HttpServletRequest request, HttpServletResponse response){
         String username = request.getParameter("username");
         String sessionId = request.getParameter("sessionId");
         response.setContentType("text/html;charset=utf-8");
+        PrintWriter writer=null;
+        try {
+            writer=response.getWriter();
+        } catch (IOException e) {
+        }
+        if(writer==null){
+            return null;
+        }
         if(!StringUtils.equals(AppSessionManager.get(username), sessionId)){
-            try {
-                response.getWriter().print("{success:false,msg:'上传出错!请先登录。'}");
-            } catch (IOException e) {
-            }
+            writer.print("{success:false,msg:'上传出错!请先登录。'}");
+            writer.close();
             return null;
         }
 
@@ -73,17 +81,14 @@ public class OpenfireController extends BaseController {
                 }
                 String httpPath="http://"+host+contextPath+"/"+picFileDir+"/"+str+"."+ext;
                 
-                response.getWriter().print("{success:true,msg:'上传成功!',path:"+httpPath+"}");
+                writer.print("{success:true,msg:'上传成功!',path:'" + httpPath + "'}");
             }
         } catch (Exception e) {
             logger.error("upload:", e);
-            try {
-                response.getWriter().print("{success:false,msg:'上传出错!'}");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            writer.print("{success:false,msg:'上传出错!'}");
             e.printStackTrace();
         }
+        writer.close();
         return null;
     }
 }

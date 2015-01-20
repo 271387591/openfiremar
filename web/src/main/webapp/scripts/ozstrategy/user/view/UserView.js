@@ -127,7 +127,7 @@ Ext.define('FlexCenter.user.view.UserView', {
         ];
         me.features=[{
             ftype: 'search',
-            disableIndexes: ['id', 'defaultRoleDisplayName', 'accountLocked', 'enabled', 'createDate'],
+            disableIndexes: ['id', 'defaultRoleDisplayName', 'accountLocked', 'enabled', 'createDate','authentication'],
             paramNames: {
                 fields: 'fields',
                 query: 'keyword'

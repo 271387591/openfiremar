@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +76,12 @@ public class AppStoreController extends BaseController {
         if (fileDir.exists() == false) {
             fileDir.mkdir();
         }
+        PrintWriter writer=null;
+        try {
+            writer=response.getWriter();
+        } catch (IOException e) {
+            
+        }
         String path=null;
         try {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
@@ -121,7 +128,7 @@ public class AppStoreController extends BaseController {
                 appStore.setVersion(version);
                 appStore.setUrl(httpPath);
                 appStoreManager.save(appStore);
-                response.getWriter().print("{success:true,msg:'上传成功!'}");
+                writer.print("{success:true,msg:'上传成功!'}");
             }
         } catch (Exception e) {
             logger.error("upload:", e);
@@ -129,13 +136,10 @@ public class AppStoreController extends BaseController {
                 File file=new File(path);
                 file.delete();
             }
-            try {
-                response.getWriter().print("{success:false,msg:'上传出错!'}");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            writer.print("{success:false,msg:'上传出错!'}");
             e.printStackTrace();
         }
+        writer.close();
         return null;
     }
     @RequestMapping(params = "method=download")

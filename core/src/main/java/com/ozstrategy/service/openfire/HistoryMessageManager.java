@@ -10,10 +10,10 @@ import java.util.Map;
  * Created by lihao on 1/7/15.
  */
 public interface HistoryMessageManager {
-    List<HistoryMessage> listHistoryMessages(Map<String,Object> map,Integer page,Integer limit,Boolean search) throws Exception;
-    Integer listHistoryMessagesCount(Map<String,Object> map,Boolean search)throws Exception;
+    List<HistoryMessage> listHistoryMessages(Map<String,Object> map,Integer start,Integer limit) throws Exception;
+    Integer listHistoryMessagesCount(Map<String,Object> map)throws Exception;
     Long maxId();
-    void addIndex(Long index_max_id,Long max_id)throws Exception;
+    void addIndex(Long index_max_id)throws Exception;
     void delete(Date startTime,Date endTime) throws Exception;
     
 }

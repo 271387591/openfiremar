@@ -9,14 +9,12 @@
     
     <select id="listProjects" resultMap="ProjectResult" parameterType="Map">
         select f.* from ext_project f where 1=1 
-        <if test="name!=null and name!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
-        <if test="serialNumber!=null and serialNumber!=''">and f.serialNumber =#{serialNumber}</if>
+        <if test="keyword!=null and keyword!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
         order by f.createDate desc
     </select>
     <select id="listProjectsCount" resultType="java.lang.Integer" parameterType="Map">
         select count(id) from ext_project f where 1=1
-        <if test="name!=null and name!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
-        <if test="serialNumber!=null and serialNumber!=''">and f.serialNumber =#{serialNumber}</if>
+        <if test="keyword!=null and keyword!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
     </select>
     <select id="getProjectById" resultMap="ProjectResult" parameterType="long">
         SELECT * from ext_project where id=#{id}

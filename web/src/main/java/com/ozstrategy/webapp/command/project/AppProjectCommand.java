@@ -22,6 +22,7 @@ public class AppProjectCommand extends BaseObjectCommand {
         this.name=project.getName();
         this.description=project.getDescription();
         this.activationCode=project.getActivationCode();
+        this.serialNumber=project.getSerialNumber();
     }
 
     public Long getId() {

@@ -1,8 +1,5 @@
 package com.ozstrategy.webapp.command;
 
-import com.ozstrategy.webapp.Constants;
-
-
 /**
  * Created by IntelliJ IDEA. User: liaodongming Date: 11-11-22 Time: PM6:14 To change this template use File | Settings
  * | File Templates.
@@ -20,7 +17,7 @@ public abstract class ExtraResponseData {
    * Constants.EXTRA_RESPONSE_DATA_TYPE_INFO Constants.EXTRA_RESPONSE_DATA_TYPE_WARN
    * Constants.EXTRA_RESPONSE_DATA_TYPE_EXCEPTION default : Constants.EXTRA_RESPONSE_DATA_TYPE_INFO
    */
-   protected String type = Constants.EXTRA_RESPONSE_DATA_TYPE_INFO;
+   protected String type = "INFO";
 
   //~ Constructors -----------------------------------------------------------------------------------------------------
 

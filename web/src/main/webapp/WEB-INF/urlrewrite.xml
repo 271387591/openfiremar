@@ -33,6 +33,11 @@
         <from>/app/download/*</from>
         <to>/service/appStoreController.do?method=download&amp;id=$1</to>
     </rule>
+    <rule>
+        <from>/app/search</from>
+        <to>/service/historyMessageController.do?method=list</to>
+    </rule>
+    
     
     
     <rule>

@@ -27,12 +27,15 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopFieldCollector;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,8 +43,53 @@ import java.util.List;
 public class LuceneUtils {
     private static String INDEX_DIR = System.getProperty("index") + "/index";
     private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_44);
-    private static Integer MAX=10000000;
+    private static Integer MAX=80000;
     private static Log log= LogFactory.getLog(LuceneUtils.class);
+    
+    synchronized public static Long addIndex(ResultSet resultSet) throws Exception{
+        Long maxId=0L;
+        File indexFile = new File(INDEX_DIR);
+        if (!indexFile.exists()) {
+            indexFile.mkdirs();
+        }
+        Directory directory = null;
+        IndexWriter indexWriter = null;
+        directory = FSDirectory.open(indexFile);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_44, analyzer);
+        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        if (IndexWriter.isLocked(directory)) {
+            IndexWriter.unlock(directory);
+        }
+        indexWriter = new IndexWriter(directory, config);
+        while (resultSet.next()) {
+            Document document = new Document();
+            Long id = resultSet.getLong("id");
+            document.add(new LongField("id", id, Field.Store.YES));
+            String message = resultSet.getString("message");
+            if (StringUtils.isNotEmpty(message)) {
+                document.add(new StringField("message", message, Field.Store.YES));
+            }
+            Date createDate=resultSet.getDate("createDate");
+            if(createDate!=null){
+                document.add(new LongField("createDate",createDate.getTime(),Field.Store.YES));
+            }
+            String fromNick=resultSet.getString("fromNick");
+            if(StringUtils.isNotEmpty(fromNick)){
+                document.add(new StringField("fromNick",fromNick,Field.Store.YES));
+            }
+            String toNick=resultSet.getString("toNick");
+            if(StringUtils.isNotEmpty(toNick)){
+                document.add(new StringField("toNick",toNick,Field.Store.YES));
+            }
+            indexWriter.addDocument(document);
+            maxId=id;
+        }
+        try {
+        } finally {
+            closeAll(directory, indexWriter);
+        }
+        return maxId;
+    }
 
     synchronized public static Long addIndex(List<HistoryMessage> historyMessages) throws Exception{
         Long maxId=0L;
@@ -126,7 +174,7 @@ public class LuceneUtils {
         return query;
     }
 
-    public static List<HistoryMessage> search(String message,String fromNick,String toNick,Long startTime,Long endTime, int pageSize, int curPage) throws Exception {
+    public static List<HistoryMessage> search(String message,String fromNick,String toNick,Long startTime,Long endTime, int pageSize, int start) throws Exception {
         Directory directory = FSDirectory.open(new File(INDEX_DIR));
         IndexReader ir = DirectoryReader.open(directory);
         IndexSearcher indexSearcher = new IndexSearcher(ir);
@@ -136,13 +184,17 @@ public class LuceneUtils {
             query.add(new MatchAllDocsQuery(),BooleanClause.Occur.MUST);
         }
         Sort sort = new Sort(new SortField("createDate", SortField.Type.LONG,true));
+        int maxItem=Math.min(MAX,start + pageSize);
+        int maxStart=Math.min(maxItem-pageSize,start);
+        TopFieldCollector res= TopFieldCollector.create(sort, maxItem, false, false, false, false);
+//        int maxItem=Math.min(MAX,start + pageSize);
+//        TopScoreDocCollector res = TopScoreDocCollector.create(maxItem, false);
+        indexSearcher.search(query, res);
+        TopDocs topDocs = res.topDocs(maxStart,pageSize);
         
-        TopDocs topDocs = indexSearcher.search(query, curPage * pageSize,sort);
         ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-        int begin = pageSize * (curPage - 1);
-        int end = Math.min(begin + pageSize, scoreDocs.length);
         List<HistoryMessage> historyMessages=new ArrayList<HistoryMessage>();
-        for(int i=begin;i<end;i++){
+        for(int i=0;i<scoreDocs.length;i++){
             HistoryMessage historyMessage=new HistoryMessage();
             Document doc = indexSearcher.doc(scoreDocs[i].doc);
             String string = doc.get("id");
@@ -158,6 +210,7 @@ public class LuceneUtils {
         }
         try {
         } finally {
+            ir.close();
             closeAll(directory, null);
         }
         return historyMessages;
@@ -171,8 +224,9 @@ public class LuceneUtils {
         if(clauses!=null && clauses.length<1){
             query.add(new MatchAllDocsQuery(),BooleanClause.Occur.MUST);
         }
-        TopDocs topDocs = indexSearcher.search(query, MAX);
-        return topDocs.totalHits;
+        TopScoreDocCollector res = TopScoreDocCollector.create(1, false);
+        indexSearcher.search(query, res);
+        return res.getTotalHits();
     }
     public static void deleteIndex(Long startTime,Long endTime) throws Exception{
         Directory dir = FSDirectory.open(new File(INDEX_DIR));
@@ -195,10 +249,12 @@ public class LuceneUtils {
 
     public static void main(String[] args) {
         try {
-            List<HistoryMessage> historyMessages=search(null,null,null,null,null,25,1);
+            List<HistoryMessage> historyMessages=search(null,null,null,null,null,999,34);
             for(HistoryMessage historyMessage:historyMessages){
-                System.out.println(historyMessage.getCreateDate());
+                System.out.println("id=="+historyMessage.getId());
             }
+            System.out.println(LuceneUtils.count(null,null,null,null,null));
+                    
             
             
 //            LuceneUtils.index();

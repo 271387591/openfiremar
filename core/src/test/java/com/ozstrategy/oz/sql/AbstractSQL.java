@@ -1,5 +1,5 @@
 
-package com.ozstrategy.sql;
+package com.ozstrategy.oz.sql;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -7,7 +7,6 @@ import com.ozstrategy.service.system.ApplicationConfigManager;
 import com.ozstrategy.webapp.command.BaseResultCommand;
 import com.ozstrategy.webapp.command.JsonReaderResponse;
 import com.ozstrategy.webapp.controller.BaseController;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,22 +34,18 @@ public class HistoryMessageController extends BaseController {
     @RequestMapping(params = "method=list")
     @ResponseBody
     public JsonReaderResponse<HistoryMessage> list(HttpServletRequest request){
-        Integer page=parseInteger(request.getParameter("page"));
+        Integer start=parseInteger(request.getParameter("start"));
         Integer limit=parseInteger(request.getParameter("limit"));
-        String search=request.getParameter("search");
-        Boolean s= StringUtils.equals(search,"true");
         Map<String,Object> map=requestMap(request);
         try{
-            if(s){
-                String value = applicationConfigManager.get(ApplicationConfig.index_max_id);
-                Long index_max_id= NumberUtils.toLong(value);
-                Long max_id=historyMessageManager.maxId();
-                if(index_max_id<max_id){
-                    historyMessageManager.addIndex(index_max_id,max_id);
-                }
+            String value = applicationConfigManager.get(ApplicationConfig.index_max_id);
+            Long index_max_id= NumberUtils.toLong(value);
+            Long max_id=historyMessageManager.maxId();
+            if(index_max_id<max_id){
+                historyMessageManager.addIndex(index_max_id);
             }
-            List<HistoryMessage> projects=historyMessageManager.listHistoryMessages(map, page, limit,s);
-            int count = historyMessageManager.listHistoryMessagesCount(map,s);
+            List<HistoryMessage> projects=historyMessageManager.listHistoryMessages(map, start, limit);
+            int count = historyMessageManager.listHistoryMessagesCount(map);
             return new JsonReaderResponse<HistoryMessage>(projects,"",count);
         }catch (Exception e){
             logger.error("list HistoryMessage",e);

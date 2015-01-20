@@ -45,7 +45,7 @@ function ActionColumnDisabledAccess(config){
     return isDisabled
 }
 
-function ajaxPostRequest(url,params,callback,mask){
+function ajaxPostRequest(url,params,callback,noMask){
 
     var box = Ext.MessageBox;
     box.show({
@@ -57,6 +57,7 @@ function ajaxPostRequest(url,params,callback,mask){
         iconCls:'loading-ux', //custom class in msg-box.html
         animateTarget: 'mb7'
     });
+    
     //var myMask = new Ext.LoadMask(Ext.getBody(), {msg:globalRes.loading});
     //if(!mask){
     //    myMask.show();

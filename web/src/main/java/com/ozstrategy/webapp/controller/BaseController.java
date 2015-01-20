@@ -1,6 +1,6 @@
 package com.ozstrategy.webapp.controller;
 
-import com.ozstrategy.webapp.Constants;
+import com.ozstrategy.Constants;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;

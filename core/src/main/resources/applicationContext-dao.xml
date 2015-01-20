@@ -21,11 +21,15 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
     
     <!-- Activates scanning of @Autowired -->
     <context:annotation-config/>
 
     <!-- Activates scanning of @Repository -->
-    <context:component-scan base-package="com.ozstrategy.dao"/>
+    <context:component-scan base-package="com.ozstrategy.jdbc"/>
+    
 
 </beans>

@@ -1,9 +1,12 @@
 package com.ozstrategy.util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFPatriarch;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -15,6 +18,9 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -120,8 +126,9 @@ public class ExcelUtils {
         map2.put("jlStartDate2","2014-01-27");
         map2.put("jlContent2","222");
         map2.put("jlStartDate3","2014-01-27");
-        map2.put("jlContent3","333");
+        map2.put("jlContent3", "333");
         data.add(map2);
+        addPic();
 
 
 //        HSSFWorkbook wb1 = export("导出排班信息", rows, data);
@@ -130,6 +137,46 @@ public class ExcelUtils {
 //        os1.close();
 //        InputStream inputStream=new FileInputStream("/Users/lihao/Downloads/workbook.xls");
 //        readExcel(rows,inputStream,0);
+    }
+    public static void addPic() throws Exception{
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet("pic");
+        Map<String,CellStyle> styleMap=createStyles(wb);
+        HSSFRow headerRow = sheet.createRow(2);
+        headerRow.setHeight((short)(800));
+        String[] headers=new String[]{"用户昵称","工程","聊天内容","发送时间"};
+        for(int i=0;i<headers.length;i++){
+            HSSFCell cell  = headerRow.createCell(i);
+            sheet.setColumnWidth(i, 3500);
+            cell.setCellStyle(styleMap.get("header"));
+            cell.setCellValue(headers[i]);
+        }
+        byte[] bytes= IOUtils.toByteArray(new FileInputStream("/Users/lihao/Documents/openfiremar/web/src/main/webapp/images/403.jpg"));
+        HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
+        HSSFClientAnchor anchor = new HSSFClientAnchor(0,0,1022,255,(short) 1,3,(short)1,8);
+//        HSSFClientAnchor anchor1 = new HSSFClientAnchor(0,0,512,255,(short) 2,30,(short)10,60);
+//        anchor1.setAnchorType(2);
+        //插入图片   
+        patriarch.createPicture(anchor , wb.addPicture(bytes,HSSFWorkbook.PICTURE_TYPE_JPEG));
+//        for(int i=0;i<headers.length;i++){
+//            HSSFCell cell  = headerRow.createCell(i);
+//            sheet.setColumnWidth(i, 3500);
+//            cell.setCellStyle(styleMap.get("header"));
+//        }
+        
+        
+        
+        
+        FileOutputStream os1 = null;
+        try {
+            os1 = new FileOutputStream("/Users/lihao/Downloads/pic.xls");
+            wb.write(os1);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
     public static HSSFWorkbook export(String sheetName,Rows rows,  List<Map<String,String>> contexts ) throws IOException {
         HSSFWorkbook wb = new HSSFWorkbook();

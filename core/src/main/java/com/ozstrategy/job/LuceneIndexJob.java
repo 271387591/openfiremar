@@ -26,7 +26,7 @@ public class LuceneIndexJob {
             Long index_max_id= NumberUtils.toLong(value);
             Long max_id=historyMessageManager.maxId();
             if(index_max_id<max_id){
-                historyMessageManager.addIndex(index_max_id,max_id);
+                historyMessageManager.addIndex(index_max_id);
             }
             JobLog jobLog=new JobLog();
             jobLog.setJob(getClass().getSimpleName());

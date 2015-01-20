@@ -3,7 +3,8 @@
  */
 Ext.define('FlexCenter.history.view.HistoryMessageView', {
     requires: [
-        'FlexCenter.history.store.HistoryMessage'
+        'FlexCenter.history.store.HistoryMessage',
+        'Ext.ux.form.field.DateTimeField'
     ],
     extend: 'Ext.panel.Panel',
     alias: 'widget.historyMessageView',
@@ -63,16 +64,14 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         items:[
                             {
                                 fieldLabel:'开始时间',
-                                xtype : 'datefield',
-                                format : 'Y-m-d',
+                                xtype : 'datetimefield',
                                 editable:false,
                                 name : 'startTime'
                             },
                             {
                                 fieldLabel:'结束时间',
-                                xtype : 'datefield',
+                                xtype : 'datetimefield',
                                 editable:false,
-                                format : 'Y-m-d 23:59:59',
                                 name : 'endTime'
                             }
                         ]
@@ -92,7 +91,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                                     store.on('beforeload',function(s,e){
                                         e.params = data;
                                     });
-                                    store.load();
+                                    store.loadPage(1);
                                 }
                             },
                             {
@@ -103,10 +102,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                                 handler : function() {
                                     me.down('form').getForm().reset();
                                     var store=me.down('grid').getStore();
-                                    store.on('beforeload',function(s,e){
-                                        e.params = {};
-                                    });
-                                    store.load();
+                                    store.loadPage(1);
                                     
                                 }
                             }
@@ -126,7 +122,18 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         xtype: 'pagingtoolbar',
                         store: store,
                         dock: 'bottom',
-                        displayInfo: true
+                        prependButtons:true,
+                        displayInfo: true,
+                        beforePageText:'',
+                        afterPageText:'共{0}页',
+                        listeners:{
+                            afterrender:function(f){
+                                var last= f.down('#last');
+                                var inputItem= f.down('#inputItem');
+                                //last.hide();
+                                //inputItem.hide();
+                            }
+                        }
                     }
                 ],
                 tbar:[
@@ -142,11 +149,6 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                     
                 ],
                 columns:[
-                    {
-                        header: '序号',
-                        xtype:'rownumberer',
-                        width:40
-                    },
                     {
                         header: '用户昵称',
                         width:200,
@@ -219,7 +221,9 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                                 ajaxPostRequest('historyMessageController.do?method=delete',data,function(result){
                                     if(result.success){
                                         me.down('grid').getStore().load();
-                                        Ext.Msg.alert(globalRes.title.prompt,globalRes.removeSuccess);
+                                        Ext.Msg.alert(globalRes.title.prompt,globalRes.removeSuccess,function(){
+                                            win.close();
+                                        });
                                     }else{
                                         Ext.MessageBox.alert({
                                             title:globalRes.title.warning,
@@ -243,18 +247,31 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         {
                             fieldLabel:'开始时间',
                             xtype : 'datefield',
-                            format : 'Y-m-d',
                             editable:false,
                             allowBlank: false,
+                            format:'Y-m-d 00:00:00',
+                            maxValue:new Date(),
+                            itemId:'startTime',
                             name : 'startTime'
                         },
                         {
                             fieldLabel:'结束时间',
                             xtype : 'datefield',
                             editable:false,
-                            format : 'Y-m-d 23:59:59',
                             allowBlank: false,
-                            name : 'endTime'
+                            name : 'endTime',
+                            format:'Y-m-d 23:59:59',
+                            maxValue:new Date(),
+                            listeners:{
+                                change:function( f, newValue, oldValue, eOpts ){
+                                    var s=win.down('#startTime');
+                                    var sv= s.getValue();
+                                    if(sv>newValue){
+                                        s.setValue(newValue);
+                                    }
+                                    s.setMaxValue(newValue);
+                                }
+                            }
                         }
                     ]
                 }

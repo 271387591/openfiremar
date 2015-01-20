@@ -11,6 +11,7 @@
     <http pattern="/app/register" security="none"/>
     <http pattern="/app/getProjects" security="none"/>
     <http pattern="/app/download/*" security="none"/>
+    <http pattern="/app/search" security="none"/>
 
     <http use-expressions="true"  >
         <expression-handler ref="expressionHandler"/>

@@ -157,7 +157,8 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                         }
                                     },
                                     allowBlank: false
-                                },{
+                                },
+                                {
                                     fieldLabel:'<font color="red">*</font>'+'工程选择',
                                     xtype:'combo',
                                     name:'projectId',

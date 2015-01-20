@@ -1,5 +1,5 @@
 
-package com.ozstrategy.sql;
+package com.ozstrategy.oz.sql;
 public class SQL extends AbstractSQL<SQL> {
 
   @Override

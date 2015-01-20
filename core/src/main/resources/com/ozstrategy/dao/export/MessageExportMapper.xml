@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ozstrategy.dao.export.MessageExportDao">
+    <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>-->
+    <resultMap id="MessageExportResult" type="com.ozstrategy.model.export.MessageExport" autoMapping="true">
+        <id column="id" property="id" javaType="long"/>
+    </resultMap>
+    
+    <select id="list" resultMap="MessageExportResult" parameterType="Map">
+        select f.* from ext_messageExport f where 1=1 order by f.createDate desc
+    </select>
+    <select id="listCount" resultType="java.lang.Integer" parameterType="Map">
+        select count(id) from ext_messageExport f where 1=1
+    </select>
+    <select id="get" resultMap="MessageExportResult" parameterType="long">
+        SELECT * FROM  ext_messageExport where id=#{id}
+    </select>
+    
+    <insert id="save" parameterType="com.ozstrategy.model.export.MessageExport" flushCache="true">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into ext_messageExport(id,exportor,type,filePath,executeDate,createDate,lastUpdateDate) values(
+        #{id},
+        #{exportor},
+        #{type,typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{filePath},
+        #{executeDate},
+        #{createDate},
+        #{lastUpdateDate}
+        )
+    </insert>
+</mapper>
