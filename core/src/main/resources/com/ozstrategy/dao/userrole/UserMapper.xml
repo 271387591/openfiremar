@@ -4,169 +4,38 @@
     <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>-->
     <resultMap id="userResult" type="com.ozstrategy.model.userrole.User" autoMapping="true">
         <id property="id" column="id"/>
-        <result column="defaultRoleId" javaType="java.lang.Long"/>
-        <association property="address" resultMap="addressResult" javaType="com.ozstrategy.model.userrole.Address"/>
-        <association property="defaultRole" select="com.ozstrategy.dao.userrole.RoleDao.getRoleById" column="defaultRoleId" javaType="com.ozstrategy.model.userrole.Role"/>
+        <association property="project" column="projectId" select="com.ozstrategy.dao.project.ProjectDao.getProjectById"/>
         <collection property="roles" column="id" select="com.ozstrategy.dao.userrole.RoleDao.getRoleByUserId" fetchType="lazy"/>
-        <collection property="projectUsers" column="id" select="com.ozstrategy.dao.project.ProjectUserDao.listProjectUserByUserId" fetchType="lazy"/>
     </resultMap>
-    <resultMap id="userNoCascadeResult" type="com.ozstrategy.model.userrole.User" autoMapping="true">
-        <id property="id" column="id"/>
-        <association property="address" resultMap="addressResult" javaType="com.ozstrategy.model.userrole.Address"/>
-    </resultMap>
-    
-    <resultMap id="addressResult" type="com.ozstrategy.model.userrole.Address">
-        <result column="address" javaType="java.lang.String" property="address"/>
-        <result column="city" javaType="java.lang.String" property="city"/>
-        <result column="country" javaType="java.lang.String" property="country"/>
-        <result column="postalCode" javaType="java.lang.String" property="postalCode"/>
-        <result column="province" javaType="java.lang.String" property="province"/>
-    </resultMap>
-    
-    
     
     <select id="listUsers" resultMap="userResult" parameterType="Map">
-        select u.* from ext_user u where u.enabled=1 and u.username != 'admin' 
+        select u.* from ext_user u where u.projectId=#{projectId}
         <if test="keyword!=null and keyword!=''">and (u.username like CONCAT(CONCAT('%', #{keyword}), '%') or u.nickName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
         order by u.createDate desc
     </select>
     <select id="listUsersCount" resultType="java.lang.Integer" parameterType="Map">
-        select count(*) from ext_user u where u.enabled=1 and u.username != 'admin' 
+        select count(id) from ext_user u where u.projectId=#{projectId}
         <if test="keyword!=null and keyword!=''">and (u.username like CONCAT(CONCAT('%', #{keyword}), '%') or u.nickName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
     </select>
     
     <select id="getUserById" parameterType="long" resultMap="userResult">
         select u.* from ext_user u where u.id=#{id} 
     </select>
-    <select id="getUserByUsername" parameterType="string" resultMap="userResult">
-        select u.* from ext_user u where u.username=#{username} 
+    <select id="getUserByUsername" parameterType="Map" resultMap="userResult">
+        <choose>
+            <when test="projectId==null">
+                select u.* from ext_user u where u.username=#{username} and projectId is null
+            </when>
+            <otherwise>
+                select u.* from ext_user u where u.username=#{username} and u.projectId=#{projectId}
+            </otherwise>
+        </choose>
     </select>
-    <select id="getUserByEmail" parameterType="string" resultMap="userResult">
-        select u.* from ext_user u where u.email=#{email} 
-    </select>
-    <select id="getUserByMobile" parameterType="string" resultMap="userResult">
-        select u.* from ext_user u where u.mobile=#{mobile} 
+    
+    <select id="getUserCountByProjectId" parameterType="long" resultType="int">
+        SELECT COUNT(id) from ext_user u where u.projectId=#{projectId}
     </select>
     <select id="getUserByRoleId" parameterType="long" resultMap="userResult">
-        select u.* from ext_user u join ext_userrole ur on u.id=ur.userId where ur.roleId=#{roleId}
+          select * from ext_user u JOIN ext_userrole ur on u.id=ur.userId where ur.roleId=#{roleId}
     </select>
-    <select id="getNoCascadeUserById" parameterType="long" resultMap="userNoCascadeResult">
-        select u.* from ext_user u  where u.id=#{id}
-    </select>
-    <select id="listAvailableUsers" resultType="com.ozstrategy.model.userrole.User">
-        select u.* from ext_user u
-    </select>
-    
-    
-    
-    <update id="enabledUser" parameterType="Long" flushCache="true">
-        update ext_user u set u.enabled='0' where u.id=#{id}
-    </update>
-    <update id="updateUserPassword" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
-        update ext_user u set u.password=#{password} where u.id=#{id}
-    </update>
-    <update id="updateUserByProjectId" parameterType="long" flushCache="true">
-        update ext_user u set u.projectId=null where u.projectId=#{projectId}
-    </update>
-    
-    <update id="updateUser" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
-        update ext_user u set 
-        u.accountExpired=#{accountExpired} ,  
-        u.accountLocked=#{accountLocked} ,  
-        u.credentialsExpired=#{credentialsExpired} ,  
-        u.enabled=#{enabled} ,  
-        u.address=#{address.address} ,  
-        u.city=#{address.city} ,  
-        u.country=#{address.country} ,  
-        u.postalCode=#{address.postalCode} ,  
-        u.province=#{address.province} ,  
-        u.email=#{email} ,  
-        u.firstName=#{firstName} ,  
-        u.lastName=#{lastName} ,  
-        u.password=#{password} ,  
-        u.passwordHint=#{passwordHint} ,  
-        u.phoneNumber=#{phoneNumber} ,  
-        u.username=#{username} ,  
-        u.version=#{version} ,  
-        u.website=#{website} ,  
-        u.gender=#{gender} ,  
-        u.mobile=#{mobile} ,  
-        u.authentication=#{authentication} ,  
-        u.createDate=#{createDate} ,  
-        u.lastUpdateDate=#{lastUpdateDate} ,  
-        u.defaultRoleId=#{defaultRole.id},  
-        u.userNo=#{userNo},  
-        u.nickName=#{nickName}  
-        where u.id=#{id}
-    </update>
-    
-    
-    
-    <insert id="saveUser" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
-        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
-            select LAST_INSERT_ID() 
-        </selectKey>
-        insert ext_user (<include refid="userColumns"/>) values(
-        #{id},
-        #{accountExpired},
-        #{accountLocked},
-        #{credentialsExpired},
-        #{enabled},
-        #{address.address},
-        #{address.city},
-        #{address.country},
-        #{address.postalCode},
-        #{address.province},
-        #{email},
-        #{firstName},
-        #{lastName},
-        #{password},
-        #{passwordHint},
-        #{phoneNumber},
-        #{username},
-        #{version},
-        #{website},
-        #{gender},
-        #{mobile},
-        #{authentication},
-        #{createDate},
-        #{lastUpdateDate},
-        #{defaultRole.id},
-        #{userNo},
-        #{nickName}
-        )
-    </insert>
-
-    
-    <sql id="userColumns">
-             id,
-             accountExpired,
-             accountLocked,
-             credentialsExpired,
-             enabled,
-             address,
-             city,
-             country,
-             postalCode,
-             province,
-             email,
-             firstName,
-             lastName,
-             password,
-             passwordHint,
-             phoneNumber,
-             username,
-             version,
-             website,
-             gender,
-             mobile,
-             authentication,
-             createDate,
-             lastUpdateDate,
-             defaultRoleId,
-             userNo,
-             nickName
-    </sql>
-    
-
 </mapper>

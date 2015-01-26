@@ -1,10 +1,8 @@
 package com.ozstrategy.webapp.command.login;
 
-import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Feature;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.User;
-import com.ozstrategy.webapp.command.project.ProjectUserCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +14,18 @@ import java.util.Set;
 public class LoginCommand {
     private Long id;
     private String username;
+    private String openfireUsername;
     private String email;
     private String mobile;
     private String nickName;
     private Boolean  authentication=Boolean.FALSE;
     private String   gender;
     private String sessionId;
+    private Long projectId;
+    private String projectName;
+    private Boolean manager;
     private List<LoginRoleCommand> roles=new ArrayList<LoginRoleCommand>();
     private List<LoginFeatureCommand> features=new ArrayList<LoginFeatureCommand>();
-    private LoginRoleCommand defaultRole=null;
-    private List<ProjectUserCommand> projects=new ArrayList<ProjectUserCommand>();
-    
 
     public LoginCommand() {
     }
@@ -39,20 +38,14 @@ public class LoginCommand {
         this.authentication=user.getAuthentication();
         this.gender=user.getGender();
         this.nickName=user.getNickName();
+        this.projectId=user.getProject()!=null?user.getProject().getId():null;
+        this.projectName=user.getProject()!=null?user.getProject().getName():null;
+        this.manager=user.getManager();
+        this.openfireUsername=user.getUsername()+"_"+user.getId();
         Set<Role> roleSet=user.getRoles();
         if(roleSet!=null && !roleSet.isEmpty()){
             for(Role role : roleSet){
                 this.roles.add(new LoginRoleCommand(role));
-            }
-        }
-        Role role=user.getDefaultRole();
-        if(role!=null){
-            this.defaultRole=new LoginRoleCommand(role);
-        }
-        Set<ProjectUser> projectUsers=user.getProjectUsers();
-        if(projectUsers!=null && projectUsers.size()>0){
-            for(ProjectUser projectUser:projectUsers){
-                this.projects.add(new ProjectUserCommand(projectUser));
             }
         }
     }
@@ -127,14 +120,6 @@ public class LoginCommand {
         this.features = features;
     }
 
-    public LoginRoleCommand getDefaultRole() {
-        return defaultRole;
-    }
-
-    public void setDefaultRole(LoginRoleCommand defaultRole) {
-        this.defaultRole = defaultRole;
-    }
-
     public String getNickName() {
         return nickName;
     }
@@ -143,19 +128,43 @@ public class LoginCommand {
         this.nickName = nickName;
     }
 
-    public List<ProjectUserCommand> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(List<ProjectUserCommand> projects) {
-        this.projects = projects;
-    }
-
     public String getSessionId() {
         return sessionId;
     }
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public Boolean getManager() {
+        return manager;
+    }
+
+    public void setManager(Boolean manager) {
+        this.manager = manager;
+    }
+
+    public String getOpenfireUsername() {
+        return openfireUsername;
+    }
+
+    public void setOpenfireUsername(String openfireUsername) {
+        this.openfireUsername = openfireUsername;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 }

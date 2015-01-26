@@ -20,7 +20,7 @@ public class OpenfireUser implements Serializable{
     private String modificationDate;
     public OpenfireUser(){}
     public OpenfireUser copy(User user){
-        this.username=user.getUsername();
+        this.username=user.getUsername()+"_"+user.getId();
         this.encryptedPassword=user.getPassword();
         this.name=user.getNickName();
         this.email=user.getEmail();

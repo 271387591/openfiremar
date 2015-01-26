@@ -1,6 +1,5 @@
 package com.ozstrategy.webapp.security;
 
-import com.ozstrategy.model.userrole.Feature;
 import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.userrole.FeatureManager;
 import com.ozstrategy.webapp.command.JsonReaderSingleResponse;
@@ -14,7 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,8 +37,9 @@ public class WebAuthenticationSuccessLoggerHandler extends WebAuthenticationLogg
           response.sendRedirect("dispatcherPage.action");
           return;
       }
+      String projectId=request.getParameter("projectId");
       User user = (User)authentication.getPrincipal();
-      user  = userManager.getUserByUsername(user.getUsername());
+      user  = userManager.getUserByUsername(user.getUsername(),Long.parseLong(projectId));
       if (user == null) {
         return;
       }
@@ -49,8 +48,8 @@ public class WebAuthenticationSuccessLoggerHandler extends WebAuthenticationLogg
       
       LoginCommand command = new LoginCommand(user);
       command.setSessionId(sessionId);
-      List<Feature> roleFeatures = featureManager.getUserFeaturesByUsername(request.getRemoteUser());
-      command = command.populateFeatures(roleFeatures);
+//      List<Feature> roleFeatures = featureManager.getUserFeaturesByUsername(request.getRemoteUser());
+//      command = command.populateFeatures(roleFeatures);
       JsonReaderSingleResponse<LoginCommand> jsonReaderSingleResponse=new JsonReaderSingleResponse<LoginCommand>(command);
       String result=objectMapper.writeValueAsString(jsonReaderSingleResponse);
       response.getWriter().print(result);

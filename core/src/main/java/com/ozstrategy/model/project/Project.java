@@ -1,33 +1,28 @@
 package com.ozstrategy.model.project;
 
-import com.ozstrategy.model.BaseObject;
+import com.ozstrategy.model.BaseEntity;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by lihao on 12/29/14.
  */
-public class Project extends BaseObject implements Serializable {
-    private Long id;
+@Entity
+@Table(name = "ext_project")
+public class Project extends BaseEntity{
+    @Column
     private String serialNumber;
+    @Column
     private String name;
+    @Column
     private String description;
+    @Column
     private String  activationCode;
     
-    private Set<ProjectUser> users=new HashSet<ProjectUser>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getSerialNumber() {
         return serialNumber;
     }
@@ -60,13 +55,6 @@ public class Project extends BaseObject implements Serializable {
         this.activationCode = activationCode;
     }
 
-    public Set<ProjectUser> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<ProjectUser> users) {
-        this.users = users;
-    }
 
     @Override
     public boolean equals(Object o) {

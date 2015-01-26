@@ -33,7 +33,7 @@
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basenames">
             <list>
-                <value>classpath:/ApplicationResources</value>
+                <value>classpath:ApplicationResources</value>
             </list>
         </property>
         <property name="cacheSeconds" value="3600"/>

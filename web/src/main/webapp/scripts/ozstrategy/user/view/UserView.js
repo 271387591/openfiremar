@@ -28,6 +28,7 @@ Ext.define('FlexCenter.user.view.UserView', {
                 pageSize: 25
             });
         }
+        store.getProxy().extraParams={projectId:projectId};
         return store;
     },
     border: false,
@@ -139,7 +140,6 @@ Ext.define('FlexCenter.user.view.UserView', {
             tplDetail: [
                 '<tpl for=".">',
                 '昵称' + ' : <b>{nickName}</b><br/>',
-                userRoleRes.header.defaultRoleName + ' : <b>{defaultRoleDisplayName}</b><br/>',
                 userRoleRes.userRoles + ' : <b><tpl for="simpleRoles"><tpl if="xindex != 1">, </tpl>{#}. {displayName}</tpl></b><br/>',
                 globalRes.header.createDate + ' : <b>{createDate}</b><br/>',
                 '</tpl>'
@@ -155,10 +155,6 @@ Ext.define('FlexCenter.user.view.UserView', {
             {
                 header: userRoleRes.header.username,
                 dataIndex: 'username'
-            },
-            {
-                header: userRoleRes.header.defaultRoleName,
-                dataIndex: 'defaultRoleDisplayName'
             },
             {
                 header: userRoleRes.header.accountLocked,
@@ -187,9 +183,6 @@ Ext.define('FlexCenter.user.view.UserView', {
                 if (record.get('accountLocked')) {
                     return 'locked-row';
                 }
-                if (record.get('username') == 'admin') {
-                    return 'disabled-row';
-                }
             }
         };
         me.listeners={
@@ -217,7 +210,7 @@ Ext.define('FlexCenter.user.view.UserView', {
     },
     onAddClick: function () {
         var me = this;
-        ajaxPostRequest('userRoleController.do?method=readAvailableRoles', {}, function (result) {
+        ajaxPostRequest('userRoleController.do?method=readAvailableRoles', {projectId:projectId}, function (result) {
             if (result.success) {
                 var availableRoleStore = Ext.create('FlexCenter.user.store.Roles', {
                     storeId: 'availableRoleStore',
@@ -303,7 +296,7 @@ Ext.define('FlexCenter.user.view.UserView', {
     },
     onEditClick: function () {
         var me = this;
-        ajaxPostRequest('userRoleController.do?method=readAvailableRoles', undefined, function (result) {
+        ajaxPostRequest('userRoleController.do?method=readAvailableRoles', {projectId:projectId}, function (result) {
             if (result.success) {
                 var availableRoleStore = Ext.create('FlexCenter.user.store.Roles', {
                     storeId: 'availableRoleStore',

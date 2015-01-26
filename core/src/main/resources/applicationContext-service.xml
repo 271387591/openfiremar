@@ -57,7 +57,7 @@
     <!-- Encryption in UserManagerImpl. Can override in security.xml.        -->
     <!-- =================================================================== -->
     <bean id="passwordEncoder" class="com.ozstrategy.encode.PswEncode">
-        <constructor-arg value="Uw51jHUNpY390Jx"/>
+        <constructor-arg value="V6N82IHvy9H6kCq"/>
     </bean>
 
 </beans>

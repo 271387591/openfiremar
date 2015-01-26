@@ -1,5 +1,6 @@
 package com.ozstrategy.util;
 
+import com.ozstrategy.Constants;
 import com.ozstrategy.model.openfire.HistoryMessage;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -41,7 +42,7 @@ import java.util.Date;
 import java.util.List;
 
 public class LuceneUtils {
-    private static String INDEX_DIR = System.getProperty("index") + "/index";
+    private static String INDEX_DIR = Constants.imDataDir + "/index";
     private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_44);
     private static Integer MAX=80000;
     private static Log log= LogFactory.getLog(LuceneUtils.class);
@@ -133,6 +134,7 @@ public class LuceneUtils {
         }
         try {
         } finally {
+            IndexWriter.unlock(directory);
             closeAll(directory, indexWriter);
         }
         return maxId;

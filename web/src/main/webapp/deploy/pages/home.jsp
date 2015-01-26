@@ -23,6 +23,9 @@
     <script type="text/javascript" src="<c:url value='/scripts/ext/locale/ext-lang-${language}.js'/>"></script>
 
     <script type="text/javascript">
+        var projectId;
+        var projectName;
+        var porjectActivationCode
         extTheme = '<c:url value="/scripts/ext/resources/css/ext-all"/>';
         basePath = '<c:url value="/"/>';
         Ext.Loader.setConfig({
@@ -60,7 +63,8 @@
   var treeRegister;
   var surveyRegister;
   Ext.onReady(function () {
-    flexCenterApp = new FlexCenter.App();
+      Ext.QuickTips.init();
+      Ext.create('FlexCenter.ProjectViewport');
     var oDiv = document.getElementById('loading');
     oDiv.style.display = "none";
     for (var i = 0; i < oDiv.childNodes.length; i++)

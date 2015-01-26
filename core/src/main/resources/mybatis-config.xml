@@ -33,19 +33,17 @@
 		<!--<setting name="aggressiveLazyLoading" value="false"/>-->
     </settings>
 	<mappers>
+		<mapper class="com.ozstrategy.dao.UniversalDao"/>
 		<mapper resource="com/ozstrategy/dao/userrole/UserMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/UserRoleMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/RoleMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/userrole/SystemViewMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/FeatureMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/RoleFeatureMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/system/ApplicationConfigMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/project/ProjectMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/project/ProjectUserMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/openfire/OpenfireUserMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/openfire/OpenfireMucRoomMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/appstore/AppStoreMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/export/MessageExportMapper.xml"/>
-		<!--<mapper class="com.ozstrategy.dao.UniversalDao"/>-->
 	</mappers>
 </configuration>

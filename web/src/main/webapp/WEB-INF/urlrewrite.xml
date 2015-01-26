@@ -37,7 +37,22 @@
         <from>/app/search</from>
         <to>/service/historyMessageController.do?method=list</to>
     </rule>
-    
+    <rule>
+        <from>/app/getHistory</from>
+        <to>/service/historyMessageController.do?method=listFromDb</to>
+    </rule>
+    <rule>
+        <from>/app/getManagerMessage</from>
+        <to>/service/historyMessageController.do?method=listManagerMessages</to>
+    </rule>
+    <rule>
+        <from>/app/deleteMessage</from>
+        <to>/service/historyMessageController.do?method=deleteMessage</to>
+    </rule>
+    <rule>
+        <from>/app/getUser</from>
+        <to>/service/userController.do?method=listAppUsers</to>
+    </rule>
     
     
     <rule>
@@ -75,16 +90,6 @@
         <to>/styles/$1</to>
     </rule>
     <rule>
-        <from>/mxgraph/**</from>
-        <to>/mxgraph/$1</to>
-    </rule>
-    <rule>
-        <from>/**/mxgraph/**</from>
-        <to>/mxgraph/$2</to>
-    </rule>
-    
-    
-    <rule>
         <from>/demo/**</from>
         <to>/demo/$1</to>
     </rule>
@@ -101,11 +106,6 @@
         <!--<from>/service/</from>-->
         <!--<to>/login.jsp</to>-->
     <!--</rule>-->
-    
-    <rule>
-        <from>/pushlet.srv</from>
-        <to>/pushlet.srv</to>
-    </rule>
     
     
     

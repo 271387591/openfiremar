@@ -3,7 +3,9 @@ package com.ozstrategy.webapp.controller.export;
 import com.ozstrategy.Constants;
 import com.ozstrategy.model.export.ExportType;
 import com.ozstrategy.model.export.MessageExport;
+import com.ozstrategy.model.project.Project;
 import com.ozstrategy.service.export.MessageExportManager;
+import com.ozstrategy.service.project.ProjectManager;
 import com.ozstrategy.util.FileHelper;
 import com.ozstrategy.webapp.command.JsonReaderResponse;
 import com.ozstrategy.webapp.command.export.MessageExportCommand;
@@ -45,6 +47,9 @@ public class MessageExportController extends BaseController {
     
     @Autowired
     private MessageExportManager messageExportManager;
+    @Autowired
+    private ProjectManager projectManager;
+    
     private static Map<String,Boolean> detailMap=new ConcurrentHashMap<String, Boolean>();
     private static Map<String,Boolean> finishedMap=new ConcurrentHashMap<String, Boolean>();
     private ExecutorService executorService= Executors.newFixedThreadPool(10);
@@ -86,6 +91,8 @@ public class MessageExportController extends BaseController {
         final String username=request.getRemoteUser();
         final String startTime=request.getParameter("startTime");
         final String endTime=request.getParameter("endTime");
+        final Long projectId=parseLong(request.getParameter("projectId"));
+        final String type=request.getParameter("type");
         Map<String,Object> result=new HashMap<String, Object>();
         Date ssDate= null;
         Date eeDate=null;
@@ -100,7 +107,7 @@ public class MessageExportController extends BaseController {
         
         finishedMap.put(username,false);
         try {
-            if(!messageExportManager.checkExportDataExist(sDate,eDate)){
+            if(!messageExportManager.checkExportDataExist(sDate,eDate,projectId)){
                 result.put("success",false);
                 result.put("message","没有数据可导出");
                 return result;
@@ -115,7 +122,7 @@ public class MessageExportController extends BaseController {
                 File finalUploadedFile=null;
                 try{
                     
-                    String attachFilesDirStr = request.getRealPath("/") + "/"+exportFileDir+"/";
+                    String attachFilesDirStr = Constants.imDataDir + "/"+exportFileDir+"/";
                     attachFilesDirStr= FilenameUtils.normalize(attachFilesDirStr);
                     File fileDir = new File(attachFilesDirStr);
                     if (fileDir.exists() == false) {
@@ -126,21 +133,30 @@ public class MessageExportController extends BaseController {
                     if(!finalUploadedFile.exists()){
                         finalUploadedFile.mkdir();
                     }
-                    messageExportManager.exportMessage(sDate,eDate,finalUploadedFile);
-                    String finalExportZipFileName= "聊天记录"+DateFormatUtils.format(new Date(),Constants.YMDHMS);
+                    Project project=projectManager.getProjectById(projectId);
+                    String finalExportZipFileName=null;
+                    if(StringUtils.equals(ExportType.MessagePicture.name(),type)){
+                        messageExportManager.exportMessage(sDate,eDate,finalUploadedFile,project.getId());
+                        finalExportZipFileName= "工程("+project.getName()+")聊天记录"+DateFormatUtils.format(new Date(),Constants.YMDHMS);
+                    }else if(StringUtils.equals(ExportType.Voice.name(),type)){
+                        messageExportManager.exportVoice(sDate, eDate, finalUploadedFile, project.getId());
+                        finalExportZipFileName= "工程("+project.getName()+")语音记录"+DateFormatUtils.format(new Date(),Constants.YMDHMS);
+                    }
                     File zipFile = FileHelper.fileToZip(finalUploadedFile, fileDir, finalExportZipFileName);
                     FileHelper.deleteDirectory(finalUploadedFile);
                     MessageExport messageExport=new MessageExport();
                     messageExport.setCreateDate(new Date());
                     messageExport.setLastUpdateDate(new Date());
-                    messageExport.setType(ExportType.MessagePicture);
+                    messageExport.setType(ExportType.valueOf(type));
                     messageExport.setExportor(username);
                     messageExport.setExecuteDate(new Date());
                     messageExport.setFilePath(zipFile.getAbsolutePath());
+                    messageExport.setProjectId(projectId);
                     messageExportManager.save(messageExport);
                     detailMap.put(username,true);
                     finishedMap.put(username,true);
                 }catch (Exception e){
+                    e.printStackTrace();
                     logger.error("export message fail",e);
                     FileHelper.deleteDirectory(finalUploadedFile);
                     detailMap.put(username,false);

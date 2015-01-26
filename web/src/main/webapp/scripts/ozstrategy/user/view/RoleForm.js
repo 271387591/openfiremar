@@ -78,6 +78,10 @@ Ext.define('FlexCenter.user.view.RoleForm',{
                               name:'id',
                               hidden:true
                           },{
+                              name:'projectId',
+                              value:projectId,
+                              hidden:true
+                          },{
                               name: 'name',
                               fieldLabel: '<font color="red">*</font>'+userRoleRes.header.roleName,
                               allowBlank: false,

@@ -13,7 +13,7 @@ import org.springframework.test.annotation.Rollback;
 
 import java.util.Date;
 
-public class UserManagerTest extends BaseManagerTestCase {
+public class UserManagerTest {
     private Log log = LogFactory.getLog(UserManagerTest.class);
     @Autowired
     private UserManager userManager;
@@ -48,7 +48,7 @@ public class UserManagerTest extends BaseManagerTestCase {
 
     @Test
     public void testGetUser() throws Exception {
-        User user=userDao.getUserById(1L);
+        User user=userDao.getUserByUsername("admin",1L);
         System.out.println(user.getId());
         System.out.println("sdfdsf");
 //        System.out.println(user.getDefaultRole().getDisplayName());

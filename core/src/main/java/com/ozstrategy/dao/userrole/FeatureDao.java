@@ -1,5 +1,6 @@
 package com.ozstrategy.dao.userrole;
 
+import com.ozstrategy.dao.UniversalDao;
 import com.ozstrategy.model.userrole.Feature;
 import org.apache.ibatis.session.RowBounds;
 
@@ -7,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public interface FeatureDao{
+public interface FeatureDao extends UniversalDao<Feature,Long>{
     List<Feature> listFeatures(Map<String,Object> map, RowBounds rowBounds);
     List<Feature> getFeaturesByRoleId(Long roleId);
     List<Feature> getFeaturesByUsername(String username);

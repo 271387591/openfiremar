@@ -1,7 +1,7 @@
 package com.ozstrategy.webapp.command.export;
 
 import com.ozstrategy.model.export.MessageExport;
-import com.ozstrategy.webapp.command.BaseObjectCommand;
+import com.ozstrategy.webapp.command.BaseEntityCommand;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by lihao on 1/11/15.
  */
-public class MessageExportCommand extends BaseObjectCommand {
+public class MessageExportCommand extends BaseEntityCommand {
     private Long id;
     private String exportor;
     private String type;

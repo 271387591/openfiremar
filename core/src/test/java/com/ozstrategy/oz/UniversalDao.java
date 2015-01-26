@@ -1,6 +1,5 @@
-package com.ozstrategy.dao;
+package com.ozstrategy.oz;
 
-import com.ozstrategy.model.BaseEntity;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.SelectKey;

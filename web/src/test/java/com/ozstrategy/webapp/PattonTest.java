@@ -50,7 +50,7 @@ public class PattonTest {
         nvps.add(new BasicNameValuePair("username", "admin"));
         nvps.add(new BasicNameValuePair("password", "tomcat"));
         nvps.add(new BasicNameValuePair("nickName", "李浩"));
-        nvps.add(new BasicNameValuePair("projectId", "1"));
+        nvps.add(new BasicNameValuePair("projectId", "8"));
         nvps.add(new BasicNameValuePair("activationCode", "111"));
 
         try {
@@ -92,6 +92,7 @@ public class PattonTest {
 
         nvps.add(new BasicNameValuePair("username", "admin"));
         nvps.add(new BasicNameValuePair("password", "tomcat"));
+        nvps.add(new BasicNameValuePair("projectId", "9"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;
@@ -109,7 +110,7 @@ public class PattonTest {
     @Test
     public void testGetProjects() throws Exception{
         String url="http://120.24.234.71/im/app/getProjects";
-//        String url="http://localhost:9095/openfiremar/app/login";
+//        String url="http://localhost:9095/openfiremar/app/getProjects";
         HttpPost httpost = new HttpPost(url);
 //        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -129,6 +130,174 @@ public class PattonTest {
         httpclient.getConnectionManager().shutdown();
         
     }
+    /**
+     * 接口参数：
+     * start:数据起始量，比如：从第0条数据开始，start=0,从第34条数据开始：start=34 （必须，并且为数字）
+     * limit:每次获取的数据量,默认每次25条，（可以不传，默认25条）
+     * projectId:工程ID（必须）
+     *
+     * 参数示例：比如每页显示30条数据，参数传递为：
+     * 第一页：start=0&limit=30
+     * 第二页：start=31&limit=30
+     * 第三页：start=61&limit=30
+     * .......
+     *
+     * 请求方式：POST/GET
+     * 返回字段说明：
+     * id:消息ID
+     * fromId：发送者用户名
+     * fromNick：发送者昵称
+     * toId:工程ID
+     * toNick：工程名称
+     * type：消息类型，0表示图片，1表示音频
+     * message：消息类容
+     * createDate：发送时间
+     * manager：是否为管理员消息，1表示管理员，0表示普通用户
+     * deleted：表示是否为删除的数据，1表示是，0表示否
+     * messageId：openfire每次发送消息时的id,该参数在管理员删除信息时需要
+     * @throws Exception
+     */
+    
+     @Test
+    public void testGetHistory() throws Exception{
+        String url="http://120.24.234.71/im/app/getHistory";
+//        String url="http://localhost:9095/openfiremar/app/getHistory";
+        HttpPost httpost = new HttpPost(url);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+        nvps.add(new BasicNameValuePair("start", "0"));
+        nvps.add(new BasicNameValuePair("limit", "25"));
+        nvps.add(new BasicNameValuePair("projectId", "2"));
+        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httpost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+        
+    }
+     /**
+     * 接口参数：
+     * start:数据起始量，比如：从第0条数据开始，start=0,从第34条数据开始：start=34 （必须，并且为数字）
+     * limit:每次获取的数据量,默认每次25条，（可以不传，默认25条）
+     * projectId:工程ID（必须）
+     *
+     * 参数示例：比如每页显示30条数据，参数传递为：
+     * 第一页：start=0&limit=30
+     * 第二页：start=31&limit=30
+     * 第三页：start=61&limit=30
+     * .......
+     *
+     * 请求方式：POST/GET
+     * 返回字段说明：
+     * id:消息ID
+     * fromId：发送者用户名
+     * fromNick：发送者昵称
+     * toId:工程ID
+     * toNick：工程名称
+     * type：消息类型，0表示图片，1表示音频
+     * message：消息类容
+     * createDate：发送时间
+     * manager：是否为管理员消息，1表示管理员，0表示普通用户
+     * deleted：表示是否为删除的数据，1表示是，0表示否
+     * messageId：openfire每次发送消息时的id,该参数在管理员删除信息时需要
+     * @throws Exception
+     */
+    
+     @Test
+    public void testGetManagerMessage() throws Exception{
+        String url="http://120.24.234.71/im/app/getManagerMessage";
+//        String url="http://localhost:9095/openfiremar/app/getHistory";
+        HttpPost httpost = new HttpPost(url);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+        nvps.add(new BasicNameValuePair("start", "0"));
+        nvps.add(new BasicNameValuePair("limit", "25"));
+        nvps.add(new BasicNameValuePair("projectId", "2"));
+        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httpost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+        
+    }
+    /**
+     * 接口参数：
+     * projectId:工程ID（必须）
+     * messageId:openfire每次发送消息时的id,
+     *
+     *
+     * 请求方式：POST
+     * @throws Exception
+     */
+    @Test
+    public void testDeleteMessage() throws Exception{
+        String url="http://120.24.234.71/im/app/deleteMessage";
+//        String url="http://localhost:9095/openfiremar/app/getHistory";
+        HttpPost httpost = new HttpPost(url);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+        nvps.add(new BasicNameValuePair("projectId", "2"));
+        nvps.add(new BasicNameValuePair("messageId", "SSSSS"));
+        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httpost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+        
+    }
+    
+    
+    
+    @Test
+    public void testSearch() throws Exception{
+//        String url="http://120.24.234.71/im/app/search";
+        String url="http://localhost:9095/openfiremar/app/search";
+        HttpPost httpost = new HttpPost(url);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+
+//        nvps.add(new BasicNameValuePair("message", "admin"));
+//        nvps.add(new BasicNameValuePair("fromNick", "tomcat"));
+//        nvps.add(new BasicNameValuePair("toNick", "tomcat"));
+        nvps.add(new BasicNameValuePair("startTime", "2014-12-23 12:23:34"));
+        nvps.add(new BasicNameValuePair("endTime", "2015-12-23 12:23:34"));
+        nvps.add(new BasicNameValuePair("start", "0"));
+        nvps.add(new BasicNameValuePair("limit", "2"));
+        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httpost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+        
+    }
+    
     
     
     @Test

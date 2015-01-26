@@ -40,11 +40,15 @@ public class MessageExportManagerImpl implements MessageExportManager {
         return messageExportDao.get(id);
     }
 
-    public void exportMessage(Date startTime, Date endTime, File folder) throws Exception {
-        historyMessageDao.export(startTime,endTime,folder);
+    public void exportMessage(Date startTime, Date endTime, File folder,Long projectId) throws Exception {
+        historyMessageDao.exportMessage(startTime, endTime, folder, projectId);
     }
 
-    public boolean checkExportDataExist(Date startTime, Date endTime) throws Exception {
-        return historyMessageDao.checkExportDataExist(startTime,endTime);
+    public void exportVoice(Date startTime, Date endTime, File folder, Long projectId) throws Exception {
+        historyMessageDao.exportVoice(startTime,endTime,folder,projectId);
+    }
+
+    public boolean checkExportDataExist(Date startTime, Date endTime,Long projectId) throws Exception {
+        return historyMessageDao.checkExportDataExist(startTime,endTime,projectId);
     }
 }

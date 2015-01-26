@@ -1,17 +1,17 @@
-package com.ozstrategy.dao;
+package com.ozstrategy.oz;
 
-import com.ozstrategy.model.BaseEntity;
 
 public class SqlHelper<T extends BaseEntity> {
+
 	public String insert(T entity) {
 		return entity.returnInsertSql();
 	}
 	public String update(T entity) {
-		return entity.returnUpdateSql();
+		return entity.returnInsertSql();
 	}
 	public String delete(T entity) {
-		return entity.returnDeleteSql();
+		return entity.returnInsertSql();
 	}
-
-
+	
+	
 }

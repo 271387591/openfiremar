@@ -12,7 +12,6 @@ Ext.define('FlexCenter.user.model.Role',{
     'name',
     'displayName',
       'context',
-      'systemViewId',
     'description',
       'text',
     {name:'createDate',convert:function(v){
@@ -21,10 +20,8 @@ Ext.define('FlexCenter.user.model.Role',{
     {name:'lastUpdateDate',convert:function(v){
         return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
     }},
-      'simpleFeatures',
-      'users'
+      'simpleFeatures'
   ],
-    hasMany: { model: 'FlexCenter.user.model.Feature', name: 'simpleFeatures' },
-    hasMany: { model: 'FlexCenter.user.model.User', name: 'users' }
+    hasMany: { model: 'FlexCenter.user.model.Feature', name: 'simpleFeatures' }
 
 });

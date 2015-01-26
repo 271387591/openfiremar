@@ -1,42 +1,86 @@
 package com.ozstrategy.model.userrole;
 
 import com.ozstrategy.Constants;
-import com.ozstrategy.model.BaseObject;
-import com.ozstrategy.model.project.ProjectUser;
+import com.ozstrategy.model.BaseEntity;
+import com.ozstrategy.model.project.Project;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class User extends BaseObject implements UserDetails {
+@Entity
+@Table(name = "ext_user")
+public class User extends BaseEntity implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column
     private Boolean accountExpired = Boolean.FALSE;
+    @Column
     private Boolean accountLocked = Boolean.FALSE;
+    @Column
     private Boolean credentialsExpired = Boolean.FALSE;
+    @Column
     private Boolean enabled = Boolean.TRUE;
-    private Address address = new Address();
+    @Column
     private String email;
+    @Column
     private String firstName;
+    @Column
     private String lastName;
+    @Column
     private String password;
-    private String passwordHint;
+    @Column
     private String phoneNumber;
+    @Column
     private String username;
+    @Column
     private Integer version;
+    @Column
     private String nickName;
+    @Column
     private String userNo;
+    @Column
     private Boolean authentication = Boolean.TRUE;
-    private String website;
+    @Column
     private String gender;
+    @Column
     private String mobile;
+    @JoinTable(
+            name               = "ext_userrole",
+            joinColumns        = { @JoinColumn(name = "userId") },
+            inverseJoinColumns = @JoinColumn(name = "roleId")
+    )
+    @ManyToMany(
+            fetch   = FetchType.LAZY,
+            cascade = {CascadeType.ALL}
+    )
+    @Transient
     private Set<Role> roles = new HashSet<Role>();
-    private Role defaultRole;
-    private Set<ProjectUser> projectUsers = new HashSet<ProjectUser>();
+    @Transient
     private String fullName;
+    @Column
+    private Long projectId;
+    @Transient
+    private Project project;
+    @Column
+    private Boolean manager;
 
     public User() {
     }
@@ -85,14 +129,6 @@ public class User extends BaseObject implements UserDetails {
         this.enabled = enabled;
     }
 
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -132,13 +168,7 @@ public class User extends BaseObject implements UserDetails {
         this.password = password;
     }
 
-    public String getPasswordHint() {
-        return passwordHint;
-    }
-
-    public void setPasswordHint(String passwordHint) {
-        this.passwordHint = passwordHint;
-    }
+    
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -183,13 +213,7 @@ public class User extends BaseObject implements UserDetails {
         return firstName + lastName;
     }
 
-    public Role getDefaultRole() {
-        return defaultRole;
-    }
-
-    public void setDefaultRole(Role defaultRole) {
-        this.defaultRole = defaultRole;
-    }
+   
 
     public void setUsername(String username) {
         this.username = username;
@@ -203,13 +227,6 @@ public class User extends BaseObject implements UserDetails {
         this.version = version;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
 
     public String getMobile() {
         return mobile;
@@ -243,14 +260,6 @@ public class User extends BaseObject implements UserDetails {
         this.nickName = nickName;
     }
 
-    public Set<ProjectUser> getProjectUsers() {
-        return projectUsers;
-    }
-
-    public void setProjectUsers(Set<ProjectUser> projectUsers) {
-        this.projectUsers = projectUsers;
-    }
-
     public Boolean getAuthentication() {
         return authentication;
     }
@@ -265,6 +274,31 @@ public class User extends BaseObject implements UserDetails {
 
     public void setUserNo(String userNo) {
         this.userNo = userNo;
+    }
+
+    public Boolean getManager() {
+        return manager;
+    }
+
+    public void setManager(Boolean manager) {
+        this.manager = manager;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     @Override

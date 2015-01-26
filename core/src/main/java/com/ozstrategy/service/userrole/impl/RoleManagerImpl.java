@@ -6,7 +6,6 @@ import com.ozstrategy.model.userrole.Feature;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.RoleFeature;
 import com.ozstrategy.service.userrole.RoleManager;
-import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,10 +40,10 @@ public class RoleManagerImpl  implements RoleManager {
     public void saveOrUpdate(Role role,List<Feature> features) throws Exception{
         boolean save=true;
         if(role.getId()!=null){
-            roleDao.updateRole(role);
+            roleDao.update(role);
             save=false;
         }else {
-            roleDao.saveRole(role);
+            roleDao.save(role);
         }
         if(features!=null && features.size()>0){
             if(!save){
@@ -60,9 +59,9 @@ public class RoleManagerImpl  implements RoleManager {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void removeRoleById(Long id) {
-        roleFeatureDao.removeRoleFeatureByRoleId(id);
-        roleDao.removeRoleById(id);
+    public void removeRoleById(Role role) {
+        roleFeatureDao.removeRoleFeatureByRoleId(role.getId());
+        roleDao.delete(role);
     }
 
     public Role getRoleByName(String name) {
@@ -82,9 +81,6 @@ public class RoleManagerImpl  implements RoleManager {
             Role role = roleDao.getRoleByName(roleName);
             if(role==null){
                 return false;
-            }
-            if(StringUtils.equals(context,role.getSystemView().getContext())){
-                return true;
             }
         }
         return false;

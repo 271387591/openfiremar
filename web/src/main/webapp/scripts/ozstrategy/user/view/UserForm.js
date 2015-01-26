@@ -85,6 +85,17 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                     name: 'id'
                                 },
                                 {
+                                    name:'projectId',
+                                    value:projectId,
+                                    hidden:true
+                                },
+                                {
+                                    name:'activationCode',
+                                    value:porjectActivationCode,
+                                    hidden:true
+                                },
+                                
+                                {
                                     xtype: 'hidden',
                                     name: 'defaultRoleId',
                                     itemId: 'defaultRoleId'
@@ -157,26 +168,6 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                         }
                                     },
                                     allowBlank: false
-                                },
-                                {
-                                    fieldLabel:'<font color="red">*</font>'+'工程选择',
-                                    xtype:'combo',
-                                    name:'projectId',
-                                    mode:'remote',
-                                    editable:false,
-                                    triggerAction:'all',
-                                    store:availableProjectStore,
-                                    valueField:'id',
-                                    displayField:'name',
-                                    pageSize:15,
-                                    allowBlank: false,
-                                    listeners:{
-                                        select:function(combo, records){
-                                            var activationCode=me.down('#activationCode');
-                                            var code=records[0].get('activationCode');
-                                            activationCode.setValue(code)
-                                        }
-                                    }
                                 }
                             ]
                         },
@@ -221,17 +212,7 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                         }
                                     },
                                     selectedCfg: {
-                                        selModel: {
-                                            selType: 'checkboxmodel',
-                                            mode: 'SINGLE',
-                                            allowDeselect: false,
-                                            injectCheckbox: 'first',
-                                            listeners: {
-                                                'selectionchange': function (rowModel, records, eOpts) {
-                                                    me.onCheckedChange(records);
-                                                }
-                                            }
-                                        },
+                                        
                                         features: [
                                             {
                                                 id: 'searchSelectedRole',
@@ -245,7 +226,7 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                             'refresh': function (view, eOpts) {
                                                 var selModel = view.ownerCt.getSelectionModel();
                                                 var store = view.ownerCt.store;
-                                                me.onGridViewRefresh(store, selModel);
+                                                //me.onGridViewRefresh(store, selModel);
                                             }
                                         },
                                         getRowClass: function (record) {
@@ -341,10 +322,10 @@ Ext.define('FlexCenter.user.view.UserForm', {
         Ext.each(simpleRoles, function (data) {
             roleids.push(data.id);
         })
-        if (roleids.length == 0) {
-            Ext.MessageBox.alert(globalRes.title.prompt, userRoleRes.msg.addUserHasRole);
-            return;
-        }
+        //if (roleids.length == 0) {
+        //    Ext.MessageBox.alert(globalRes.title.prompt, userRoleRes.msg.addUserHasRole);
+        //    return;
+        //}
         datas.roleIds = roleids.join(',');
         if (form.isValid()) {
             if (!active) {

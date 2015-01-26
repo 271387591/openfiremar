@@ -20,7 +20,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                 storeId:'MessageExportStore'
             });
         }
-        store.load();
+        store.getProxy().extraParams={projectId:projectId};
         return store;
     },
     initComponent: function () {
@@ -59,6 +59,13 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 itemId:'picStartTime',
                                                 format:'Y-m-d 00:00:00',
                                                 maxValue:new Date(),
+                                                minValue:function(){
+                                                    var newValue=new Date();
+                                                    var year=newValue.getFullYear();
+                                                    var moth=newValue.getMonth()-3;
+                                                    var day=newValue.getDate();
+                                                    return new Date(year,moth,day);
+                                                }(),
                                                 name : 'startTime'
                                             },
                                             {
@@ -79,6 +86,13 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                             s.setValue(newValue);
                                                         }
                                                         s.setMaxValue(newValue);
+                                                        if(newValue){
+                                                            var year=newValue.getFullYear();
+                                                            var moth=newValue.getMonth()-3;
+                                                            var day=newValue.getDate();
+                                                            var min=new Date(year,moth,day);
+                                                            s.setMinValue(min);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -95,10 +109,10 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 formBind: true,
                                                 text: '导出',
                                                 handler: function () {
-                                                    var picStartTime=me.down('#picStartTime').getValue();
-                                                    var picEndTime=me.down('#picEndTime').getValue();
                                                     var form=me.down('#picForm').getForm();
                                                     var data=form.getValues();
+                                                    data.projectId=projectId;
+                                                    data.type='MessagePicture';
                                                     ajaxPostRequest("messageExportController.do?method=export",data,function(result){
                                                         if(result.success){
                                                             var win=me.createExportWin();
@@ -121,6 +135,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                         xtype:'form',
                         frame: false,
                         bodyPadding: 5,
+                        itemId:'vcForm',
                         border:false,
                         items:[
                             {
@@ -135,19 +150,49 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                         items:[
                                             {
                                                 fieldLabel:'开始时间',
-                                                xtype : 'datetimefield',
+                                                xtype : 'datefield',
+                                                format:'Y-m-d 00:00:00',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
+                                                maxValue:new Date(),
+                                                itemId:'vcStartTime',
+                                                minValue:function(){
+                                                    var newValue=new Date();
+                                                    var year=newValue.getFullYear();
+                                                    var moth=newValue.getMonth()-3;
+                                                    var day=newValue.getDate();
+                                                    return new Date(year,moth,day);
+                                                }(),
                                                 name : 'startTime'
                                             },
                                             {
                                                 fieldLabel:'结束时间',
-                                                xtype : 'datetimefield',
+                                                xtype : 'datefield',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
-                                                name : 'endTime'
+                                                name : 'endTime',
+                                                format:'Y-m-d 23:59:59',
+                                                maxValue:new Date(),
+                                                itemId : 'vcEndTime',
+                                                listeners:{
+                                                    change:function( f, newValue, oldValue, eOpts ){
+                                                        var s=me.down('#vcStartTime');
+                                                        var sv= s.getValue();
+                                                        if(sv>newValue){
+                                                            s.setValue(newValue);
+                                                        }
+                                                        s.setMaxValue(newValue);
+                                                        if(newValue){
+                                                            var year=newValue.getFullYear();
+                                                            var moth=newValue.getMonth()-3;
+                                                            var day=newValue.getDate();
+                                                            var min=new Date(year,moth,day);
+                                                            s.setMinValue(min);
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     },
@@ -160,8 +205,22 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 itemId: 'save',
                                                 width:120,
                                                 margin:1,
+                                                formBind: true,
                                                 text: '导出',
                                                 handler: function () {
+                                                    var form=me.down('#vcForm').getForm();
+                                                    var data=form.getValues();
+                                                    data.projectId=projectId;
+                                                    data.type='Voice';
+                                                    ajaxPostRequest("messageExportController.do?method=export",data,function(result){
+                                                        if(result.success){
+                                                            var win=me.createExportWin();
+                                                            win.show();
+                                                            win.fireEvent('startBar');
+                                                        }else{
+                                                            Ext.Msg.alert('错误',result.message);
+                                                        }
+                                                    });
 
                                                 }
                                             }
@@ -228,7 +287,13 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                     {
                         header: '操作者(用户名)',
                         flex:1,
-                        dataIndex: 'exportor'
+                        dataIndex: 'exportor',
+                        renderer: function (v) {
+                            if(!v){
+                                return '系统自动执行';
+                            }
+                            return v;
+                        }
                     },
                     {
                         header:'下载',
@@ -310,6 +375,8 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                     itemId:'closeBtn',
                     handler:function(){
                         win.close();
+                        var form=me.down('#picForm').getForm();
+                        form.reset();
                         me.down('grid').getStore().load();
                     }
                     
@@ -364,170 +431,5 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
         });
         return win;
         
-    },
-    onAddClick:function(){
-        var me=this;
-        var win=Ext.widget('window',{
-            title:'数据导出',
-            width:400,
-            layout: 'fit',
-            autoShow: true,
-            modal: true,
-            border:false,
-            autoScroll:true,
-            autoHeight:true,
-            items:[
-                {
-                    xtype: 'form',
-                    frame: true,
-                    bodyPadding: 5,
-                    layout: 'anchor',
-                    defaults: {
-                        anchor: '100%'
-                    },
-                    autoScroll: true,
-                    buttons: [
-                        {
-                            xtype: 'button',
-                            itemId: 'save',
-                            text: globalRes.buttons.ok,
-                            formBind: true,
-                            handler: function () {
-                                var form=win.down('form').getForm();
-                                var data=form.getValues();
-                                ajaxPostRequest('historyMessageController.do?method=delete',data,function(result){
-                                    if(result.success){
-                                        me.down('grid').getStore().load();
-                                        Ext.Msg.alert(globalRes.title.prompt,globalRes.removeSuccess);
-                                    }else{
-                                        Ext.MessageBox.alert({
-                                            title:globalRes.title.warning,
-                                            icon: Ext.MessageBox.ERROR,
-                                            msg:result.message,
-                                            buttons:Ext.MessageBox.OK
-                                        });
-                                    }
-                                });
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            text: globalRes.buttons.cancel,
-                            handler: function () {
-                                win.close();
-                            }
-                        }
-                    ],
-                    items:[
-                        {
-                            fieldLabel:'开始时间',
-                            xtype : 'datetimefield',
-                            editable:false,
-                            allowBlank: false,
-                            name : 'startTime'
-                        },
-                        {
-                            fieldLabel:'结束时间',
-                            xtype : 'datetimefield',
-                            editable:false,
-                            allowBlank: false,
-                            name : 'endTime'
-                        }
-                    ]
-                }
-            ]
-        });
-        win.show();
-        
-    },
-
-    onDeleteClick:function(){
-        var me = this;
-        Ext.ux.form.Downloader.get({
-            url: 'messageExportController.do?method=export',
-            params:{id:1},
-            handleException: function(response,options){
-                var me = this,result = Ext.decode(response.responseXML.body.innerText,true);
-                if(result){
-                    Ext.Msg.alert('Message',result['message']);
-                    barwin.close();
-                }else{
-                    Ext.Msg.alert('Message',' An unknown Error occurred while downloading.');
-                    barwin.close();
-                }
-            }
-        });
-        return;
-        var win=Ext.widget('window',{
-            title:'删除',
-            width:400,
-            layout: 'fit',
-            autoShow: true,
-            modal: true,
-            border:false,
-            autoScroll:true,
-            autoHeight:true,
-            items:[
-                {
-                    xtype: 'form',
-                    frame: true,
-                    bodyPadding: 5,
-                    layout: 'anchor',
-                    defaults: {
-                        anchor: '100%'
-                    },
-                    autoScroll: true,
-                    buttons: [
-                        {
-                            xtype: 'button',
-                            itemId: 'save',
-                            text: globalRes.buttons.ok,
-                            formBind: true,
-                            handler: function () {
-                                var form=win.down('form').getForm();
-                                var data=form.getValues();
-                                ajaxPostRequest('historyMessageController.do?method=delete',data,function(result){
-                                    if(result.success){
-                                        me.down('grid').getStore().load();
-                                        Ext.Msg.alert(globalRes.title.prompt,globalRes.removeSuccess);
-                                    }else{
-                                        Ext.MessageBox.alert({
-                                            title:globalRes.title.warning,
-                                            icon: Ext.MessageBox.ERROR,
-                                            msg:result.message,
-                                            buttons:Ext.MessageBox.OK
-                                        });
-                                    }
-                                });
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            text: globalRes.buttons.cancel,
-                            handler: function () {
-                                win.close();
-                            }
-                        }
-                    ],
-                    items:[
-                        {
-                            fieldLabel:'开始时间',
-                            xtype : 'datetimefield',
-                            editable:false,
-                            allowBlank: false,
-                            name : 'startTime'
-                        },
-                        {
-                            fieldLabel:'结束时间',
-                            xtype : 'datetimefield',
-                            editable:false,
-                            allowBlank: false,
-                            name : 'endTime'
-                        }
-                    ]
-                }
-            ]
-        });
-        win.show();
     }
 });

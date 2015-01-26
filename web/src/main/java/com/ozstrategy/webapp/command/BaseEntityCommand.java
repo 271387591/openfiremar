@@ -1,19 +1,19 @@
 package com.ozstrategy.webapp.command;
 
-import com.ozstrategy.model.BaseObject;
+import com.ozstrategy.model.BaseEntity;
 
 import java.util.Date;
 
 /**
  * Created by lihao on 8/8/14.
  */
-public class BaseObjectCommand {
+public class BaseEntityCommand {
     private Date createDate;
     private Date lastUpdateDate;
-    public BaseObjectCommand(){
+    public BaseEntityCommand(){
         
     }
-    public BaseObjectCommand(BaseObject baseObject){
+    public BaseEntityCommand(BaseEntity baseObject){
         this.createDate=baseObject.getCreateDate();
         this.lastUpdateDate=baseObject.getLastUpdateDate();
     }

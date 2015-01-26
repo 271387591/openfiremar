@@ -37,25 +37,13 @@
 			<transactionManager type="jdbc"></transactionManager>
 			<dataSource type="POOLED">
 				<property name="driver" value="com.mysql.jdbc.Driver"/>
-				<property name="url" value="jdbc:mysql://127.0.0.1:3306/openfiremar?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf-8&amp;amp;autoReconnect=true"/>
+				<property name="url" value="jdbc:mysql://127.0.0.1:3306/mybatistest?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf-8&amp;amp;autoReconnect=true"/>
 				<property name="username" value="root"/>
 				<property name="password" value="Passw0rd"/>
 			</dataSource>
 		</environment>
 	</environments>
 	<mappers>
-		<mapper resource="com/ozstrategy/dao/userrole/UserMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/userrole/UserRoleMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/userrole/RoleMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/userrole/SystemViewMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/userrole/FeatureMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/userrole/RoleFeatureMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/system/ApplicationConfigMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/project/ProjectMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/project/ProjectUserMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/openfire/OpenfireUserMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/openfire/OpenfireMucRoomMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/openfire/HistoryMessageMapper.xml"/>
-		<mapper resource="com/ozstrategy/dao/appstore/AppStoreMapper.xml"/>
+		<mapper class="com.ozstrategy.oz.UniversalDao"/>
 	</mappers>
 </configuration>

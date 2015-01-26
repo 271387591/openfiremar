@@ -2,16 +2,12 @@ package com.ozstrategy.service.userrole.impl;
 
 import com.ozstrategy.Constants;
 import com.ozstrategy.dao.openfire.OpenfireUserDao;
-import com.ozstrategy.dao.project.ProjectUserDao;
-import com.ozstrategy.dao.userrole.SystemViewDao;
 import com.ozstrategy.dao.userrole.UserDao;
 import com.ozstrategy.dao.userrole.UserRoleDao;
 import com.ozstrategy.exception.UserNotAuthenticationException;
 import com.ozstrategy.exception.UserNotFoundException;
 import com.ozstrategy.model.openfire.OpenfireUser;
-import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Role;
-import com.ozstrategy.model.userrole.SystemView;
 import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.userrole.UserManager;
 import org.apache.commons.lang.StringUtils;
@@ -39,10 +35,6 @@ public class UserManagerImpl implements UserManager {
     @Autowired
     private UserRoleDao userRoleDao;
     @Autowired
-    private SystemViewDao systemViewDao;
-    @Autowired
-    private ProjectUserDao projectUserDao;
-    @Autowired
     private OpenfireUserDao openfireUserDao;
     
     
@@ -67,24 +59,20 @@ public class UserManagerImpl implements UserManager {
 
     @Transactional(rollbackFor = Throwable.class)
     public void deleteUser(Long userId) throws Exception{
-        userDao.enabledUser(userId);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public Integer updateUserPassword(Long userId, String oldPassword, String newPassword, boolean admin)  throws Exception{
-        User user=userDao.getUserById(userId);
+    public Integer updateUserPassword(User user, String oldPassword, String newPassword, boolean admin)  throws Exception{
         String password=user.getPassword();
         if(admin){
-            user.setPassword(passwordEncoder.encodePassword(newPassword,null));
-            userDao.updateUserPassword(user);
-            return 0;
+            user.setPassword(passwordEncoder.encodePassword(newPassword, null));
         }else{
             if(!password.equals(passwordEncoder.encodePassword(oldPassword,null))){
                 return 1;
             }
-            user.setPassword(passwordEncoder.encodePassword(newPassword,null));
-            userDao.updateUserPassword(user);
+            user.setPassword(passwordEncoder.encodePassword(newPassword, null));
         }
+        userDao.update(user);
         return 0;
     }
 
@@ -92,30 +80,22 @@ public class UserManagerImpl implements UserManager {
         return userDao.getUserById(id);
     }
 
-    public User getUserByUsername(String username) {
-        return userDao.getUserByUsername(username);
-    }
-
-    public User getUserByEmail(String email) {
-        return userDao.getUserByEmail(email);
-    }
-
-    public User getUserByMobile(String mobile) {
-        return userDao.getUserByMobile(mobile);
+    public User getUserByUsername(String username,Long projectId) {
+        return userDao.getUserByUsername(username,projectId);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void saveOrUpdate(User user) throws Exception{
         boolean save=true;
         if(user.getId()!=null){
-            userDao.updateUser(user);
+            userDao.update(user);
             save=false;
         }else{
             String password=user.getPassword();
             if(StringUtils.isNotEmpty(password)){
                 user.setPassword(passwordEncoder.encodePassword(user.getPassword(), null));
             }
-            userDao.saveUser(user);
+            userDao.save(user);
         }
         Set<Role> roleSet=user.getRoles();
         if(roleSet!=null && roleSet.size()>0){
@@ -129,16 +109,6 @@ public class UserManagerImpl implements UserManager {
                 userRoleDao.saveUserRole(map);
             }
         }
-        Set<ProjectUser> projects=user.getProjectUsers();
-        if(projects!=null && projects.size()>0){
-            if(!save){
-                projectUserDao.removeByUserId(user.getId());
-            }
-            for(ProjectUser projectUser : projects){
-                projectUser.setUser(user);
-                projectUserDao.save(projectUser);
-            }
-        }
         OpenfireUser openfireUser=new OpenfireUser();
         openfireUser=openfireUser.copy(user);
         if(!save){
@@ -148,39 +118,33 @@ public class UserManagerImpl implements UserManager {
         }
     }
 
-    public List<SystemView> listSystemView() {
-        return systemViewDao.listSystemViews(new HashMap<String, Object>(),RowBounds.DEFAULT);
-    }
-
-    public SystemView getSystemViewById(Long id) {
-        return systemViewDao.getSystemViewById(id);
-    }
-
     @Transactional(rollbackFor = Throwable.class)
     public void authorizationUser(User user) {
-        userDao.updateUser(user);
+        userDao.update(user);
+    }
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateUser(User user) {
+        userDao.update(user);
     }
 
-    public List<User> listUsersByProjectId(Long projectId, Integer start, Integer limit) {
-        return projectUserDao.listUsersByProjectId(projectId,new RowBounds(start,limit));
-    }
 
-    public Integer listUsersByProjectIdCount(Long projectId) {
-        return projectUserDao.listUsersByProjectIdCount(projectId);
-    }
-
-    public List<User> listAvailableUsers() {
-        return userDao.listAvailableUsers();
+    public Integer getUserCountByProjectId(Long projectId) {
+        return userDao.getUserCountByProjectId(projectId);
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user=userDao.getUserByUsername(username);
+        String[] usernames=username.split(",");
+        if(usernames[1].equals("0")){
+            usernames[1]=null;
+        }
+        Long projectId= usernames[1]!=null?Long.parseLong(usernames[1]):null;
+        User user=userDao.getUserByUsername(usernames[0],projectId);
         if(user==null){
             throw new UserNotFoundException(Constants.USER_NOT_Found); 
         }
         if(!user.getAuthentication()){
             throw new UserNotAuthenticationException(Constants.USER_NOT_Authentication);
         }
-        return userDao.getUserByUsername(username);
+        return user;
     }
 } 

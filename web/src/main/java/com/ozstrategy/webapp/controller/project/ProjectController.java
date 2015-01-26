@@ -1,8 +1,6 @@
 package com.ozstrategy.webapp.controller.project;
 
 import com.ozstrategy.model.project.Project;
-import com.ozstrategy.model.project.ProjectUser;
-import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.project.ProjectManager;
 import com.ozstrategy.service.userrole.UserManager;
 import com.ozstrategy.webapp.command.BaseResultCommand;
@@ -35,6 +33,7 @@ public class ProjectController extends BaseController {
     @Autowired
     private UserManager userManager;
     
+    
     @RequestMapping(params = "method=listAllProjects")
     @ResponseBody
     public JsonReaderResponse<AppProjectCommand> listAllProjects(HttpServletRequest request){
@@ -57,7 +56,10 @@ public class ProjectController extends BaseController {
         List<Project> projects=projectManager.listProjects(map, start, limit);
         if(projects!=null && projects.size()>0){
             for(Project project : projects){
-                commands.add(new ProjectCommand(project));
+                ProjectCommand command= new ProjectCommand(project);
+                Integer userCount=userManager.getUserCountByProjectId(project.getId());
+                command.setUserCount(userCount);
+                commands.add(command);
             }
         }
         int count = projectManager.listProjectsCount(map);
@@ -80,8 +82,13 @@ public class ProjectController extends BaseController {
     public BaseResultCommand deleteProject(HttpServletRequest request){
         String ids=request.getParameter("id");
         Long id=parseLong(ids);
-        projectManager.delete(id);
-        return new BaseResultCommand("",true);
+        Project project=projectManager.getProjectById(id);
+        if(project!=null){
+            projectManager.delete(project);
+            return new BaseResultCommand("",true);
+        }else{
+            return new BaseResultCommand("工程未找到",false);
+        }      
     }
     @RequestMapping(params = "method=saveProjectUser")
     @ResponseBody
@@ -92,18 +99,6 @@ public class ProjectController extends BaseController {
         if(StringUtils.isNotEmpty(projectId)){
             project=projectManager.getProjectById(parseLong(projectId));
         }
-        List<ProjectUser> projectUsers=new ArrayList<ProjectUser>();
-        if(StringUtils.isNotEmpty(userIds)){
-            String[] users=userIds.split(",");
-            for(String userId:users){
-                ProjectUser projectUser=new ProjectUser();
-                User user=userManager.getUserById(parseLong(userId));
-                projectUser.setUser(user);
-                projectUser.setProject(project);
-                projectUsers.add(projectUser);
-            }
-        }
-        projectManager.saveProjectUser(projectUsers);
         return new BaseResultCommand("",true);
     }
     @RequestMapping(params = "method=updateManager")
@@ -113,7 +108,6 @@ public class ProjectController extends BaseController {
         String projectId=request.getParameter("projectId");
         String manager=request.getParameter("manager");
         if(StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(projectId)){
-            projectManager.updateManager(parseLong(userId), parseLong(projectId),StringUtils.equals(manager,"true"));
             return new BaseResultCommand("",true);
         }
         return new BaseResultCommand("操作失败",true);
@@ -129,7 +123,6 @@ public class ProjectController extends BaseController {
             for(String userId:userIdss){
                 ids.add(parseLong(userId));
             }
-            projectManager.removeUser(ids,parseLong(projectId));
             return new BaseResultCommand("",true);
         }
         return new BaseResultCommand("操作失败",true);
@@ -180,7 +173,6 @@ public class ProjectController extends BaseController {
                     return new BaseResultCommand(getMessage("message.error.serialNumber.exist",request),Boolean.FALSE);
                 }
             }
-            
         }
         try{
             if(save){
@@ -194,25 +186,6 @@ public class ProjectController extends BaseController {
             project.setActivationCode(activationCode);
             project.setLastUpdateDate(new Date());
             project.setSerialNumber(serialNumber);
-
-            Set<ProjectUser> projectUsers=new HashSet<ProjectUser>();
-            if(StringUtils.isNotEmpty(usersIds)){
-                String[] strings=usersIds.split(",");
-                for(String userId:strings){
-                    ProjectUser projectUser=new ProjectUser();
-                    User user=userManager.getUserById(parseLong(userId));
-                    projectUser.setUser(user);
-                    projectUser.setProject(project);
-                    for(String amanagerId:amanagerIds){
-                        if(StringUtils.equals(userId,amanagerId)){
-                            projectUser.setManager(true);
-                        }
-                    }
-                    projectUsers.add(projectUser);
-                }
-            }
-            project.getUsers().clear();
-            project.getUsers().addAll(projectUsers);
             if(save){
                 projectManager.save(project);
             }else{

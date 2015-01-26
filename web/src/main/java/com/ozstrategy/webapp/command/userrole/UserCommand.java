@@ -1,12 +1,9 @@
 package com.ozstrategy.webapp.command.userrole;
 
-import com.ozstrategy.model.project.Project;
-import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Feature;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.RoleFeature;
 import com.ozstrategy.model.userrole.User;
-import com.ozstrategy.webapp.command.project.ProjectUserCommand;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +39,6 @@ public class UserCommand {
     private String nickName;
     private String userNo;
     private Boolean authentication;
-    private List<ProjectUserCommand> projects=new ArrayList<ProjectUserCommand>();
 
     public UserCommand() {
     }
@@ -64,12 +60,7 @@ public class UserCommand {
         this.mobile = user.getMobile();
         this.gender = user.getGender();
         
-        Role defaultRole = user.getDefaultRole();
-        if (defaultRole != null) {
-            this.defaultRoleDisplayName = defaultRole.getDisplayName();
-            this.defaultRoleId = defaultRole.getId();
-            this.defaultRoleName = defaultRole.getName();
-        }
+      
         if ((user.getRoles() != null) && (user.getRoles().size() > 0)) {
             for (Role role : user.getRoles()) {
                 this.roleId = role.getId();
@@ -80,12 +71,6 @@ public class UserCommand {
                 simpleRoleCommand.setDisplayName(roleDisplayName);
                 simpleRoleCommand.setName(roleName);
                 this.simpleRoles.add(simpleRoleCommand);
-            }
-        }
-        Set<ProjectUser> projectUsers=user.getProjectUsers();
-        if(projectUsers!=null && projectUsers.size()>0){
-            for(ProjectUser projectUser : projectUsers){
-                this.projects.add(new ProjectUserCommand(projectUser));
             }
         }
     }
@@ -313,14 +298,4 @@ public class UserCommand {
     public void setAuthentication(Boolean authentication) {
         this.authentication = authentication;
     }
-
-    public List<ProjectUserCommand> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(List<ProjectUserCommand> projects) {
-        this.projects = projects;
-    }
-
-    
 } 

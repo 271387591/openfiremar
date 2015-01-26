@@ -1,15 +1,14 @@
 package com.ozstrategy.service.openfire.impl;
 
 import com.ozstrategy.Constants;
-import com.ozstrategy.jdbc.message.HistoryMessageDao;
 import com.ozstrategy.dao.system.ApplicationConfigDao;
+import com.ozstrategy.jdbc.message.HistoryMessageDao;
 import com.ozstrategy.model.openfire.HistoryMessage;
 import com.ozstrategy.model.system.ApplicationConfig;
 import com.ozstrategy.service.openfire.HistoryMessageManager;
 import com.ozstrategy.util.LuceneUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,10 +53,31 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
         applicationConfigDao.put(ApplicationConfig.index_max_id, id.toString());
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void delete(Date startTime, Date endTime)  throws Exception{
-        historyMessageDao.delete(startTime,endTime);
-        LuceneUtils.deleteIndex(startTime.getTime(),endTime.getTime());
+    public void delete(Date startTime, Date endTime,Long projectId)  throws Exception{
+        historyMessageDao.delete(startTime,endTime,projectId);
+//        LuceneUtils.deleteIndex(startTime.getTime(),endTime.getTime());
         
+    }
+
+    public List<HistoryMessage> listHistoryMessagesStore(Map<String, Object> map, Integer start, Integer limit) throws Exception {
+        return historyMessageDao.listHistoryMessagesStore(map,start,limit);
+    }
+
+    public Integer listHistoryMessagesStoreCount(Map<String, Object> map) throws Exception {
+        return historyMessageDao.listHistoryMessagesStoreCount(map);
+    }
+
+    public List<HistoryMessage> listManagerMessages(Map<String, Object> map, Integer start, Integer limit) throws Exception {
+        return historyMessageDao.listManagerMessages(map,start,limit);
+    }
+
+    public Integer listManagerMessagesCount(Map<String, Object> map) throws Exception {
+        return historyMessageDao.listManagerMessagesCount(map);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void deleteMessage(Long projectId, String messageId) {
+        historyMessageDao.deleteMessage(projectId,messageId);
     }
 
     public Integer listHistoryMessagesCount(Map<String, Object> map) throws Exception {
@@ -69,12 +89,22 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
         Long startTime = null;
         Long endTime = null;
         if (StringUtils.isNotEmpty(startTimeStr)) {
-            startTime = NumberUtils.toLong(startTimeStr);
+            Date sDate = DateUtils.parseDate(startTimeStr, new String[]{Constants.YMDHMS, Constants.YMD});
+            startTime = sDate.getTime();
         }
         if (StringUtils.isNotEmpty(endTimeStr)) {
-            endTime = NumberUtils.toLong(endTimeStr);
+            Date sDate = DateUtils.parseDate(endTimeStr, new String[]{Constants.YMDHMS, Constants.YMD});
+            endTime = sDate.getTime();
         }
         return LuceneUtils.count(message, fromNick, toNick, startTime, endTime);
+    }
+
+    public List<HistoryMessage> listHistoryMessagesFromDb(Map<String, Object> map, Integer start, Integer limit) throws Exception {
+        return historyMessageDao.listHistoryMessagesFromDb(map,start,limit);
+    }
+
+    public Integer listHistoryMessagesFromDbCount(Map<String, Object> map) throws Exception {
+        return historyMessageDao.listHistoryMessagesFromDbCount(map);
     }
 
     public Long maxId() {

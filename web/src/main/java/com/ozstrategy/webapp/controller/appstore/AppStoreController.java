@@ -1,5 +1,6 @@
 package com.ozstrategy.webapp.controller.appstore;
 
+import com.ozstrategy.Constants;
 import com.ozstrategy.model.appstore.AppStore;
 import com.ozstrategy.model.appstore.Platform;
 import com.ozstrategy.service.appstore.AppStoreManager;
@@ -40,7 +41,6 @@ import java.util.UUID;
 @Controller
 @RequestMapping("appStoreController.do")
 public class AppStoreController extends BaseController {
-    private static final String picFileDir="app";
     private static final String fileUrl="app/download/{0}";
     @Autowired
     private AppStoreManager appStoreManager;
@@ -67,7 +67,7 @@ public class AppStoreController extends BaseController {
         String description = request.getParameter("description");
         String platform=request.getParameter("platform");
         response.setContentType("text/html;charset=utf-8");
-        String attachFilesDirStr = request.getRealPath("/") + "/"+picFileDir+"/";
+        String attachFilesDirStr = Constants.imDataDir + "/"+Constants.appFileDir+"/";
         String host=request.getServerName();
         String contextPath=request.getContextPath();
 

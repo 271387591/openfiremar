@@ -1,12 +1,12 @@
 package com.ozstrategy.webapp.command.project;
 
 import com.ozstrategy.model.project.Project;
-import com.ozstrategy.webapp.command.BaseObjectCommand;
+import com.ozstrategy.webapp.command.BaseEntityCommand;
 
 /**
  * Created by lihao on 1/5/15.
  */
-public class AppProjectCommand extends BaseObjectCommand {
+public class AppProjectCommand extends BaseEntityCommand {
     protected Long id;
     protected String serialNumber;
     protected String name;

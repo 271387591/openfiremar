@@ -13,35 +13,54 @@
     <http pattern="/app/download/*" security="none"/>
     <http pattern="/app/search" security="none"/>
 
-    <http use-expressions="true"  >
+    <http use-expressions="true" 
+          entry-point-ref="authenticationProcessingFilterEntryPoint" 
+          authentication-manager-ref="authenticationManager"
+          disable-url-rewriting="true">
         <expression-handler ref="expressionHandler"/>
+        
         <intercept-url pattern="/service/desktop" access="isAuthenticated()"/>
         <!--<intercept-url pattern="/service/userview" access="authenticatedContext('user')"/>-->
         <!--<intercept-url pattern="/service/*" access="hasAnyRole('ROLE_USER,ROLE_ADMIN')"/>-->
         <!--<intercept-url pattern="/app/passwordHint*" access="hasFeature('sss')"/>-->
         <!--<intercept-url pattern="/app/signup*" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>-->
         <!--<intercept-url pattern="/app/**" access="ROLE_ADMIN,ROLE_USER"/>-->
-        <form-login login-page="/login" 
-                    authentication-failure-url="/login?error=true" 
-                    login-processing-url="/j_security_check"
-                    username-parameter="username"
-                    password-parameter="password"
-                    always-use-default-target="false"
-                    authentication-success-handler-ref="authSuccessLogger"
-                    authentication-failure-handler-ref="authFailLogger"/>
+        <!--<form-login login-page="/login" -->
+                    <!--authentication-failure-url="/login?error=true" -->
+                    <!--login-processing-url="/j_security_check"-->
+                    <!--username-parameter="username"-->
+                    <!--password-parameter="password"-->
+                    <!--always-use-default-target="false"-->
+                    <!--authentication-success-handler-ref="authSuccessLogger"-->
+                    <!--authentication-failure-handler-ref="authFailLogger"/>-->
         <remember-me user-service-ref="userManager" key="e37f4b31-0c45-11dd-bd0b-0800200c9a66"/>
+        <custom-filter ref="multiParamsAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
     </http>
-    <beans:bean id="authSuccessLogger" class="com.ozstrategy.webapp.security.WebAuthenticationSuccessLoggerHandler">
-        <!--<beans:property name="userManager" ref="userManager"></beans:property>-->
-    </beans:bean>
-    <beans:bean id="authFailLogger" class="com.ozstrategy.webapp.security.WebAuthenticationFailLoggerHandler">
-    </beans:bean>
-
-    <authentication-manager>
+    
+    <authentication-manager id="authenticationManager">
         <authentication-provider user-service-ref="userManager">
             <password-encoder ref="passwordEncoder"/>
         </authentication-provider>
     </authentication-manager>
+    
+    
+    <beans:bean id="authSuccessLogger" class="com.ozstrategy.webapp.security.WebAuthenticationSuccessLoggerHandler" />
+    <beans:bean id="authFailLogger" class="com.ozstrategy.webapp.security.WebAuthenticationFailLoggerHandler">
+    </beans:bean>
+    <beans:bean id="authenticationProcessingFilterEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <beans:property name="loginFormUrl" value="/login"/>
+        <beans:property name="forceHttps" value="false" />
+    </beans:bean>
+    
+    <beans:bean id="multiParamsAuthenticationFilter" class="com.ozstrategy.webapp.security.MultiParamsAuthenticationFilter">
+        <beans:property name="filterProcessesUrl" value="/j_security_check"/>
+        <beans:property name="passwordParameter" value="password"/>
+        <beans:property name="usernameParameter" value="username"/>
+        <beans:property name="projectParameter" value="projectId"/>
+        <beans:property name="authenticationSuccessHandler" ref="authSuccessLogger"/>
+        <beans:property name="authenticationFailureHandler" ref="authFailLogger"/>
+        <beans:property name="authenticationManager" ref="authenticationManager"/>
+    </beans:bean>
 
     <!-- Override the default password-encoder (SHA) by uncommenting the following and changing the class -->
     <!-- <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/> -->

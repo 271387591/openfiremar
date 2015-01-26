@@ -1,6 +1,6 @@
 package com.ozstrategy.model.userrole;
 
-import com.ozstrategy.model.BaseObject;
+import com.ozstrategy.model.BaseEntity;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,17 +11,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import java.io.Serializable;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Role extends BaseObject implements Serializable, GrantedAuthority {
+@Table(name = "ext_role")
+public class Role extends BaseEntity implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -31,14 +29,13 @@ public class Role extends BaseObject implements Serializable, GrantedAuthority {
     private String description;
     @Column(length = 64)
     private String displayName;
-    @Column(columnDefinition = "char",length = 1)
+    @Column
     private Boolean enabled=true;
-    
+    @Column    
+    private Long projectId;
     @ManyToMany(fetch = FetchType.LAZY,mappedBy = "roles")
+    @Transient
     private Set<User> users=new HashSet<User>();
-    @ManyToOne
-    @JoinColumn(name = "systemViewId")
-    private SystemView systemView;
     
     public Role() {
     }
@@ -83,20 +80,20 @@ public class Role extends BaseObject implements Serializable, GrantedAuthority {
         return getName();
     }
 
-    public SystemView getSystemView() {
-        return systemView;
-    }
-
-    public void setSystemView(SystemView systemView) {
-        this.systemView = systemView;
-    }
-
     public Set<User> getUsers() {
         return users;
     }
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     @Override

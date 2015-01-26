@@ -8,12 +8,12 @@ Ext.define('FlexCenter.App', {
         'Ext.ux.desktop.ShortcutModel',
         'Ext.form.field.Text',
         'FlexCenter.UnitUserView',
-        'FlexCenter.ProjectManager',
         'FlexCenter.AppStoreManager',
         'FlexCenter.HistoryMessageManager',
         'FlexCenter.ExportManager',
         'Ext.util.Cookies',
         'FlexCenter.ChangePassword',
+        'FlexCenter.ProjectHome',
         'FlexCenter.Settings'
     ],
 
@@ -48,65 +48,31 @@ Ext.define('FlexCenter.App', {
 
     getModules: function () {
         var items = [];
-        if (globalRes.isAdmin || (accessRes.showUserManager)) {
-            items.push(new FlexCenter.UnitUserView());
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            items.push(new FlexCenter.ProjectManager());
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            items.push(new FlexCenter.AppStoreManager());
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            items.push(new FlexCenter.HistoryMessageManager());
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            items.push(new FlexCenter.ExportManager());
-        }
-        
-        
-        
-        
+        items.push(new FlexCenter.UnitUserView());
+        items.push(new FlexCenter.AppStoreManager());
+        items.push(new FlexCenter.HistoryMessageManager());
+        items.push(new FlexCenter.ExportManager());
         return items;
     },
 
     getDesktopConfig: function () {
         var me = this, ret = me.callParent(), shortcutDataArray = [];
-        if ((globalRes.isAdmin || accessRes.showUserManager)) {
-            shortcutDataArray.push({name: userRoleRes.title, iconCls: 'manageUser-shortcut', module: 'unitUserView'});
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            shortcutDataArray.push({
-                name: '工程管理',
-                iconCls: 'project-shortcut',
-                module: 'projectManager'
-            });
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            shortcutDataArray.push({
-                name: '搜索管理',
-                iconCls: 'search-shortcut',
-                module: 'historyMessageManager'
-            });
-        }
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            shortcutDataArray.push({
-                name: '数据导出',
-                iconCls: 'export-shortcut',
-                module: 'exportManager'
-            });
-        }
-        
-        if (globalRes.isAdmin || (accessRes.showSystemDataManager)) {
-            shortcutDataArray.push({
-                name: '应用版本管理',
-                iconCls: 'appStore-shortcut',
-                module: 'appStoreManager'
-            });
-        }
-        
-        
-        
+        shortcutDataArray.push({name: userRoleRes.title, iconCls: 'manageUser-shortcut', module: 'unitUserView'});
+        shortcutDataArray.push({
+            name: '搜索管理',
+            iconCls: 'search-shortcut',
+            module: 'historyMessageManager'
+        });
+        shortcutDataArray.push({
+            name: '数据导出',
+            iconCls: 'export-shortcut',
+            module: 'exportManager'
+        });
+        shortcutDataArray.push({
+            name: '应用版本管理',
+            iconCls: 'appStore-shortcut',
+            module: 'appStoreManager'
+        });
         return Ext.apply(ret, {
             //cls: 'ux-desktop-black',
 //      contextMenuItems:[
@@ -134,12 +100,12 @@ Ext.define('FlexCenter.App', {
             toolConfig: {
                 width: 150,
                 items: [
-                    {
-                        text: userRoleRes.passwordTilte,
-                        iconCls: 'user-edit',
-                        handler: me.onChangePassword,
-                        scope: me
-                    },
+                    //{
+                    //    text: userRoleRes.passwordTilte,
+                    //    iconCls: 'user-edit',
+                    //    handler: me.onChangePassword,
+                    //    scope: me
+                    //},
                     {
                         text: globalRes.changeBackground,
                         iconCls: 'settings',
@@ -175,11 +141,18 @@ Ext.define('FlexCenter.App', {
                     '-',
                     '->',
                     {
+                        text: '退出当前工程',
+                        iconCls: 'app-logout',
+                        handler: me.onLogoutProject,
+                        scope: me
+                    },
+                    {
                         text: globalRes.title.logout,
                         iconCls: 'app-logout',
                         handler: me.onLogout,
                         scope: me
                     }
+                    
                 ]
             }
         });
@@ -258,6 +231,10 @@ Ext.define('FlexCenter.App', {
                 }
             }
         };
+        var quitProject=Ext.create('Ext.Button', {
+            text: '退出当前工程',
+            handler: me.onLogoutProject
+        });
 
         return Ext.apply(ret, {
             startBtnText: globalRes.buttons.start,
@@ -266,6 +243,7 @@ Ext.define('FlexCenter.App', {
 //            { name: 'Grid Window', iconCls: 'icon-grid', module: 'grid-win' }
             ],
             trayItems: [
+                quitProject,'-',
                 {xtype: 'trayclock'}, '-',
                 //languageCombo, '-',
                 changeGraw
@@ -288,6 +266,49 @@ Ext.define('FlexCenter.App', {
                     buttons: Ext.MessageBox.OK,
                     icon: Ext.MessageBox.ERROR
                 });
+            }
+        });
+    },
+    onLogoutProject:function(){
+        Ext.Msg.alert('退出工程',"你确定要退出该工程吗？",function(btn){
+            if(btn=='ok'){
+                var pmb = Ext.create('Ext.ProgressBar', {
+                    text:'正在退出...'
+                });
+                var runnerProgress = new Ext.util.TaskRunner();
+                pmb.wait({
+                    interval: 100,
+                    duration: 1000,
+                    increment: 10,
+                    text: '正在退出...',
+                    scope: this,
+                    fn: function(){
+                        var projectViewport=Ext.ComponentQuery.query('#projectViewport')[0];
+                        projectViewport.removeAll();
+                        var projectHome=Ext.widget('projectHome');
+                        projectViewport.add(projectHome);
+                        win.close();
+                        projectId=null;
+                        projectName=null;
+                    }
+                });
+                var win=Ext.widget('window', {
+                    width: 600,
+                    height:80,
+                    closable:false,
+                    modal: true,
+                    bodyPadding:10,
+                    title:'退出工程',
+                    onCancel:function(){
+                        win.close();
+                        runnerProgress.stopAll();
+                        runnerProgress.destroy();
+                    },
+                    items:[
+                        pmb
+                    ]
+                });
+                win.show();
             }
         });
     },

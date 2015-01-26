@@ -10,7 +10,7 @@ Ext.define('FlexCenter.project.model.Project', {
         'description',
         'activationCode',
         'mucRoomId',
-        'users',
+        'userCount',
         {
             name: 'createDate', convert: function (v) {
                 return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');

@@ -10,7 +10,7 @@ Ext.define('FlexCenter.history.store.HistoryMessage', {
     model: 'FlexCenter.history.model.HistoryMessage',
     proxy: {
         type: 'ajax',
-        url: 'historyMessageController.do?method=list',
+        url: 'historyMessageController.do?method=listStore',
         
         reader: {
             type: 'json',

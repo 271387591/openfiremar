@@ -244,7 +244,6 @@
                                     <include>scripts/ozstrategy/system/model/GlobalType.js</include>
                                     <!--project-->
                                     <include>scripts/ozstrategy/project/model/Project.js</include>
-                                    <include>scripts/ozstrategy/project/model/ProjectUser.js</include>
                                     <!--app store-->
                                     <include>scripts/ozstrategy/appstore/model/AppStore.js</include>
                                     <!--history-->
@@ -293,7 +292,6 @@
                                     <include>scripts/ozstrategy/system/view/GlobalTypeView.js</include>
                                     <!--project-->
                                     <include>scripts/ozstrategy/project/view/ProjectForm.js</include>
-                                    <include>scripts/ozstrategy/project/view/ProjectUserView.js</include>
                                     <include>scripts/ozstrategy/project/view/ProjectView.js</include>
                                     <!--appstore-->
                                     <include>scripts/ozstrategy/appstore/view/AppStoreForm.js</include>
@@ -304,11 +302,13 @@
                                     
 
                                     
+                                    <include>scripts/ozstrategy/UserHeader.js</include>
+                                    <include>scripts/ozstrategy/ProjectHome.js</include>
+                                    <include>scripts/ozstrategy/ProjectViewport.js</include>
                                     <include>scripts/ozstrategy/Settings.js</include>
                                     <include>scripts/ozstrategy/ChangePassword.js</include>
                                     <include>scripts/ozstrategy/UnitUserView.js</include>
                                     <include>scripts/ozstrategy/SystemBaseDataView.js</include>
-                                    <include>scripts/ozstrategy/ProjectManager.js</include>
                                     <include>scripts/ozstrategy/AppStoreManager.js</include>
                                     <include>scripts/ozstrategy/HistoryMessageManager.js</include>
                                     <include>scripts/ozstrategy/ExportManager.js</include>

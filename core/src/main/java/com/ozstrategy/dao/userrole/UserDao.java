@@ -1,25 +1,19 @@
 package com.ozstrategy.dao.userrole;
 
+import com.ozstrategy.dao.UniversalDao;
 import com.ozstrategy.model.userrole.User;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 import java.util.Map;
 
-public interface UserDao {
+public interface UserDao extends UniversalDao<User,Long>{
 
     List<User> listUsers(Map<String,Object> map, RowBounds rowBounds);
     Integer listUsersCount(Map<String,Object> map);
-    void saveUser(User user);
-    void updateUser(User user);
-    List<User> getUserByRoleId(Long roleId);
-    void enabledUser(Long userId);
-    void updateUserPassword(User user);
     User getUserById(Long id);
-    User getUserByUsername(String username);
-    User getUserByEmail(String email);
-    User getUserByMobile(String mobile);
-    
-    List<User> listAvailableUsers();
-    void updateUserByProjectId(Long projectId);
+    User getUserByUsername(@Param("username")String username,@Param("projectId")Long projectId);
+    Integer getUserCountByProjectId(Long projectId);
+    List<User> getUserByRoleId(Long roleId);
 } 

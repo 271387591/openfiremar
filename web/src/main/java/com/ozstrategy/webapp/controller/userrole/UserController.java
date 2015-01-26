@@ -1,7 +1,6 @@
 package com.ozstrategy.webapp.controller.userrole;
 
 import com.ozstrategy.model.project.Project;
-import com.ozstrategy.model.project.ProjectUser;
 import com.ozstrategy.model.userrole.Role;
 import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.project.ProjectManager;
@@ -9,6 +8,7 @@ import com.ozstrategy.service.userrole.RoleManager;
 import com.ozstrategy.service.userrole.UserManager;
 import com.ozstrategy.webapp.command.BaseResultCommand;
 import com.ozstrategy.webapp.command.JsonReaderResponse;
+import com.ozstrategy.webapp.command.login.LoginCommand;
 import com.ozstrategy.webapp.command.userrole.UserCommand;
 import com.ozstrategy.webapp.controller.BaseController;
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +64,28 @@ public class UserController extends BaseController {
         int count = userManager.listUsersCount(map);
         return new JsonReaderResponse<UserCommand>(userCommands,count);
     }
+    @RequestMapping(params = "method=listAppUsers")
+    @ResponseBody
+    public JsonReaderResponse<LoginCommand> listAppUsers(HttpServletRequest request) {
+        String start=request.getParameter("start");
+        String limit=request.getParameter("limit");
+        Map<String,Object> map=requestMap(request);
+        if(checkIsNotNumber(start)){
+            return new JsonReaderResponse<LoginCommand>(emptyData, Boolean.FALSE,getMessage("message.error.start",request));
+        }
+        List<User> users        = userManager.listUsers(map, parseInteger(start), initLimit(limit));
+        List<LoginCommand> userCommands = new ArrayList<LoginCommand>();
+
+        if ((users != null) && (users.size() > 0)) {
+            for (User user : users) {
+                LoginCommand cmd = new LoginCommand(user);
+                userCommands.add(cmd);
+            }
+        }
+        int count = userManager.listUsersCount(map);
+        return new JsonReaderResponse<LoginCommand>(userCommands,count);
+    }
+    
     @RequestMapping(params = "method=listAllUsers")
     @ResponseBody
     public JsonReaderResponse<UserCommand> listAllUsers(HttpServletRequest request) {
@@ -86,25 +108,20 @@ public class UserController extends BaseController {
         Integer start=parseInteger(request.getParameter("start"));
         Integer limit=parseInteger(request.getParameter("limit"));
         Long projectId=parseLong(request.getParameter("projectId"));
-        List<User> projects=userManager.listUsersByProjectId(projectId, start, limit);
-        if(projects!=null && projects.size()>0){
-            for(User project : projects){
-                commands.add(new UserCommand(project));
-            }
-        }
-        int count = userManager.listUsersByProjectIdCount(projectId);
-        return new JsonReaderResponse<UserCommand>(commands,"",count);
+//        List<User> projects=userManager.listUsersByProjectId(projectId, start, limit);
+//        if(projects!=null && projects.size()>0){
+//            for(User project : projects){
+//                commands.add(new UserCommand(project));
+//            }
+//        }
+//        int count = userManager.listUsersByProjectIdCount(projectId);
+        return new JsonReaderResponse<UserCommand>(commands,"",0);
     }
     @RequestMapping(params = "method=listAvailableUsers")
     @ResponseBody
     public JsonReaderResponse<UserCommand> listAvailableUsers(HttpServletRequest request){
         List<UserCommand> commands=new ArrayList<UserCommand>();
-        List<User> projects=userManager.listAvailableUsers();
-        if(projects!=null && projects.size()>0){
-            for(User project : projects){
-                commands.add(new UserCommand(project));
-            }
-        }
+       
         return new JsonReaderResponse<UserCommand>(commands,true,"");
     }
     
@@ -231,34 +248,21 @@ public class UserController extends BaseController {
         String username=request.getParameter("username");
         String email=request.getParameter("email");
         String mobile=request.getParameter("mobile");
+        String projectId=request.getParameter("projectId");
         
         if(StringUtils.equals("username",type)){
             if(checkIsEmpty(username)){
                 return new BaseResultCommand(getMessage("message.error.username.null",request),Boolean.FALSE);
             }
             try{
-                User user=userManager.getUserByUsername(username);
+                User user=userManager.getUserByUsername(username,parseLong(projectId));
                 return new BaseResultCommand(new UserCommand(user));
             }catch (Exception e){
             }
         }else if(StringUtils.equals("email",type)){
-            if(checkIsEmpty(email)){
-                return new BaseResultCommand(getMessage("message.error.email.null",request),Boolean.FALSE);
-            }
-            try{
-                User user=userManager.getUserByEmail(email);
-                return new BaseResultCommand(new UserCommand(user));
-            }catch (Exception e){
-            }
+            
         }else if(StringUtils.equals("mobile",type)){
-            if(checkIsEmpty(mobile)){
-                return new BaseResultCommand(getMessage("message.error.mobile.null",request),Boolean.FALSE);
-            }
-            try{
-                User user=userManager.getUserByMobile(mobile);
-                return new BaseResultCommand(new UserCommand(user));
-            }catch (Exception e){
-            }
+            
         }else if(StringUtils.equals("id",type)){
             if(checkIsNotNumber(id)){
                 return new BaseResultCommand(getMessage("message.error.id.null",request),Boolean.FALSE);
@@ -285,7 +289,7 @@ public class UserController extends BaseController {
             targetUser.setAccountLocked(false);
         }
         targetUser.setLastUpdateDate(new Date());
-        userManager.saveOrUpdate(targetUser);
+        userManager.updateUser(targetUser);
         return new BaseResultCommand(Boolean.TRUE);
     } 
     private BaseResultCommand enableOrDisableUser(HttpServletRequest request,boolean enable) throws Exception{
@@ -308,6 +312,7 @@ public class UserController extends BaseController {
         String id=request.getParameter("id");
         String oldPassword=request.getParameter("oldPassword");
         String newPassword=request.getParameter("newPassword");
+        String projectId=request.getParameter("projectId");
         if(admin){
             if(checkIsNotNumber(id)){
                 return new BaseResultCommand(getMessage("message.error.id.null",request),Boolean.FALSE);
@@ -326,13 +331,17 @@ public class UserController extends BaseController {
             if(admin){
                 user=userManager.getUserById(parseLong(id));
             }else{
-                user = userManager.getUserByUsername(request.getRemoteUser());
+                user = userManager.getUserByUsername(request.getRemoteUser(),parseLong(projectId));
             }
-            Integer result=userManager.updateUserPassword(user.getId(),oldPassword,newPassword,admin);
-            if(result==1){
-                return new BaseResultCommand(getMessage("message.error.updatePassword.oldPassword.error",request),Boolean.FALSE);
+            if(user!=null){
+                Integer result=userManager.updateUserPassword(user,oldPassword,newPassword,admin);
+                if(result==1){
+                    return new BaseResultCommand(getMessage("message.error.updatePassword.oldPassword.error",request),Boolean.FALSE);
+                }
+                return new BaseResultCommand(Boolean.TRUE);
             }
-            return new BaseResultCommand(Boolean.TRUE);
+            
+            return new BaseResultCommand("修改密码失败",Boolean.FALSE);
         }catch (Exception e) {
             log.error(e.getMessage(),e);
         }
@@ -397,13 +406,19 @@ public class UserController extends BaseController {
             if(!matcher.matches()){
                 return new BaseResultCommand(getMessage("message.error.username.unlawful",request),Boolean.FALSE);
             }
-            if(userManager.getUserByUsername(username)!=null){
+            if(userManager.getUserByUsername(username,project.getId())!=null){
                 return new BaseResultCommand(getMessage("message.error.username.exist",request),Boolean.FALSE);
             }
         }
         try{
             if(!save){
                 user=userManager.getUserById(parseLong(id));
+                if(!StringUtils.equals(username,user.getUsername())){
+                    user=userManager.getUserByUsername(username,parseLong(projectId));
+                    if(user!=null){
+                        return new BaseResultCommand(getMessage("message.error.username.exist",request),Boolean.FALSE);
+                    }
+                }
                 user.setVersion(user.getVersion()+1);
             }else{
                 user=new User();
@@ -421,10 +436,8 @@ public class UserController extends BaseController {
             user.setEmail(email);
             user.setNickName(nickName);
             user.setUserNo(userNo);
-            if(!checkIsNotNumber(defaultRoleId)){
-               Role role=roleManager.getRoleById(parseLong(defaultRoleId));
-               user.setDefaultRole(role);
-            }
+            user.setProjectId(project.getId());
+            
             Set<Role> roleSet  = new HashSet<Role>();
             if(StringUtils.isNotEmpty(roleIds)){
                 String[] roleIdes=StringUtils.split(roleIds,",");
@@ -435,11 +448,6 @@ public class UserController extends BaseController {
                     }
                 }
             }
-            ProjectUser projectUser=new ProjectUser();
-            projectUser.setProject(project);
-            user.getProjectUsers().clear();
-            user.getProjectUsers().add(projectUser);
-            
             user.getRoles().clear();
             user.getRoles().addAll(roleSet);
             userManager.saveOrUpdate(user);

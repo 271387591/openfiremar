@@ -27,8 +27,7 @@ Ext.define('FlexCenter.user.model.User', {
             return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
         }
         },
-        'simpleRoles',
-        'projects'
+        'simpleRoles'
     ],
     hasMany: {model: 'FlexCenter.user.model.SimpleRole', name: 'simpleRoles'},
     hasMany: {model: 'FlexCenter.project.model.ProjectUser', name: 'projects'}

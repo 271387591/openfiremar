@@ -29,11 +29,12 @@ Ext.define('Ext.ux.desktop.App', {
 
         me.mixins.observable.constructor.call(this, config);
 
-        if (Ext.isReady) {
-            Ext.Function.defer(me.init, 10, me);
-        } else {
-            Ext.onReady(me.init, me);
-        }
+        //if (Ext.isReady) {
+        //    Ext.Function.defer(me.init, 10, me);
+        //} else {
+        //    Ext.onReady(me.init, me);
+        //}
+        me.init();
     },
 
     init: function() {
@@ -51,10 +52,10 @@ Ext.define('Ext.ux.desktop.App', {
         desktopCfg = me.getDesktopConfig();
         me.desktop = new Ext.ux.desktop.Desktop(desktopCfg);
 
-        me.viewport = new Ext.container.Viewport({
-            layout: 'fit',
-            items: [ me.desktop ]
-        });
+        //me.viewport = new Ext.container.Viewport({
+        //    layout: 'fit',
+        //    items: [ me.desktop ]
+        //});
 
         Ext.EventManager.on(window, 'beforeunload', me.onUnload, me);
 

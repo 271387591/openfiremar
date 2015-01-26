@@ -8,9 +8,12 @@
         <property name="triggers">
             <list>
                 <ref bean="luceneIndexTrigger" />
+                <ref bean="exportMessageTrigger" />
             </list>
         </property>
     </bean>
+    
+    <!--lucene add index-->
     <bean id="luceneIndexTrigger"
           class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail">
@@ -30,4 +33,27 @@
         </property>
     </bean>
     <bean id="luceneIndexJob" class="com.ozstrategy.job.LuceneIndexJob" />
+    
+    
+    <!--export message-->
+    <bean id="exportMessageTrigger"
+          class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="exportMessageDetail" />
+        </property>
+        <property name="cronExpression">
+            <value>0 0 5 1 * ?</value>
+        </property>
+    </bean>
+    <bean id="exportMessageDetail"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="exportMessageJob" />
+        </property>
+        <property name="targetMethod">
+            <value>exportMessage</value>
+        </property>
+    </bean>
+    <bean id="exportMessageJob" class="com.ozstrategy.job.ExportMessageJob" />
+    
 </beans>

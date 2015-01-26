@@ -7,27 +7,12 @@
     </resultMap>
     
     <select id="list" resultMap="MessageExportResult" parameterType="Map">
-        select f.* from ext_messageExport f where 1=1 order by f.createDate desc
+        select f.* from ext_messageExport f where f.projectId=#{projectId} order by f.createDate desc
     </select>
     <select id="listCount" resultType="java.lang.Integer" parameterType="Map">
-        select count(id) from ext_messageExport f where 1=1
+        select count(id) from ext_messageExport f where f.projectId=#{projectId}
     </select>
     <select id="get" resultMap="MessageExportResult" parameterType="long">
         SELECT * FROM  ext_messageExport where id=#{id}
     </select>
-    
-    <insert id="save" parameterType="com.ozstrategy.model.export.MessageExport" flushCache="true">
-        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
-            select LAST_INSERT_ID()
-        </selectKey>
-        insert into ext_messageExport(id,exportor,type,filePath,executeDate,createDate,lastUpdateDate) values(
-        #{id},
-        #{exportor},
-        #{type,typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-        #{filePath},
-        #{executeDate},
-        #{createDate},
-        #{lastUpdateDate}
-        )
-    </insert>
 </mapper>

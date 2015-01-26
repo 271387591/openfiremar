@@ -1,10 +1,10 @@
 package com.ozstrategy.model.export;
 
 import com.ozstrategy.model.BaseEntity;
-import com.ozstrategy.model.BaseObject;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -12,20 +12,19 @@ import java.util.Date;
  * Created by lihao on 1/11/15.
  */
 @Table(name = "ext_messageExport")
-public class MessageExport extends BaseObject {
-    private Long id;
+public class MessageExport extends BaseEntity {
+    @Column
     private String exportor;
+    @Column
     private ExportType type;
+    @Column
     private String filePath;
+    @Column
     private Date executeDate;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column
+    private String exceptions;
+    @Column
+    private Long projectId;
 
     public String getExportor() {
         return exportor;
@@ -57,6 +56,22 @@ public class MessageExport extends BaseObject {
 
     public void setExecuteDate(Date executeDate) {
         this.executeDate = executeDate;
+    }
+
+    public String getExceptions() {
+        return exceptions;
+    }
+
+    public void setExceptions(String exceptions) {
+        this.exceptions = exceptions;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     @Override

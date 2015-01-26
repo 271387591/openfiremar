@@ -18,7 +18,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                 storeId:'HistoryMessageStore'
             });
         }
-        
+        store.getProxy().extraParams={projectId:projectId};
         store.load();
         return store;
     },
@@ -155,11 +155,6 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         dataIndex:'fromNick'
                     },
                     {
-                        header: '工程',
-                        width:200,
-                        dataIndex: 'toNick'
-                    },
-                    {
                         header: '聊天内容',
                         flex:1,
                         dataIndex: 'message',
@@ -245,12 +240,24 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                     ],
                     items:[
                         {
+                            name:'projectId',
+                            value:projectId,
+                            hidden:true
+                        },
+                        {
                             fieldLabel:'开始时间',
                             xtype : 'datefield',
                             editable:false,
                             allowBlank: false,
                             format:'Y-m-d 00:00:00',
                             maxValue:new Date(),
+                            minValue:function(){
+                                var newValue=new Date(); 
+                                var year=newValue.getFullYear();
+                                var moth=newValue.getMonth()-3;
+                                var day=newValue.getDate();
+                                return new Date(year,moth,day);
+                            }(),
                             itemId:'startTime',
                             name : 'startTime'
                         },
@@ -270,6 +277,14 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                                         s.setValue(newValue);
                                     }
                                     s.setMaxValue(newValue);
+                                    if(newValue){
+                                        var year=newValue.getFullYear();
+                                        var moth=newValue.getMonth()-3;
+                                        var day=newValue.getDate();
+                                        var min=new Date(year,moth,day);
+                                        s.setMinValue(min);
+                                    }
+                                    
                                 }
                             }
                         }

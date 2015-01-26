@@ -30,6 +30,7 @@ Ext.define('FlexCenter.user.view.RoleView', {
                 storeId: 'roleStore'
             });
         }
+        store.getProxy().extraParams={projectId:projectId};
         return store;
     },
     initComponent: function () {

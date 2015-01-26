@@ -7,8 +7,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
 
     requires: [
         'FlexCenter.project.store.Project',
-        'FlexCenter.project.view.ProjectForm',
-        'FlexCenter.project.view.ProjectUserView'
+        'FlexCenter.project.view.ProjectForm'
     ],
 
     getProjectStore: function () {
@@ -21,7 +20,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
     border: false,
     forceFit: true,
     autoScroll: true,
-
+    title: '工程管理',
     initComponent: function () {
         var me=this;
         
@@ -89,13 +88,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             },
             {
                 header: '工程人数',
-                dataIndex: 'users',
-                renderer: function (v) {
-                    if(v){
-                        return v.length;
-                    }
-                    return 0;
-                }
+                dataIndex: 'userCount'
             },
             {
                 header: '工程简介',
@@ -115,7 +108,47 @@ Ext.define('FlexCenter.project.view.ProjectView', {
                         tooltip:'进入',
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
-                            me.fireEvent('addTab', rec);
+                            projectId=rec.get('id');
+                            projectName=rec.get('name');
+                            porjectActivationCode=rec.get('activationCode');
+                            var pmb = Ext.create('Ext.ProgressBar', {
+                                text:'进入工程...'
+                            });
+                            var runnerProgress = new Ext.util.TaskRunner();
+                            pmb.wait({
+                                interval: 100,
+                                duration: 1000,
+                                increment: 10,
+                                text: '进入工程...',
+                                scope: this,
+                                fn: function(){
+                                    var flexCenterApp = new FlexCenter.App();
+                                    var desktop=flexCenterApp.getDesktop();
+                                    var projectViewport=Ext.ComponentQuery.query('#projectViewport')[0];
+                                    projectViewport.removeAll();
+                                    projectViewport.add(desktop);
+                                    win.close();
+                                }
+                            });
+                            var win=Ext.widget('window', {
+                                width: 600,
+                                height:80,
+                                closable:false,
+                                modal: true,
+                                bodyPadding:10,
+                                title:'进入工程',
+                                onCancel:function(){
+                                    win.close();
+                                    runnerProgress.stopAll();
+                                    runnerProgress.destroy();
+                                },
+                                items:[
+                                    pmb
+                                ]
+                            });
+                            win.show();
+                            
+                            
                         }
                     }
                 ]

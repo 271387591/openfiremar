@@ -1,6 +1,6 @@
 package com.ozstrategy.model.userrole;
 
-import com.ozstrategy.model.BaseObject;
+import com.ozstrategy.model.BaseEntity;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -9,10 +9,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
+import javax.persistence.Table;
 
 @Entity 
-public class Feature extends BaseObject implements Serializable {
+@Table(name = "ext_feature")
+public class Feature extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private Long id;
@@ -24,7 +25,7 @@ public class Feature extends BaseObject implements Serializable {
     private String description;
     @Column
     private String criteria;
-    @Column(columnDefinition = "char",length = 1)
+    @Column
     private Boolean  enabled=Boolean.TRUE;
 
     public Feature() {

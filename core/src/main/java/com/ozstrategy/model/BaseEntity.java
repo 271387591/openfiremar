@@ -1,29 +1,33 @@
 package com.ozstrategy.model;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SqlBuilder;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public abstract class BaseEntity implements Serializable {
-
-    private static transient Map<Class<? extends BaseEntity>, List<String>> columnMap = null;
-
+    @Transient
+    private static transient Map<Class<? extends BaseEntity>, Map<String,String>> columnMap = null;
     static {
-        columnMap = new ConcurrentHashMap<Class<? extends BaseEntity>, List<String>>();
+        columnMap = new ConcurrentHashMap<Class<? extends BaseEntity>, Map<String,String>>();
     }
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
     @Column(name = "createDate")
     protected Date createDate;
@@ -33,6 +37,7 @@ public abstract class BaseEntity implements Serializable {
     public BaseEntity() {
         this.createDate = new Date();
         this.lastUpdateDate = createDate;
+        caculationColumnList();
     }
 
     public Long getId() {
@@ -60,126 +65,75 @@ public abstract class BaseEntity implements Serializable {
     }
 
     public String returnInsertSql(){
-        caculationColumnList();
-        List<String> list = columnMap.get(this.getClass());
+        Map<String,String> map = columnMap.get(this.getClass());
         List<String> columnList=new ArrayList<String>();
         List<String> valueList=new ArrayList<String>();
-        int len=list.size();
-        for(int i=0;i<len;i++){
-            String fieldName=list.get(i);
-            String columnName = fieldName;
-            columnName = getColumnName(fieldName);
-            columnList.add(columnName);
-            valueList.add("#{"+columnName+"}");
+        Map<String,String> idMap=getIdMap(this.getClass());
+        for(Map.Entry<String,String> entry:idMap.entrySet()){
+            String key=entry.getKey();
+            String value=entry.getValue();
+            columnList.add(key);
+            valueList.add("#{"+value+"}");
         }
+        for(Map.Entry<String,String> entry:map.entrySet()){
+            String key=entry.getKey();
+            String value=entry.getValue();
+            columnList.add(key);
+            valueList.add("#{"+value+"}");
+        }
+
         String tableName=getTablename();
         String columnNames=StringUtils.join(columnList.iterator(),",");
         String values=StringUtils.join(valueList.iterator(),",");
         SqlBuilder.BEGIN();
         SqlBuilder.INSERT_INTO(tableName);
-        SqlBuilder.VALUES(columnNames,values);
-        String sql=SqlBuilder.SQL();
+        SqlBuilder.VALUES(columnNames, values);
+        String sql= SqlBuilder.SQL();
         return sql;
     }
-    public Object[] insert(){
-        caculationColumnList();
-        List<String> list = columnMap.get(this.getClass());
+    public String returnUpdateSql(){
+        Map<String,String> map = columnMap.get(this.getClass());
         List<String> columnList=new ArrayList<String>();
-        List<String> valueList=new ArrayList<String>();
-        int len=list.size();
-        Object[] objects=new Object[len];
-        for(int i=0;i<len;i++){
-            String fieldName=list.get(i);
-            String columnName = fieldName;
-            columnName = getColumnName(fieldName);
-            columnList.add(columnName);
-            valueList.add("?");
-            try {
-                objects[i]=ReflectHelper.getValueByFieldName(this,fieldName);
-            } catch (Exception e) {
-            }
+        Map<String,String> idMap=getIdMap(this.getClass());
+        for(Map.Entry<String,String> entry:map.entrySet()){
+            String key=entry.getKey();
+            String value=entry.getValue();
+            columnList.add(key+"=#{"+value+"}");
+        }
+        List<String> whereList=new ArrayList<String>();
+        for(Map.Entry<String,String> entry:idMap.entrySet()){
+            String key=entry.getKey();
+            String value=entry.getValue();
+            whereList.add(key+"=#{"+value+"}");
         }
         String tableName=getTablename();
-        String columnNames=StringUtils.join(columnList.iterator(),",");
-        String values=StringUtils.join(valueList.iterator(),",");
-        SqlBuilder.BEGIN();
-        SqlBuilder.INSERT_INTO(tableName);
-        SqlBuilder.VALUES(columnNames,values);
-        String sql=SqlBuilder.SQL();
-        Object[] o=new Object[2];
-        o[0]=sql;
-        o[1]=objects;
-        return o;
-    }
-    public Object[] update(){
-        caculationColumnList();
-        List<String> list = columnMap.get(this.getClass());
-        List<String> columnList=new ArrayList<String>();
-        int len=list.size();
-        int k=0;
-        Object[] objects=new Object[len];
-        for(int i=0;i<len;i++){
-            String fieldName=list.get(i);
-            String columnName = fieldName;
-            if(isId(fieldName)){
-                k=i;
-                continue;
-            }
-            columnName = getColumnName(fieldName);
-            columnList.add(columnName+"=?");
-            try {
-                objects[i]=ReflectHelper.getValueByFieldName(this,fieldName);
-            } catch (Exception e) {
-            }
-        }
-        
-        
-        Object[] objects1=ArrayUtils.remove(objects, k);
-        objects1=ArrayUtils.add(objects1,getId());
-        
-        String tableName=getTablename();
-        String columnNames=StringUtils.join(columnList.iterator(),",");
-        String id=getIdName();
+        String columnNames=StringUtils.join(columnList.iterator(), ",");
+        String wheres=StringUtils.join(whereList.iterator(),",");
         SqlBuilder.BEGIN();
         SqlBuilder.UPDATE(tableName);
         SqlBuilder.SET(columnNames);
-        SqlBuilder.WHERE(id + "=?");
-        String sql=SqlBuilder.SQL();
-        Object[] o=new Object[2];
-        o[0]=sql;
-        o[1]=objects1;
-        return o;
+        SqlBuilder.WHERE(wheres);
+        String sql= SqlBuilder.SQL();
+        return sql;
     }
-    public Object[] delete(){
+    public String returnDeleteSql(){
+        List<String> columnList=new ArrayList<String>();
+        Map<String,String> idMap=getIdMap(this.getClass());
+        for(Map.Entry<String,String> entry:idMap.entrySet()){
+            String key=entry.getKey();
+            String value=entry.getValue();
+            columnList.add(key+"=#{"+value+"}");
+        }
         String tableName=getTablename();
-        String id=getIdName();
+        String columnNames=StringUtils.join(columnList.iterator(), ",");
         SqlBuilder.BEGIN();
         SqlBuilder.DELETE_FROM(tableName);
-        SqlBuilder.WHERE(id+"=?");
-        String sql=SqlBuilder.SQL();
-        Object[] objects=new Object[1];
-        objects[0]=getId();
-        Object[] o=new Object[2];
-        o[0]=sql;
-        o[1]=objects;
-        return o;
+        SqlBuilder.WHERE(columnNames);
+        String sql= SqlBuilder.SQL();
+        return sql;
     }
-    public Object[] get(Serializable id){
-        String tableName=getTablename();
-        String idName=getIdName();
-        SqlBuilder.BEGIN();
-        SqlBuilder.SELECT("*");
-        SqlBuilder.FROM(tableName);
-        SqlBuilder.WHERE(idName+"=?");
-        String sql=SqlBuilder.SQL();
-        Object[] objects=new Object[1];
-        objects[0]=id;
-        Object[] o=new Object[2];
-        o[0]=sql;
-        o[1]=objects;
-        return o;
-    }
-    protected String getTablename() {
+
+    private String getTablename() {
         Table table = this.getClass().getAnnotation(Table.class);
         if (table == null) {
             return this.getClass().getSimpleName().toUpperCase();
@@ -187,67 +141,74 @@ public abstract class BaseEntity implements Serializable {
             return table.name();
         }
     }
-    public String getIdName() {
-        Field[] fields = this.getClass().getDeclaredFields();
+    private Map<String,String> getIdMap(Class<? extends BaseEntity> cl) {
+        Map<String,String> map=new HashMap<String, String>();
+        List<Field> fields=new ArrayList<Field>();
+        fields = caculationColumn(cl,fields);
         for (Field field : fields) {
             if (field.isAnnotationPresent(Id.class)) {
-                return getColumnName(field);
+                if(field.isAnnotationPresent(Column.class)){
+                    String idName=getColumnName(field);
+                    map.put(idName,field.getName());
+                }else{
+                    String idName=field.getName();
+                    map.put(idName,field.getName());
+                }
+                break;
             }
         }
-        throw new RuntimeException("undefine POJO @Id");
-    }
-    public String getIdName(Class<? extends BaseEntity> cls) {
-        Field[] fields = cls.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Id.class)) {
-                return getColumnName(field);
-            }
+        if(map.isEmpty()){
+            throw new RuntimeException("undefine POJO @Id");
         }
-        throw new RuntimeException("undefine POJO @Id");
+        return map;
     }
-    
-    public void caculationColumnList() {
+
+
+    private void caculationColumnList() {
         if (columnMap.containsKey(this.getClass())) {
             return;
         }
-        Field[] fields = this.getClass().getDeclaredFields();
-        List<String> columnList = new ArrayList<String>(fields.length);
-        for (Field field : fields) {
+        List<Field> list=new ArrayList<Field>();
+        list=caculationColumn(this.getClass(),list);
+        Map<String,String> map=new HashMap<String, String>();
+        for (Field field : list) {
             if(field.isAnnotationPresent(Transient.class)){
                 continue;
             }
-            columnList.add(field.getName());
+            if(field.isAnnotationPresent(Column.class)){
+                String columnName=getColumnName(field);
+                if(columnName!=null){
+                    map.put(columnName, field.getName());
+                }
+            }
         }
-        columnMap.put(this.getClass(), columnList);
+        columnMap.put(this.getClass(), map);
     }
-    private String getColumnName(String fieldName) {
-        try {
-            Field field = this.getClass().getDeclaredField(fieldName);
-            return getColumnName(field);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+    private List<Field> caculationColumn(Class cl,List<Field> list){
+        Field[] fields = cl.getDeclaredFields();
+        list.addAll(Arrays.asList(fields));
+        Class supercl= cl.getSuperclass();
+        if(supercl.getName().equals(Object.class.getName())){
+            return list;
         }
+        return caculationColumn(supercl,list);
     }
 
     private String getColumnName(Field field) {
-        try {
-            String fieldName = field.getName();
-            if (!field.isAnnotationPresent(Column.class)) {
-                return fieldName;
+        String columnName=null;
+        Column column = field.getAnnotation(Column.class);
+        if(column==null){
+            columnName=field.getName();
+        }else{
+            if(StringUtils.isNotEmpty(column.name())){
+                columnName=column.name();
+            }else{
+                columnName=field.getName();
             }
-            Column column = field.getAnnotation(Column.class);
-            String columnName = column.name().trim();
-            if (columnName == null || columnName.isEmpty()) {
-                return fieldName;
-            } else {
-                return columnName;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
         }
+        return columnName;
     }
+
     private boolean isTransient(String fieldName){
         Field field = null;
         try {
@@ -299,8 +260,4 @@ public abstract class BaseEntity implements Serializable {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    
-
-    
 }

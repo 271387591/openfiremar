@@ -2,11 +2,10 @@
 var globalRes = {
     logoutUrl: '<c:url value="/logout"/>',
     userName: '${command.username}',
-    userFullName: '${command.fullName}',
+    nickName: '${command.nickName}',
     userId: '${command.id}',
-    isAdmin : ${command.admin},
+    isAdmin : '${command.admin}',
     features: '${command.features}',
-    taskCount: '${command.taskCount}',
     webname: '<fmt:message key="webapp.name" />',
     welcome: '<fmt:message key="globalRes.welcome" />',
     welcomeToday: '<fmt:message key="globalRes.welcomeToday" />',

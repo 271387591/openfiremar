@@ -1,6 +1,5 @@
 package com.ozstrategy.service.userrole;
 
-import com.ozstrategy.model.userrole.SystemView;
 import com.ozstrategy.model.userrole.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -14,16 +13,13 @@ public interface UserManager extends UserDetailsService {
     List<User> getUserByRoleId(Long roleId);
     Integer listUsersCount(Map<String,Object> map);
     void deleteUser(Long userId) throws Exception;
-    Integer updateUserPassword(Long userId, String oldPassword, String newPassword, boolean admin) throws Exception;
+    Integer updateUserPassword(User user, String oldPassword, String newPassword, boolean admin) throws Exception;
     User getUserById(Long id);
-    User getUserByUsername(String username);
-    User getUserByEmail(String email);
-    User getUserByMobile(String mobile);
+    User getUserByUsername(String username,Long projectId);
     void saveOrUpdate(User user)throws Exception;
-    List<SystemView> listSystemView();
-    SystemView getSystemViewById(Long id);
     void authorizationUser(User user);
-    List<User> listUsersByProjectId(Long projectId,Integer start,Integer limit);
-    Integer listUsersByProjectIdCount(Long projectId);
-    List<User> listAvailableUsers();
+    void updateUser(User user);
+
+
+    Integer getUserCountByProjectId(Long projectId);
 } 

@@ -1,19 +1,19 @@
 package com.ozstrategy.webapp.command.appstore;
 
 import com.ozstrategy.model.appstore.AppStore;
-import com.ozstrategy.webapp.command.BaseObjectCommand;
+import com.ozstrategy.webapp.command.BaseEntityCommand;
 
 /**
  * Created by lihao on 1/6/15.
  */
-public class AppStoreCommand extends BaseObjectCommand {
+public class AppStoreCommand extends BaseEntityCommand {
     private Long id;
     private String url;
     private String version;
     private String description;
     private String platform;
     public AppStoreCommand(AppStore appStore) {
-        super(appStore);
+//        super(appStore);
         this.id= appStore.getId();
         this.url= appStore.getUrl();
         this.version= appStore.getVersion();

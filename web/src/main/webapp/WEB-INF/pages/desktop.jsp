@@ -34,6 +34,7 @@
 
   <script type="text/javascript">
       var isLogout = false;
+      var wholeProject=null;
 //      window.onbeforeunload = function () {
 //          if(!isLogout){
 //              return '您即将离开本页面，如有未保存的数据将会丢失，是否继续？';
@@ -64,14 +65,16 @@
     var apps = {};
     Ext.require([
       'FlexCenter.App',
+            'FlexCenter.ProjectViewport',
       'Ext.ux.utils.Utils',
       'Ext.data.ArrayStore',
       'Ext.util.CSS'
     ]);
     var flexCenterApp;
-    var treeRegister;
-    var surveyRegister;
     Ext.onReady(function () {
+        Ext.QuickTips.init();
+//        flexCenterApp=Ext.create('FlexCenter.ProjectViewport');
+        
         
       flexCenterApp = new FlexCenter.App();
       var oDiv = document.getElementById('loading');

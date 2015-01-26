@@ -15,6 +15,7 @@ public interface MessageExportManager {
     Integer listCount(Map<String,Object> map);
     void save(MessageExport messageExport);
     MessageExport getById(Long id);
-    void exportMessage(Date startTime, Date endTime,File folder) throws Exception;
-    boolean checkExportDataExist(Date startTime,Date endTime) throws Exception;
+    void exportMessage(Date startTime, Date endTime,File folder,Long projectId) throws Exception;
+    void exportVoice(Date startTime, Date endTime,File folder,Long projectId) throws Exception;
+    boolean checkExportDataExist(Date startTime,Date endTime,Long projectId) throws Exception;
 }

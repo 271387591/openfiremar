@@ -12,7 +12,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title><fmt:message key="webapp.name"/></title>
     <c:set var="language"><%=language %></c:set>
-    <link rel="stylesheet" type="text/css" href="<c:url value='/scripts/desktop/css/desktop.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value='/scripts/ext/resources/css/ext-all.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value='/scripts/ozstrategy/css/flexcenter.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value='/scripts/ozstrategy/css/BoxSelect.css'/>"/>

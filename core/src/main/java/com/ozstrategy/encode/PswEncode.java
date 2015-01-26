@@ -19,10 +19,10 @@ public class PswEncode implements PasswordEncoder {
 
     public static void main(String[] args){
         String psw="52726a2dc6e8a969d3d5c858c89da1706ac8021b603bda8d";
-        String str =  new PswEncode("Uw51jHUNpY390Jx").encryptString("tomcat");
+        String str =  new PswEncode("V6N82IHvy9H6kCq").encryptString("tomcat");
 //        psw="536c0b339345616c1b33caf454454d8b8a190d6c";
 
-        System.out.println("str1==="+new PswEncode("Uw51jHUNpY390Jx").decryptString(psw));
+        System.out.println("str1==="+new PswEncode("V6N82IHvy9H6kCq").decryptString(psw));
         System.out.println("str2==="+str);
     }
 

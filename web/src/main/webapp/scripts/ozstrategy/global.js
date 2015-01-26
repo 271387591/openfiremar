@@ -91,7 +91,7 @@ function checkUserSessionStatus(conn,response,options){
         if(response && response.getAllResponseHeaders().sessionstatus){
             setTimeout(function (){
                 Ext.MessageBox.alert(globalRes.title.fail,globalRes.msg.logoutTimeout,function (){
-                    location.href = location.href;
+                    location.href = basePath;
                 });
             },500);
         }
