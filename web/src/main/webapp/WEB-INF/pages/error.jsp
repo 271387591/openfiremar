@@ -1,4 +1,5 @@
 <%@ page language="java" isErrorPage="true" %>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -16,13 +17,7 @@
         <div id="content" class="clearfix">
             <div id="main">
                 <h1><fmt:message key="errorPage.heading"/></h1>
-                <%@ include file="/common/messages.jsp" %>
-                 <% if (exception != null) { %>
-                    <pre><% exception.printStackTrace(new java.io.PrintWriter(out)); %></pre>
-                 <% } else if ((Exception)request.getAttribute("javax.servlet.error.exception") != null) { %>
-                    <pre><% ((Exception)request.getAttribute("javax.servlet.error.exception"))
-                                           .printStackTrace(new java.io.PrintWriter(out)); %></pre>
-                 <% } %>
+                访问错误
             </div>
         </div>
     </div>

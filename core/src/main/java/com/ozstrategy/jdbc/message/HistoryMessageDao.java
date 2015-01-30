@@ -1,7 +1,5 @@
 package com.ozstrategy.jdbc.message;
 
-import com.ozstrategy.model.openfire.HistoryMessage;
-
 import java.io.File;
 import java.util.Date;
 import java.util.List;
@@ -12,23 +10,27 @@ import java.util.Map;
  */
 public interface HistoryMessageDao {
     Long maxId();
+    Map<String,Object> maxMinIdByTime(Date startTime, Date endTime,Long projectId);
+    
+    void deleteByIds(List<Long> ids);
+    List<Map<String, Object>> getIdByBetween(Long minId,Long maxId,Long projectId,Integer limit);
+    
     void delete(Date startTime, Date endTime,Long projectId);
-    Long addIndex(Long index_max_id) throws Exception;
     void exportMessage(Date startTime,Date endTime,File folder,Long projectId) throws Exception;
     void exportVoice(Date startTime,Date endTime,File folder,Long projectId) throws Exception;
-    Integer countTime(Date startTime,Date endTime) throws Exception;
     boolean checkExportDataExist(Date startTime,Date endTime,Long projectId);
-
-    List<HistoryMessage> listHistoryMessagesFromDb(Map<String,Object> map,Integer start,Integer limit) throws Exception;
-    Integer listHistoryMessagesFromDbCount(Map<String,Object> map)throws Exception;
     
-    List<HistoryMessage> listHistoryMessagesStore(Map<String,Object> map,Integer start,Integer limit) throws Exception;
-    Integer listHistoryMessagesStoreCount(Map<String,Object> map)throws Exception;
-
-    List<HistoryMessage> listManagerMessages(Map<String,Object> map,Integer start,Integer limit) throws Exception;
-    Integer listManagerMessagesCount(Map<String,Object> map)throws Exception;
-
     void deleteMessage(Long projectId,String messageId);
+
+    List<Map<String,String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Integer start, Integer limit) throws Exception;
+    
+    Long addIndex(Long minId)throws Exception;
+    
+    void deleteIndex(Date startDate,Date endDate,Long projectId) throws Exception;
+
+
+    List<Map<String,Object>> getHistory(Long projectId,Integer start,Integer limit) throws Exception;
+    Integer getHistoryCount(Long projectId);
     
     
     

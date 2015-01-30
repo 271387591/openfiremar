@@ -1,9 +1,8 @@
 package com.ozstrategy.webapp.controller.openfire;
 
-import com.ozstrategy.model.openfire.HistoryMessage;
-import com.ozstrategy.model.system.ApplicationConfig;
+import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.openfire.HistoryMessageManager;
-import com.ozstrategy.service.system.ApplicationConfigManager;
+import com.ozstrategy.service.userrole.UserManager;
 import com.ozstrategy.webapp.command.BaseResultCommand;
 import com.ozstrategy.webapp.command.JsonReaderResponse;
 import com.ozstrategy.webapp.controller.BaseController;
@@ -16,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,71 +31,7 @@ public class HistoryMessageController extends BaseController {
     @Autowired
     private HistoryMessageManager historyMessageManager;
     @Autowired
-    private ApplicationConfigManager applicationConfigManager;
-    
-    @RequestMapping(params = "method=list")
-    @ResponseBody
-    public JsonReaderResponse<HistoryMessage> list(HttpServletRequest request){
-        Integer start=parseInteger(request.getParameter("start"));
-        Integer limit=parseInteger(request.getParameter("limit"));
-        Map<String,Object> map=requestMap(request);
-        try{
-            String value = applicationConfigManager.get(ApplicationConfig.index_max_id);
-            Long index_max_id= NumberUtils.toLong(value);
-            Long max_id=historyMessageManager.maxId();
-            if(index_max_id<max_id){
-                historyMessageManager.addIndex(index_max_id);
-            }
-            List<HistoryMessage> projects=historyMessageManager.listHistoryMessages(map, start, limit);
-            int count = historyMessageManager.listHistoryMessagesCount(map);
-            return new JsonReaderResponse<HistoryMessage>(projects,"",count);
-        }catch (Exception e){
-            logger.error("list HistoryMessage",e);
-            
-        }
-        return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),"",0);
-    }
-    @RequestMapping(params = "method=listFromDb")
-    @ResponseBody
-    public JsonReaderResponse<HistoryMessage> listFromDb(HttpServletRequest request){
-        try{
-            Integer start=parseInteger(request.getParameter("start"));
-            Integer limit=parseInteger(request.getParameter("limit"));
-            if(StringUtils.isEmpty(request.getParameter("projectId"))){
-                return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),"缺少projectId",0);
-            }
-            Map<String,Object> map=requestMap(request);
-           
-            List<HistoryMessage> projects=historyMessageManager.listHistoryMessagesFromDb(map, start, limit);
-            int count = historyMessageManager.listHistoryMessagesFromDbCount(map);
-            return new JsonReaderResponse<HistoryMessage>(projects,"",count);
-        }catch (Exception e){
-            logger.error("list HistoryMessage",e);
-            
-        }
-        return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),false,0,"");
-    }
-    @RequestMapping(params = "method=listManagerMessages")
-    @ResponseBody
-    public JsonReaderResponse<HistoryMessage> listManagerMessages(HttpServletRequest request){
-        try{
-            Integer start=parseInteger(request.getParameter("start"));
-            Integer limit=parseInteger(request.getParameter("limit"));
-            if(StringUtils.isEmpty(request.getParameter("projectId"))){
-                return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),"缺少projectId",0);
-            }
-            Map<String,Object> map=requestMap(request);
-           
-            List<HistoryMessage> projects=historyMessageManager.listManagerMessages(map, start, limit);
-            int count = historyMessageManager.listManagerMessagesCount(map);
-            return new JsonReaderResponse<HistoryMessage>(projects,"",count);
-        }catch (Exception e){
-            logger.error("list HistoryMessage",e);
-            
-        }
-        return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),false,0,"");
-    }
-    
+    private UserManager userManager;
     @RequestMapping(params = "method=deleteMessage")
     @ResponseBody
     public BaseResultCommand deleteMessage(HttpServletRequest request){
@@ -118,25 +55,86 @@ public class HistoryMessageController extends BaseController {
     
     @RequestMapping(params = "method=listStore")
     @ResponseBody
-    public JsonReaderResponse<HistoryMessage> listStore(HttpServletRequest request){
+    public JsonReaderResponse<Map<String,Object>> listStore(HttpServletRequest request) throws Exception{
         try{
             Integer start=parseInteger(request.getParameter("start"));
             Integer limit=parseInteger(request.getParameter("limit"));
-            if(StringUtils.isEmpty(request.getParameter("projectId"))){
-                return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),"缺少projectId",0);
+            Long projectId=parseLong(request.getParameter("projectId"));
+            String formNick=request.getParameter("fromNick");
+            String startTime=request.getParameter("startTime");
+            String endTime=request.getParameter("endTime");
+            String message=request.getParameter("message");
+            Long manager=parseLong(request.getParameter("manager"));
+            Long deleted=parseLong(request.getParameter("deleted"));
+            if(projectId==null){
+                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"缺少projectId");
             }
-            Map<String,Object> map=requestMap(request);
+            Long fromId=null;
+            if(StringUtils.isNotEmpty(formNick)){
+                User user=userManager.getUserByNickName(projectId,formNick);
+                if(user==null){
+                    return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"昵称不存在");
+                }
+                fromId=user.getId();
+            }
+            Date sDate=null;
+            Date eDate=null;
+            if(StringUtils.isNotEmpty(startTime)){
+                sDate=DateUtils.parseDate(startTime, new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
+            }
+            if(StringUtils.isNotEmpty(endTime)){
+                eDate=DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
+            }
+            Long maxId=historyMessageManager.addIndex();
+            if(maxId==0L){
+                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),true,0,"");
+            }
            
-            List<HistoryMessage> projects=historyMessageManager.listHistoryMessagesStore(map, start, limit);
-            int count = historyMessageManager.listHistoryMessagesStoreCount(map);
-            return new JsonReaderResponse<HistoryMessage>(projects,"",count);
+            List<Map<String,String>> projects=historyMessageManager.search(message,sDate, eDate, fromId, projectId,manager,deleted,start, limit);
+            List<Map<String,Object>> list=new ArrayList<Map<String, Object>>();
+            if(projects!=null && projects.size()>0){
+                for(Map<String,String> map:projects){
+                    Map<String,Object> newMap=new HashMap<String, Object>();
+                    newMap.putAll(map);
+                    Long createDate=NumberUtils.toLong(map.get("createDate"));
+                    Date date=new Date(createDate);
+                    newMap.put("createDate",date);
+                    list.add(newMap);
+                }
+            }
+            int count=0;
+            if(projects!=null && projects.size()>0){
+                Map<String,String> map=projects.get(0);
+                count=NumberUtils.toInt(map.get("total"));
+            }
+            return new JsonReaderResponse<Map<String,Object>>(list,"",count);
         }catch (Exception e){
+            e.printStackTrace();
             logger.error("list HistoryMessage",e);
             
         }
-        return new JsonReaderResponse<HistoryMessage>(Collections.<HistoryMessage>emptyList(),false,0,"");
+        return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"数据查询失败");
     }
-    
+    @RequestMapping(params = "method=getHistory")
+    @ResponseBody
+    public JsonReaderResponse<Map<String,Object>> getHistory(HttpServletRequest request) throws Exception{
+        try{
+            Integer start=parseInteger(request.getParameter("start"));
+            Integer limit=parseInteger(request.getParameter("limit"));
+            Long projectId=parseLong(request.getParameter("projectId"));
+            if(projectId==null){
+                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"缺少projectId");
+            }
+            List<Map<String,Object>> projects=historyMessageManager.getHistory(projectId, start, limit);
+            Integer count=historyMessageManager.getHistoryCount(projectId);
+            return new JsonReaderResponse<Map<String,Object>>(projects,"",count);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("list HistoryMessage",e);
+            
+        }
+        return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"数据查询失败");
+    }
     
     @RequestMapping(params = "method=delete")
     @ResponseBody

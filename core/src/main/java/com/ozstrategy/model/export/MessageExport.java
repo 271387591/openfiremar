@@ -25,6 +25,8 @@ public class MessageExport extends BaseEntity {
     private String exceptions;
     @Column
     private Long projectId;
+    @Column
+    private Boolean multiFile=Boolean.FALSE;
 
     public String getExportor() {
         return exportor;
@@ -72,6 +74,14 @@ public class MessageExport extends BaseEntity {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public Boolean getMultiFile() {
+        return multiFile;
+    }
+
+    public void setMultiFile(Boolean multiFile) {
+        this.multiFile = multiFile;
     }
 
     @Override

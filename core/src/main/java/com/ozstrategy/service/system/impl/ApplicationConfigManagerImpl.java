@@ -15,17 +15,17 @@ public class ApplicationConfigManagerImpl implements ApplicationConfigManager {
     @Autowired
     private ApplicationConfigDao applicationConfigDao;
 
-    public String get(String key) {
+    public String get(String key) throws Exception {
         return applicationConfigDao.get(key);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void put(String key, String value) {
+    public void put(String key, String value) throws Exception {
         applicationConfigDao.put(key, value);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void insertJobLog(JobLog jobLog) {
+    public void insertJobLog(JobLog jobLog) throws Exception {
         applicationConfigDao.insertJobLog(jobLog);
     }
 }

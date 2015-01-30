@@ -102,6 +102,9 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                                 handler : function() {
                                     me.down('form').getForm().reset();
                                     var store=me.down('grid').getStore();
+                                    store.on('beforeload',function(s,e){
+                                        e.params = {};
+                                    });
                                     store.loadPage(1);
                                     
                                 }
@@ -158,12 +161,16 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         header: '聊天内容',
                         flex:1,
                         dataIndex: 'message',
-                        renderer: function (v) {
+                        renderer: function (v,metaData,rec) {
                             var message=me.down('#message').getValue();
                             if(message){
                                 var reg = new RegExp(message, "g");
                                 return v.replace(reg,'<font color="red">'+message+'</font>')
                             }
+                            if(rec.get('type')!=0){
+                                return '<a href="'+v+'" target="_blank">'+v+'</a>'
+                            }
+                            
                             return v
                         }
                     },

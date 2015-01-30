@@ -33,10 +33,9 @@ public class ProjectController extends BaseController {
     @Autowired
     private UserManager userManager;
     
-    
     @RequestMapping(params = "method=listAllProjects")
     @ResponseBody
-    public JsonReaderResponse<AppProjectCommand> listAllProjects(HttpServletRequest request){
+    public JsonReaderResponse<AppProjectCommand> listAllProjects(HttpServletRequest request) throws Exception{
         List<AppProjectCommand> commands=new ArrayList<AppProjectCommand>();
         List<Project> projects=projectManager.listAllProjects();
         if(projects!=null && projects.size()>0){
@@ -48,7 +47,7 @@ public class ProjectController extends BaseController {
     }
     @RequestMapping(params = "method=listProjects")
     @ResponseBody
-    public JsonReaderResponse<ProjectCommand> listProjects(HttpServletRequest request){
+    public JsonReaderResponse<ProjectCommand> listProjects(HttpServletRequest request) throws Exception{
         List<ProjectCommand> commands=new ArrayList<ProjectCommand>();
         Integer start=parseInteger(request.getParameter("start"));
         Integer limit=parseInteger(request.getParameter("limit"));
@@ -69,17 +68,17 @@ public class ProjectController extends BaseController {
     
     @RequestMapping(params = "method=saveProject")
     @ResponseBody
-    public BaseResultCommand saveProject(HttpServletRequest request){
+    public BaseResultCommand saveProject(HttpServletRequest request) throws Exception{
         return saveOrUpdate(request,true);
     }
     @RequestMapping(params = "method=updateProject")
     @ResponseBody
-    public BaseResultCommand updateProject(HttpServletRequest request){
+    public BaseResultCommand updateProject(HttpServletRequest request) throws Exception{
         return saveOrUpdate(request,false);
     }
     @RequestMapping(params = "method=deleteProject")
     @ResponseBody
-    public BaseResultCommand deleteProject(HttpServletRequest request){
+    public BaseResultCommand deleteProject(HttpServletRequest request) throws Exception{
         String ids=request.getParameter("id");
         Long id=parseLong(ids);
         Project project=projectManager.getProjectById(id);
@@ -92,7 +91,7 @@ public class ProjectController extends BaseController {
     }
     @RequestMapping(params = "method=saveProjectUser")
     @ResponseBody
-    public BaseResultCommand saveProjectUser(HttpServletRequest request){
+    public BaseResultCommand saveProjectUser(HttpServletRequest request) throws Exception{
         String userIds=request.getParameter("userIds");
         String projectId=request.getParameter("projectId");
         Project project=null;
@@ -131,7 +130,7 @@ public class ProjectController extends BaseController {
     
     
     
-    private BaseResultCommand saveOrUpdate(HttpServletRequest request,boolean save){
+    private BaseResultCommand saveOrUpdate(HttpServletRequest request,boolean save) throws Exception{
         Project project        = null;
         String id=request.getParameter("id");
         String name=request.getParameter("name");

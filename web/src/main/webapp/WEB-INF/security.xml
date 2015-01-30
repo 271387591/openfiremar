@@ -8,18 +8,14 @@
     <http pattern="/images/**" security="none"/>
     <http pattern="/styles/**" security="none"/>
     <http pattern="/scripts/**" security="none"/>
-    <http pattern="/app/register" security="none"/>
-    <http pattern="/app/getProjects" security="none"/>
-    <http pattern="/app/download/*" security="none"/>
-    <http pattern="/app/search" security="none"/>
-
+    <http pattern="/app/**" security="none"/>
     <http use-expressions="true" 
           entry-point-ref="authenticationProcessingFilterEntryPoint" 
           authentication-manager-ref="authenticationManager"
           disable-url-rewriting="true">
         <expression-handler ref="expressionHandler"/>
         
-        <intercept-url pattern="/service/desktop" access="isAuthenticated()"/>
+        <intercept-url pattern="/service/home" access="isAuthenticated()"/>
         <!--<intercept-url pattern="/service/userview" access="authenticatedContext('user')"/>-->
         <!--<intercept-url pattern="/service/*" access="hasAnyRole('ROLE_USER,ROLE_ADMIN')"/>-->
         <!--<intercept-url pattern="/app/passwordHint*" access="hasFeature('sss')"/>-->

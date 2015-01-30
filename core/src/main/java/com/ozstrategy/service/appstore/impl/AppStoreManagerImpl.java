@@ -19,30 +19,30 @@ import java.util.Map;
 public class AppStoreManagerImpl implements AppStoreManager {
     @Autowired
     private AppStoreDao appStoreDao;
-    public List<AppStore> listAppStores(Map<String, Object> map, Integer start, Integer limit) {
+    public List<AppStore> listAppStores(Map<String, Object> map, Integer start, Integer limit) throws Exception {
         return appStoreDao.listAppStores(map,new RowBounds(start,limit));
     }
 
-    public Integer listAppStoresCount(Map<String, Object> map) {
+    public Integer listAppStoresCount(Map<String, Object> map) throws Exception {
         return appStoreDao.listAppStoresCount(map);
     }
 
-    public AppStore getAppStoreById(Long id) {
+    public AppStore getAppStoreById(Long id) throws Exception {
         return appStoreDao.getAppStoreById(id);
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void save(AppStore appStore) {
+    public void save(AppStore appStore) throws Exception {
         appStoreDao.save(appStore);
         appStore.setUrl(MessageFormat.format(appStore.getUrl(),appStore.getId()));
         appStoreDao.update(appStore);
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void update(AppStore appStore) {
+    public void update(AppStore appStore) throws Exception {
         appStoreDao.update(appStore);
 
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void delete(Long id) {
+    public void delete(Long id) throws Exception {
         appStoreDao.delete(id);
     }
 }

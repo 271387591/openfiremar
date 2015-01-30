@@ -40,20 +40,20 @@ public class UserManagerImpl implements UserManager {
     
     
 
-    public List<User> listUsers(Map<String, Object> map, Integer start, Integer limit) {
+    public List<User> listUsers(Map<String, Object> map, Integer start, Integer limit) throws Exception {
         
         return userDao.listUsers(map,new RowBounds(start,limit));
     }
 
-    public List<User> listAllUsers(Map<String, Object> map) {
+    public List<User> listAllUsers(Map<String, Object> map) throws Exception {
         return userDao.listUsers(map,RowBounds.DEFAULT);
     }
 
-    public List<User> getUserByRoleId(Long roleId) {
+    public List<User> getUserByRoleId(Long roleId) throws Exception {
         return userDao.getUserByRoleId(roleId);
     }
 
-    public Integer listUsersCount(Map<String, Object> map) {
+    public Integer listUsersCount(Map<String, Object> map) throws Exception {
         return userDao.listUsersCount(map);
     }
 
@@ -76,11 +76,11 @@ public class UserManagerImpl implements UserManager {
         return 0;
     }
 
-    public User getUserById(Long id) {
+    public User getUserById(Long id) throws Exception {
         return userDao.getUserById(id);
     }
 
-    public User getUserByUsername(String username,Long projectId) {
+    public User getUserByUsername(String username,Long projectId) throws Exception {
         return userDao.getUserByUsername(username,projectId);
     }
 
@@ -119,17 +119,21 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void authorizationUser(User user) {
+    public void authorizationUser(User user) throws Exception {
         userDao.update(user);
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void updateUser(User user) {
+    public void updateUser(User user) throws Exception {
         userDao.update(user);
     }
 
 
-    public Integer getUserCountByProjectId(Long projectId) {
+    public Integer getUserCountByProjectId(Long projectId) throws Exception {
         return userDao.getUserCountByProjectId(projectId);
+    }
+
+    public User getUserByNickName(Long project, String nickName) {
+        return userDao.getUserByNickName(project,nickName);
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -29,43 +29,43 @@ public class ProjectManagerImpl implements ProjectManager {
     @Autowired
     private OpenfireMucRoomDao openfireMucRoomDao;
     
-    public List<Project> listProjects(Map<String, Object> map, Integer start, Integer limit) {
+    public List<Project> listProjects(Map<String, Object> map, Integer start, Integer limit)  throws Exception{
         return projectDao.listProjects(map,new RowBounds(start,limit));
     }
 
-    public List<Project> listAllProjects() {
+    public List<Project> listAllProjects() throws Exception {
         return projectDao.listProjects(new HashMap<String, Object>(),RowBounds.DEFAULT);
     }
 
-    public Integer listProjectsCount(Map<String, Object> map) {
+    public Integer listProjectsCount(Map<String, Object> map) throws Exception {
         return projectDao.listProjectsCount(map);
     }
 
-    public Project getProjectById(Long id) {
+    public Project getProjectById(Long id) throws Exception {
         return projectDao.getProjectById(id);
     }
 
-    public Project getProjectByName(String name) {
+    public Project getProjectByName(String name) throws Exception {
         return projectDao.getProjectByName(name);
     }
 
-    public Project getProjectBySno(String serialNumber) {
+    public Project getProjectBySno(String serialNumber) throws Exception {
         return projectDao.getProjectBySno(serialNumber);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void save(Project project) {
+    public void save(Project project) throws Exception {
         projectDao.save(project);
         OpenfireMucRoom room=new OpenfireMucRoom().copy(project);
         openfireMucRoomDao.save(room);
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void update(Project project) {
+    public void update(Project project) throws Exception {
         projectDao.update(project);
         openfireMucRoomDao.update(new OpenfireMucRoom().copy(project));
     }
     @Transactional(rollbackFor = Throwable.class)
-    public void delete(Project project) {
+    public void delete(Project project) throws Exception {
         openfireMucRoomDao.delete(project.getId());
         projectDao.delete(project);
     }

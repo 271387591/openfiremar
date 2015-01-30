@@ -11,7 +11,7 @@
  Target Server Version : 50610
  File Encoding         : utf-8
 
- Date: 01/26/2015 23:45:37 PM
+ Date: 01/29/2015 23:44:18 PM
 */
 
 SET NAMES utf8;
@@ -31,7 +31,7 @@ CREATE TABLE `ext_applicationConfig` (
 --  Records of `ext_applicationConfig`
 -- ----------------------------
 BEGIN;
-INSERT INTO `ext_applicationConfig` VALUES ('index_max_id', '1791');
+INSERT INTO `ext_applicationConfig` VALUES ('index_max_id', '0');
 COMMIT;
 
 -- ----------------------------
@@ -88,55 +88,9 @@ CREATE TABLE `ext_jobLog` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
---  Table structure for `ext_messageExport`
--- ----------------------------
-DROP TABLE IF EXISTS `ext_messageExport`;
-CREATE TABLE `ext_messageExport` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `exportor` varchar(32) DEFAULT NULL,
-  `type` varchar(32) DEFAULT NULL,
-  `total` int(10) DEFAULT NULL,
-  `filePath` varchar(255) DEFAULT NULL,
-  `executeDate` datetime DEFAULT NULL,
-  `createDate` datetime DEFAULT NULL,
-  `lastUpdateDate` datetime DEFAULT NULL,
-  `exceptions` varchar(500) DEFAULT NULL,
-  `projectId` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
-
--- ----------------------------
 --  Table structure for `ext_ofHistory`
 -- ----------------------------
-DROP TABLE IF EXISTS `ext_ofHistory`;
-CREATE TABLE `ext_ofHistory` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `createDate` datetime DEFAULT NULL,
-  `deleted` int(11) DEFAULT NULL,
-  `fromId` varchar(64) DEFAULT NULL,
-  `fromNick` varchar(128) DEFAULT NULL,
-  `manager` int(11) DEFAULT NULL,
-  `message` text,
-  `messageId` varchar(255) DEFAULT NULL,
-  `toId` int(10) DEFAULT NULL,
-  `toNick` varchar(128) DEFAULT NULL,
-  `type` int(10) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `toId` (`toId`) USING BTREE,
-  KEY `deleted` (`deleted`),
-  KEY `createDate` (`createDate`) USING BTREE,
-  KEY `fromNick` (`fromNick`) USING BTREE,
-  KEY `type` (`type`) USING BTREE,
-  KEY `messageId` (`messageId`) USING BTREE,
-  KEY `manager` (`manager`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
--- ----------------------------
---  Records of `ext_ofHistory`
--- ----------------------------
-BEGIN;
-INSERT INTO `ext_ofHistory` VALUES ('1', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@5a9e29fb', '0', '代理费拉萨的减肥里的水浪费教室里的房间里是大家发链接阿萨德路附近的酸辣粉就', '888a4343-4e32-4334-9645-442a3f919665', '7', '工程一', '0'), ('2', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@5e7808b9', '0', 'http://127.0.0.1/extjs-4.2.0/ext-all-debug-w-comments.js', 'e56d70df-60a6-42e1-93a8-b82e03748e1b', '7', '工程一', '2'), ('3', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@1a84da23', '0', '费就爱死拉到附近拉萨的弗拉三季度分了就撒旦法律收代理费拉萨的减肥里的水浪费教室里的房间里是大家发链接阿萨德路附近的酸辣粉就', '01701d20-d59d-4ac3-8060-0bb843d72e90', '7', '工程一', '0'), ('4', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@80d3d6f', '0', '斯克奖的法律框架阿萨德路附近拉萨的就分了家拉屎大家浪费就爱死拉到附近拉萨的弗拉三季度分了就撒旦法律收代理费拉萨的减肥里的水浪费教室里的房间里是大家发链接阿萨德路附近的酸辣粉就', 'ea1f8327-1d6e-4ecc-ab8e-ef84f9ba2608', '7', '工程一', '0'), ('5', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@1d3c468a', '0', '间里是大家发链接阿萨德路附近的酸辣粉就', 'ab9b837b-a26c-4911-b5a9-f827c1f53b8a', '7', '工程一', '0'), ('6', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@603b1d04', '0', '德路附近的酸辣粉就', '3ffab52b-24af-4ed4-b253-1b53cf968361', '7', '工程一', '0'), ('7', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@48ee22f7', '0', '拉萨的就分了家拉屎大家浪费就爱死拉到附近拉萨的弗拉三季度分了就撒旦法律收代理费拉萨的减肥里的水浪费教室里的房间里是大家发链接阿萨德路附近的酸辣粉就', '1149cbab-da23-4827-85c8-7473bf288142', '7', '工程一', '0'), ('8', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@a39ab89', '0', '律收代理费拉萨的减肥里的水浪费教室里的房间里是大家发链接阿萨德路附近的酸辣粉就', '23105cfe-600c-4aa0-8f2c-64b88d833e41', '7', '工程一', '0'), ('9', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@502cb49d', '0', '近拉萨的就分了家拉屎大家浪费就爱死拉到附近拉萨的弗拉三季度分了就撒旦法律收代理费拉萨的减肥里的水浪费教室里的房间里是大家发链接阿萨德路附近的酸辣粉就', '87198816-86e8-4fc1-9d5c-37b80fdf180a', '7', '工程一', '0'), ('10', '2015-01-26 22:05:41', '0', '1', '李浩java.util.Random@2705d88a', '0', 'http://127.0.0.1/extjs-4.2.0/build.xml', 'b8699344-e022-4692-b894-1083ceabeeee', '7', '工程一', '2');
-COMMIT;
 
 -- ----------------------------
 --  Table structure for `ext_project`

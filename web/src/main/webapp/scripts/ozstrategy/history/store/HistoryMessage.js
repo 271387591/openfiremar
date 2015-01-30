@@ -24,6 +24,18 @@ Ext.define('FlexCenter.history.store.HistoryMessage', {
         writer: {
             writeAllFields: false,
             root: 'data'
+        },
+        listeners:{
+            exception: function(proxy, response, operation) {
+                var result = Ext.decode(response.responseText,true);
+                Ext.MessageBox.show({
+                        title: '提示',
+                        msg: result.message,
+                        icon: Ext.MessageBox.WARNING,
+                        buttons: Ext.Msg.OK
+                    }
+                );
+            }
         }
     }
 });

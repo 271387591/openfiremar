@@ -1,10 +1,13 @@
 package com.ozstrategy.service;
 
+import com.ozstrategy.dao.export.MessageExportDao;
 import com.ozstrategy.dao.project.ProjectDao;
 import com.ozstrategy.jdbc.message.HistoryMessageDao;
 import com.ozstrategy.model.export.ExportType;
 import com.ozstrategy.model.export.MessageExport;
 import com.ozstrategy.model.project.Project;
+import com.ozstrategy.service.openfire.HistoryMessageManager;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.junit.Test;
@@ -24,6 +27,12 @@ public class OpenfireTest extends BaseManagerTestCase {
     private ProjectDao projectDao;
     @Autowired
     private HistoryMessageDao historyMessageDao;
+    
+    @Autowired
+    private HistoryMessageManager historyMessageManager;
+    @Autowired
+    private MessageExportDao messageExportDao;
+    
     
     
     
@@ -77,7 +86,7 @@ public class OpenfireTest extends BaseManagerTestCase {
     
     @Test
     public void testJdbc(){
-        MessageExport messageExport=new MessageExport();
+        MessageExport messageExport=messageExportDao.get(8L);
         messageExport.setExecuteDate(new Date());
         messageExport.setFilePath("dd");
         messageExport.setExportor("dsfd");
@@ -86,14 +95,19 @@ public class OpenfireTest extends BaseManagerTestCase {
     }
     @Test
     public void testExport() throws Exception{
-        Date startTime= DateUtils.parseDate("2014-12-12 12:12:12",new String[]{"yyyy-MM-dd HH:mm:ss"});
-        Date endTime= new Date();
+        Date startTime= DateUtils.parseDate("2014-12-11 23:12:12",new String[]{"yyyy-MM-dd HH:mm:ss"});
+        Date endTime= DateUtils.parseDate("2014-12-12 23:12:12",new String[]{"yyyy-MM-dd HH:mm:ss"});
+//        Date endTime= new Date();
         File file=new File("/Users/lihao/Downloads/export");
         if(!file.exists()){
             file.mkdir();
         }
+        System.out.println(startTime.getTime());
 
-        historyMessageDao.exportVoice(startTime,endTime,file,7L);
+        historyMessageDao.exportMessage(startTime,endTime,file,7L);
+
+//        historyMessageManager.addIndex();        1422370357865
+        System.out.println(DateFormatUtils.format(new Date(1422346183395L),"yyyy-MM-dd HH:mm:ss"));
         
         System.out.println(5000>>3);
         System.out.println(5000<<3);

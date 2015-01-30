@@ -38,4 +38,7 @@
     <select id="getUserByRoleId" parameterType="long" resultMap="userResult">
           select * from ext_user u JOIN ext_userrole ur on u.id=ur.userId where ur.roleId=#{roleId}
     </select>
+    <select id="getUserByNickName" parameterType="Map" resultMap="userResult">
+          select u.* from ext_user u where u.projectId=#{projectId} and u.nickName=#{nickName} 
+    </select>
 </mapper>

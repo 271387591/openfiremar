@@ -8,6 +8,7 @@ Ext.define('FlexCenter.export.model.MessageExport', {
         'exportor',
         'type',
         'hasFile',
+        'multiFile',
         {
             name: 'executeDate', convert: function (v) {
             return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');

@@ -11,6 +11,7 @@ import com.ozstrategy.webapp.command.JsonReaderResponse;
 import com.ozstrategy.webapp.command.login.LoginCommand;
 import com.ozstrategy.webapp.command.userrole.UserCommand;
 import com.ozstrategy.webapp.controller.BaseController;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +47,7 @@ public class UserController extends BaseController {
     protected final transient Log log = LogFactory.getLog(getClass());
     @RequestMapping(params = "method=listUsers")
     @ResponseBody
-    public JsonReaderResponse<UserCommand> listUsers(HttpServletRequest request) {
+    public JsonReaderResponse<UserCommand> listUsers(HttpServletRequest request)  throws Exception{
         String start=request.getParameter("start");
         String limit=request.getParameter("limit");
         Map<String,Object> map=requestMap(request);
@@ -66,10 +68,14 @@ public class UserController extends BaseController {
     }
     @RequestMapping(params = "method=listAppUsers")
     @ResponseBody
-    public JsonReaderResponse<LoginCommand> listAppUsers(HttpServletRequest request) {
+    public JsonReaderResponse<LoginCommand> listAppUsers(HttpServletRequest request)  throws Exception{
         String start=request.getParameter("start");
         String limit=request.getParameter("limit");
         Map<String,Object> map=requestMap(request);
+        if(StringUtils.isEmpty(ObjectUtils.toString(map.get("projectId")))){
+            return new JsonReaderResponse<LoginCommand>(Collections.<LoginCommand>emptyList(),false,0,"缺少projectId");
+        }
+        
         if(checkIsNotNumber(start)){
             return new JsonReaderResponse<LoginCommand>(emptyData, Boolean.FALSE,getMessage("message.error.start",request));
         }
@@ -88,7 +94,7 @@ public class UserController extends BaseController {
     
     @RequestMapping(params = "method=listAllUsers")
     @ResponseBody
-    public JsonReaderResponse<UserCommand> listAllUsers(HttpServletRequest request) {
+    public JsonReaderResponse<UserCommand> listAllUsers(HttpServletRequest request)  throws Exception{
         Map<String,Object> map=requestMap(request);
         List<User> users        = userManager.listAllUsers(map);
         List<UserCommand> userCommands = new ArrayList<UserCommand>();
@@ -129,13 +135,13 @@ public class UserController extends BaseController {
     
     @RequestMapping(params = "method=saveUser")
     @ResponseBody
-    public BaseResultCommand saveUser(HttpServletRequest request){
+    public BaseResultCommand saveUser(HttpServletRequest request) throws Exception{
         return saveOrUpdate(request,true);
     }
     
     @RequestMapping(params = "method=updateUser")
     @ResponseBody
-    public BaseResultCommand updateUser(HttpServletRequest request){
+    public BaseResultCommand updateUser(HttpServletRequest request) throws Exception{
         return saveOrUpdate(request,false);
     }
     @RequestMapping(params = "method=deleteUser")
@@ -205,7 +211,7 @@ public class UserController extends BaseController {
     }
     @RequestMapping(params = "method=authorizationUser")
     @ResponseBody 
-    public BaseResultCommand authorizationUser(HttpServletRequest request) {
+    public BaseResultCommand authorizationUser(HttpServletRequest request)  throws Exception{
         String id=request.getParameter("id");
         if(checkIsNotNumber(id)){
             return new BaseResultCommand(getMessage("message.error.id.null",request),Boolean.FALSE);
@@ -348,7 +354,7 @@ public class UserController extends BaseController {
         return new BaseResultCommand(getMessage("message.error.updatePassword.fail",request),Boolean.FALSE);
     }
     
-    private BaseResultCommand saveOrUpdate(HttpServletRequest request,boolean save){
+    private BaseResultCommand saveOrUpdate(HttpServletRequest request,boolean save) throws Exception{
         User        user        = null;
         String id=request.getParameter("id");
         String username=request.getParameter("username");

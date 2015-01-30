@@ -118,7 +118,7 @@ public class UserRoleController extends BaseController {
     
     @RequestMapping(params = "method=checkRoleInUser")
     @ResponseBody
-    public BaseResultCommand checkRoleInUser(HttpServletRequest request){
+    public BaseResultCommand checkRoleInUser(HttpServletRequest request) throws Exception{
         String roleId=request.getParameter("roleId");
         Long rId=parseLong(roleId);
         if(rId!=null){

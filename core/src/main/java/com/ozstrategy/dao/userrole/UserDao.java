@@ -16,4 +16,5 @@ public interface UserDao extends UniversalDao<User,Long>{
     User getUserByUsername(@Param("username")String username,@Param("projectId")Long projectId);
     Integer getUserCountByProjectId(Long projectId);
     List<User> getUserByRoleId(Long roleId);
+    User getUserByNickName(@Param("projectId")Long projectId,@Param("nickName")String nickName);
 } 

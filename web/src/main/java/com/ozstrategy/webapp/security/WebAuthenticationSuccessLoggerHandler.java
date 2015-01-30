@@ -39,8 +39,11 @@ public class WebAuthenticationSuccessLoggerHandler extends WebAuthenticationLogg
       }
       String projectId=request.getParameter("projectId");
       User user = (User)authentication.getPrincipal();
+    try {
       user  = userManager.getUserByUsername(user.getUsername(),Long.parseLong(projectId));
-      if (user == null) {
+    } catch (Exception e) {
+    }
+    if (user == null) {
         return;
       }
       String sessionId= UUID.randomUUID().toString();

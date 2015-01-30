@@ -13,10 +13,11 @@ import java.util.zip.ZipOutputStream;
  * Created by lihao on 1/20/15.
  */
 public class FileHelper {
-    public static void deleteDirectory(File directory){
+    public static void deleteDirectory(File directory) throws Exception{
         try {
             FileUtils.deleteDirectory(directory);
         } catch (IOException e) {
+            throw e;
         }
     }
     public static File fileToZip(File sourceFolder, File targetFolder, String targetZipFileName) throws Exception{

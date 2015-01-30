@@ -46,7 +46,7 @@ public class AppStoreController extends BaseController {
     private AppStoreManager appStoreManager;
     @RequestMapping(params = "method=listAppStores")
     @ResponseBody
-    public JsonReaderResponse<AppStoreCommand> listAppStores(HttpServletRequest request){
+    public JsonReaderResponse<AppStoreCommand> listAppStores(HttpServletRequest request) throws Exception{
         List<AppStoreCommand> commands=new ArrayList<AppStoreCommand>();
         Integer start=parseInteger(request.getParameter("start"));
         Integer limit=parseInteger(request.getParameter("limit"));

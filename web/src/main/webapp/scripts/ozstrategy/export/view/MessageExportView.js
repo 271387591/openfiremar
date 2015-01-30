@@ -26,6 +26,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
     initComponent: function () {
         var me = this;
         var store=me.getStore();
+        store.load();
         me.items=[
             {
                 xtype:'panel',
@@ -319,20 +320,28 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                     return '下载';
                                 },
                                 handler:function(grid, rowIndex, colIndex,item,e,rec){
-                                    Ext.ux.form.Downloader.get({
-                                        url: 'messageExportController.do?method=download',
-                                        params:{
-                                            id:rec.get('id')
-                                        },
-                                        success:function(response,options){
+                                    var multiFile=rec.get('multiFile');
+                                    var id=rec.get('id');
+                                    if(multiFile){
+                                        window.open('messageExportController.do/multiDownload?id='+id)
+                                        console.log('sdf')
+                                        
+                                    }else{
+                                        Ext.ux.form.Downloader.get({
+                                            url: 'messageExportController.do?method=download',
+                                            params:{
+                                                id:rec.get('id')
+                                            },
+                                            success:function(response,options){
 
-                                        },
-                                        failure: function(response,options){
-                                            var str=response.responseXML.body.innerText;
-                                            var result = Ext.decode(str,true);
-                                            Ext.Msg.alert('Message','dowload file fail..');
-                                        }
-                                    });
+                                            },
+                                            failure: function(response,options){
+                                                var str=response.responseXML.body.innerText;
+                                                var result = Ext.decode(str,true);
+                                                Ext.Msg.alert('Message','dowload file fail..');
+                                            }
+                                        }); 
+                                    }
                                 }
                             }
                         ]

@@ -23,21 +23,22 @@ public class MessageExportManagerImpl implements MessageExportManager {
     private MessageExportDao messageExportDao;
     @Autowired
     private HistoryMessageDao historyMessageDao;
-    public List<MessageExport> list(Map<String, Object> map, Integer start, Integer limit) {
+    public List<MessageExport> list(Map<String, Object> map, Integer start, Integer limit)  throws Exception{
         return messageExportDao.list(map,new RowBounds(start,limit));
     }
 
-    public Integer listCount(Map<String, Object> map) {
+    public Integer listCount(Map<String, Object> map) throws Exception {
         return messageExportDao.listCount(map);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void save(MessageExport messageExport) {
+    public void save(MessageExport messageExport) throws Exception {
         messageExportDao.save(messageExport);
     }
 
-    public MessageExport getById(Long id) {
+    public MessageExport getById(Long id) throws Exception {
         return messageExportDao.get(id);
+        
     }
 
     public void exportMessage(Date startTime, Date endTime, File folder,Long projectId) throws Exception {

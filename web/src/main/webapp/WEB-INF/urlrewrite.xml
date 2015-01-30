@@ -35,15 +35,15 @@
     </rule>
     <rule>
         <from>/app/search</from>
-        <to>/service/historyMessageController.do?method=list</to>
+        <to>/service/historyMessageController.do?method=listStore</to>
     </rule>
     <rule>
         <from>/app/getHistory</from>
-        <to>/service/historyMessageController.do?method=listFromDb</to>
+        <to>/service/historyMessageController.do?method=getHistory</to>
     </rule>
     <rule>
         <from>/app/getManagerMessage</from>
-        <to>/service/historyMessageController.do?method=listManagerMessages</to>
+        <to>/service/historyMessageController.do?method=listStore</to>
     </rule>
     <rule>
         <from>/app/deleteMessage</from>

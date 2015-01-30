@@ -44,15 +44,6 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             //    frame: true,
             //    iconCls: 'user-edit',
             //    xtype: 'button',
-            //    text: globalRes.buttons.edit,
-            //    itemId: 'userEditBtn',
-            //    scope: this,
-            //    handler: this.editClick
-            //},
-            //{
-            //    frame: true,
-            //    iconCls: 'user-edit',
-            //    xtype: 'button',
             //    text: '进入',
             //    scope: this,
             //    handler: function(){

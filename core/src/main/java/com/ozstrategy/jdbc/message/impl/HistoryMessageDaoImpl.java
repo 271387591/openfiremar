@@ -2,14 +2,30 @@ package com.ozstrategy.jdbc.message.impl;
 
 import com.ozstrategy.Constants;
 import com.ozstrategy.jdbc.message.HistoryMessageDao;
-import com.ozstrategy.model.export.ExportType;
-import com.ozstrategy.model.openfire.HistoryMessage;
-import com.ozstrategy.util.LuceneUtils;
-import org.apache.commons.beanutils.BeanUtils;
+import com.ozstrategy.lucene.LuceneInstance;
+import com.ozstrategy.model.openfire.MessageType;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FieldDoc;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.RegexpQuery;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopDocs;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -22,8 +38,6 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Repository;
@@ -34,7 +48,6 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,221 +62,234 @@ import java.util.Map;
 public class HistoryMessageDaoImpl implements HistoryMessageDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private Long maxItem=2L;
+    private Integer maxExportItem =20000;
+    private Integer maxIndexItem = 200000;
+    @Autowired
+    private LuceneInstance luceneInstance;
 
     public Long maxId() {
-        String sql="SELECT max(id) from ext_ofHistory";
-        return jdbcTemplate.queryForObject(sql,Long.class);
+        String sql = "SELECT max(id) from ext_ofHistory";
+        Long maxId= jdbcTemplate.queryForObject(sql, Long.class);
+        if(maxId==null){
+            maxId=0L;
+        }
+        return maxId;
     }
 
-    public void delete(Date startTime, Date endTime,Long projectId) {
-        String sql="DELETE FROM ext_ofHistory WHERE createDate>=? AND createDate<=? and toId=?";
-        jdbcTemplate.update(sql,startTime,endTime,projectId);
-
+    public Map<String, Object> maxMinIdByTime(Date startTime, Date endTime, Long projectId) {
+        String sql = "SELECT max(id) as max,min(id) as min from ext_ofHistory where toId=? and createDate>=? and createDate<=?";
+        return jdbcTemplate.queryForMap(sql, projectId, startTime, endTime);
     }
 
-    public Long addIndex(final Long index_max_id)  throws Exception{
-        final String sql="SELECT * FROM  ext_ofHistory WHERE id>?";
-        return jdbcTemplate.execute(new ConnectionCallback<Long>(){
-            public Long doInConnection(Connection con) throws SQLException, DataAccessException {
-                PreparedStatement statement = con.prepareStatement(sql);
-                statement.setLong(1,index_max_id);
-                ResultSet resultSet = statement.executeQuery();
-                try{
-                Long id= LuceneUtils.addIndex(resultSet);
-                return id;
-                }catch (Exception e) {
-                    e.printStackTrace();
-                    throw new SQLException("");
-                }finally {
-                    resultSet.close();
-                    statement.close();
-                }
-            }
-        });
+    public void deleteByIds(List<Long> ids) {
+        String sql = "DELETE FROM ext_ofHistory WHERE id in(?)";
+        String idsd=StringUtils.join(ids.iterator(),",");
+        jdbcTemplate.update(sql, idsd);
     }
 
-    public void exportMessage(Date startTime, Date endTime,File folder,Long projectId) throws Exception {
-        int index=0;
-        String sql="SELECT max(id) from ext_ofHistory where toId=?";
-        Long maxId = jdbcTemplate.queryForObject(sql,Long.class,projectId)+1;
-        do{
-            index++;
-            maxId=exportMessage(startTime, endTime, folder, maxId, index, projectId);
-        }while (maxId!=0);
-       
+    public List<Map<String, Object>> getIdByBetween(Long minId, Long maxId, Long projectId, Integer limit) {
+        String sql = "SELECT id from ext_ofHistory WHERE id>=? AND id<=? and toId=? limit ?";
+        return jdbcTemplate.queryForList(sql, maxId, maxId, projectId, limit);
     }
+
+
+    public void delete(Date startTime, Date endTime, Long projectId) {
+        String sql = "DELETE FROM ext_ofHistory WHERE createDate>=? AND createDate<=? and toId=?";
+        jdbcTemplate.update(sql, startTime, endTime, projectId);
+    }
+
+    public void exportMessage(Date startTime, Date endTime, File folder, Long projectId) throws Exception {
+        String maxSql = "SELECT max(id) from ext_ofHistory where toId=? and createDate>=? and createDate<=? and type!=2";
+        String minSql = "SELECT min(id) from ext_ofHistory where toId=? and createDate>=? and createDate<=? and type!=2";
+        Long maxId = jdbcTemplate.queryForObject(maxSql, Long.class, projectId, startTime, endTime);
+        if(maxId==null){
+            maxId=0L;
+        }
+        maxId=maxId+1;
+        Long minId = jdbcTemplate.queryForObject(minSql, Long.class, projectId, startTime, endTime);
+        if(minId==null){
+            minId=0L;
+        }
+        minId=minId-1;
+        Long mId = minId;
+        int fileIndex = 0;
+        do {
+            fileIndex++;
+            mId = exportMessage(folder, mId, maxId, projectId, fileIndex);
+        } while (mId != 0);
+    }
+
 
     public void exportVoice(Date startTime, Date endTime, File folder, Long projectId) throws Exception {
-        String sql="SELECT max(id) from ext_ofHistory where type=2 and toId=?";
-        Long maxId = jdbcTemplate.queryForObject(sql,Long.class,projectId)+1;
-        do{
-            maxId=exportVoice(startTime, endTime, folder, projectId,maxId);
-        }while (maxId!=0);
-
+        String maxSql = "SELECT max(id) from ext_ofHistory where toId=? and createDate>=? and createDate<=? and type=2";
+        String minSql = "SELECT min(id) from ext_ofHistory where toId=? and createDate>=? and createDate<=? and type=2";
+        Long maxId = jdbcTemplate.queryForObject(maxSql, Long.class, projectId, startTime, endTime);
+        if(maxId==null){
+            maxId=0L;
+        }
+        maxId=maxId+1;
+        Long minId = jdbcTemplate.queryForObject(minSql, Long.class, projectId, startTime, endTime)-1;
+        if(minId==null){
+            minId=0L;
+        }
+        minId=minId-1;
+        Long mId = minId;
+        do {
+            mId = exportVoice(folder, mId, maxId, projectId);
+        } while (mId != minId);
     }
-    private Long exportVoice(Date startTime, Date endTime, File folder, Long projectId,Long maxId) throws Exception{
-        final String sql="select * from ext_ofHistory where  type=2 and createDate>=? and createDate<=? and id<? and toId=? order by id desc limit ?";
-        Long mId=0L;
-        Connection con=null;
-        PreparedStatement statement=null;
-        ResultSet resultSet=null;
-        try{
+
+    private Long exportVoice(File folder, Long minId, Long maxId, Long projectId) throws Exception {
+        final String sql = "select * from ext_ofHistory  where id >? and id<? and toId=? limit ?";
+        Connection con = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        Long mId = 0L;
+        try {
             con = jdbcTemplate.getDataSource().getConnection();
             statement = con.prepareStatement(sql);
-            statement.setTimestamp(1, new Timestamp(startTime.getTime()));
-            statement.setTimestamp(2, new Timestamp(endTime.getTime()));
-            statement.setLong(3, maxId);
-            statement.setLong(4, projectId);
-            statement.setInt(5, maxItem.intValue());
+            statement.setLong(1, minId);
+            statement.setLong(2, maxId);
+            statement.setLong(3, projectId);
+            statement.setInt(4, maxExportItem);
             resultSet = statement.executeQuery();
-            
-            if(!resultSet.next()){
-                mId=0L;
-                if(mId<=0){
-                    return mId;
-                }
+            if (!resultSet.next()) {
+                mId = 0L;
+                return mId;
             }
             resultSet.close();
-            resultSet=statement.executeQuery();
-            while (resultSet.next()){
-                Long id=resultSet.getLong("id");
-                Timestamp createDate=resultSet.getTimestamp("createDate");
-                String fromNick=resultSet.getString("fromNick");
-                int type=resultSet.getInt("type");
-                String message=resultSet.getString("message");
-                if(type==(ExportType.Voice.ordinal()+1)){
-                    try{
-                        byte[] bytes= IOUtils.toByteArray(new URI(message));
-                        String ext=message.substring(message.lastIndexOf("."));
-                        String fileName=fromNick+createDate.getTime()+ext;
-                        File file=new File(folder,fileName);
-                        FileOutputStream outputStream=new FileOutputStream(file);
-                        IOUtils.write(bytes,outputStream);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                mId = id;
+                Timestamp createDate = resultSet.getTimestamp("createDate");
+                String fromNick = resultSet.getString("fromNick");
+                int type = resultSet.getInt("type");
+                String message = resultSet.getString("message");
+                if (type == MessageType.voice.ordinal()) {
+                    try {
+                        byte[] bytes = IOUtils.toByteArray(new URI(message));
+                        String ext = message.substring(message.lastIndexOf("."));
+                        String fileName = fromNick + createDate.getTime() + ext;
+                        File file = new File(folder, fileName);
+                        FileOutputStream outputStream = new FileOutputStream(file);
+                        IOUtils.write(bytes, outputStream);
                         outputStream.close();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                     }
                 }
-                maxId=id;
             }
-        }catch (Exception e) {
+            return mId;
+        } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }finally {
+        } finally {
             JdbcUtils.closeResultSet(resultSet);
             JdbcUtils.closeStatement(statement);
             JdbcUtils.closeConnection(con);
         }
-        mId=maxId;
-        return mId;
     }
 
-    private Long exportMessage(final Date startTime, final Date endTime,File folder, Long maxId,int index,Long projectId) throws Exception{
-        final String sql="select * from ext_ofHistory where type!=2 and createDate>=? and createDate<=? and id<? and toId=? order by id desc limit ?";
-        final String sheetName="聊天记录";
-        Long mId=0L;
-        Connection con=null;
-        PreparedStatement statement=null;
-        ResultSet resultSet=null;
-        try{
+    private Long exportMessage(File folder, Long minId, Long maxId, Long projectId, Integer fileIndex) throws Exception {
+        final String sql = "select * from ext_ofHistory  where id>? and id<? and toId=? limit ?";
+        final String sheetName = "聊天记录";
+        Connection con = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        Long mId = 0L;
+        try {
             con = jdbcTemplate.getDataSource().getConnection();
             statement = con.prepareStatement(sql);
-            statement.setTimestamp(1, new Timestamp(startTime.getTime()));
-            statement.setTimestamp(2, new Timestamp(endTime.getTime()));
-            statement.setLong(3, maxId);
-            statement.setLong(4, projectId);
-            statement.setInt(5, maxItem.intValue());
+            statement.setLong(1, minId);
+            statement.setLong(2, maxId);
+            statement.setLong(3, projectId);
+            statement.setInt(4, maxExportItem);
             resultSet = statement.executeQuery();
-            if(!resultSet.next()){
-                mId=0L;
-                if(mId<=0){
-                    return mId;
-                }
+            if (!resultSet.next()) {
+                mId = 0L;
+                return mId;
             }
             resultSet.close();
-            resultSet=statement.executeQuery();
+            resultSet = statement.executeQuery();
             HSSFWorkbook wb = new HSSFWorkbook();
             HSSFSheet sheet = wb.createSheet(sheetName);
-            Map<String,CellStyle> styleMap=createStyles(wb);
+            Map<String, CellStyle> styleMap = createStyles(wb);
             HSSFRow headerRow = sheet.createRow(2);
-            headerRow.setHeight((short)(900));
-            String[] headers=new String[]{"发送时间","用户昵称","工程","聊天内容"};
-            for(int i=0;i<headers.length;i++){
-                HSSFCell cell  = headerRow.createCell(i);
-                if(i==3){
-                    sheet.setColumnWidth(i, 5000<<3);
-                }else if(i==2){
-                    sheet.setColumnWidth(i, 5000<<1);
-                }else{
+            headerRow.setHeight((short) (900));
+            String[] headers = new String[]{"发送时间", "用户昵称", "工程", "聊天内容"};
+            for (int i = 0; i < headers.length; i++) {
+                HSSFCell cell = headerRow.createCell(i);
+                if (i == 3) {
+                    sheet.setColumnWidth(i, 5000 << 3);
+                } else if (i == 2) {
+                    sheet.setColumnWidth(i, 5000 << 1);
+                } else {
                     sheet.setColumnWidth(i, 5000);
                 }
                 cell.setCellStyle(styleMap.get("header"));
                 cell.setCellValue(headers[i]);
             }
-            int i=3;
-            boolean hasMessage=false;
-            while (resultSet.next()){
-                Long id=resultSet.getLong("id");
-                int type=resultSet.getInt("type");
-                if(type==(ExportType.Voice.ordinal()+1)){
-                    
-                }else{
-                    HSSFRow sheetRow = sheet.createRow(i);
-                    Timestamp createDate=resultSet.getTimestamp("createDate");
-                    HSSFCell cell=sheetRow.createCell(0);
-                    cell.setCellStyle(styleMap.get("cell"));
-                    cell.setCellValue(DateFormatUtils.format(createDate, Constants.YMDHMS));
-
-                    String fromNick=resultSet.getString("fromNick");
-                    sheetRow.setHeight((short)(600));
-                    cell=sheetRow.createCell(1);
-                    cell.setCellStyle(styleMap.get("cell"));
-                    cell.setCellValue(fromNick);
-
-
-                    String toNick=resultSet.getString("toNick");
-                    cell=sheetRow.createCell(2);
-                    cell.setCellStyle(styleMap.get("cell"));
-                    cell.setCellValue(toNick);
-                    String message=resultSet.getString("message");
-                    if(type==(ExportType.MessagePicture.ordinal()+1)){
-                        try{
-                            byte[] bytes= IOUtils.toByteArray(new URI(message));
-                            HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
-                            HSSFClientAnchor anchor = new HSSFClientAnchor(0,0,1022,255,(short) 2,i,(short)2,i+3);
-                            patriarch.createPicture(anchor , wb.addPicture(bytes,HSSFWorkbook.PICTURE_TYPE_JPEG));
-                            hasMessage=true;
-                        }catch (Exception e){
-                        }
-                        i=i+3;
-                    }else{
-                        cell=sheetRow.createCell(3);
-                        cell.setCellStyle(styleMap.get("cell"));
-                        cell.setCellValue(message);
-                        hasMessage=true;
-                    }
+            int column = 3;
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                mId = id;
+                int type = resultSet.getInt("type");
+                if (type == MessageType.voice.ordinal()) {
+                    continue;
                 }
-                i++;
-                maxId=id;
+                HSSFRow sheetRow = sheet.createRow(column);
+                Timestamp createDate = resultSet.getTimestamp("createDate");
+                HSSFCell cell = sheetRow.createCell(0);
+                cell.setCellStyle(styleMap.get("cell"));
+                cell.setCellValue(DateFormatUtils.format(createDate, Constants.YMDHMS));
+
+                String fromNick = resultSet.getString("fromNick");
+                sheetRow.setHeight((short) (600));
+                cell = sheetRow.createCell(1);
+                cell.setCellStyle(styleMap.get("cell"));
+                cell.setCellValue(fromNick);
+
+                String toNick = resultSet.getString("toNick");
+                cell = sheetRow.createCell(2);
+                cell.setCellStyle(styleMap.get("cell"));
+                cell.setCellValue(toNick);
+
+
+                String message = resultSet.getString("message");
+                if (type == MessageType.picture.ordinal()) {
+                    try {
+                        byte[] bytes = IOUtils.toByteArray(new URI(message));
+                        HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
+                        HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 1022, 255, (short) 2, column, (short) 2, column + 3);
+                        patriarch.createPicture(anchor, wb.addPicture(bytes, HSSFWorkbook.PICTURE_TYPE_JPEG));
+                    } catch (Exception e) {
+                    }
+                    column = column + 3;
+                } else {
+                    cell = sheetRow.createCell(3);
+                    cell.setCellStyle(styleMap.get("cell"));
+                    cell.setCellValue(message);
+                }
+                column++;
             }
-            if(hasMessage){
-                File file=new File(folder,sheetName+index+".xls");
+            if (wb != null) {
+                File file = new File(folder, sheetName + fileIndex + ".xls");
                 FileOutputStream os1 = new FileOutputStream(file);
                 wb.write(os1);
                 os1.close();
+                wb = null;
             }
-        }catch (Exception e) {
+            return mId;
+        } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }finally {
+        } finally {
             JdbcUtils.closeResultSet(resultSet);
             JdbcUtils.closeStatement(statement);
             JdbcUtils.closeConnection(con);
         }
-        mId=maxId;
-//        export(startTime,endTime,folder,mId,index,projectId);
-        return mId;
     }
+
     private static Map<String, CellStyle> createStyles(Workbook wb) {
         Map<String, CellStyle> styles = new HashMap<String, CellStyle>();
         CellStyle style;
@@ -356,146 +382,210 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
         return styles;
     }
 
-    public Integer countTime(Date startTime, Date endTime) throws Exception {
-        String sql="select count(id) from ext_ofHistory where createDate>=? and createDate<=?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, startTime, endTime);
-        return count;
-    }
 
-    public boolean checkExportDataExist(Date startTime, Date endTime,Long projectId) {
-        String sql="select id from ext_ofHistory where createDate>=? and createDate<=? and toId=? limit 1";
-        List list = jdbcTemplate.queryForList(sql, startTime, endTime,projectId);
-        return list!=null && !list.isEmpty();
-    }
-
-    public List<HistoryMessage> listHistoryMessagesFromDb(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        List<Map<String,Object>> list=null;
-        String sql="select * from ext_ofHistory where toId=? and deleted!=?  order by createDate desc limit ?,?";
-        String toId= ObjectUtils.toString(map.get("projectId"));
-        String deleted=ObjectUtils.toString(map.get("deleted"));
-        if(StringUtils.isEmpty(deleted)){
-            deleted="1";
-        }
-        list=jdbcTemplate.queryForList(sql,toId,deleted,start,limit);
-        List<HistoryMessage> historyMessages=new ArrayList<HistoryMessage>();
-        if(list!=null && list.size()>0){
-            for(Map<String,Object> map1 :list){
-                HistoryMessage historyMessage=new HistoryMessage();
-                BeanUtils.populate(historyMessage,map1);
-                historyMessages.add(historyMessage);
-            }
-        }
-        return historyMessages;
-    }
-
-    public Integer listHistoryMessagesFromDbCount(Map<String, Object> map) throws Exception {
-        String sql="select count(id) as count from ext_ofHistory WHERE toId=? and deleted!=?";
-        String toId= ObjectUtils.toString(map.get("projectId"));
-        String deleted=ObjectUtils.toString(map.get("deleted"));
-        if(StringUtils.isEmpty(deleted)){
-            deleted="1";
-        }
-        Integer count=jdbcTemplate.queryForObject(sql, Integer.class,toId,deleted);
-        return count;
-    }
-
-    public List<HistoryMessage> listHistoryMessagesStore(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        String sql="select * from ext_ofHistory where 1=1";
-        String projectId=ObjectUtils.toString(map.get("projectId"));
-        String message=ObjectUtils.toString(map.get("message"));
-        String startTime=ObjectUtils.toString(map.get("startTime"));
-        String endTime=ObjectUtils.toString(map.get("endTime"));
-        String fromNick=ObjectUtils.toString(map.get("fromNick"));
-        if(StringUtils.isNotEmpty(projectId)){
-            sql+=" and toId='"+projectId+"'";
-        }
-        if(StringUtils.isNotEmpty(message)){
-            message="%"+message+"%";
-            sql+=" and message like '"+message+"'";
-        }
-        if(StringUtils.isNotEmpty(fromNick)){
-            sql+=" and fromNick = '"+fromNick+"'";
-        }
-        if(StringUtils.isNotEmpty(startTime)){
-            sql+=" and createDate >= '"+startTime+"'";
-        }
-        if(StringUtils.isNotEmpty(endTime)){
-            sql+=" and createDate <= '"+endTime+"'";
-        }
-        sql+=" order by createDate desc limit ?,?";
-        List<Map<String,Object>> list=jdbcTemplate.queryForList(sql, start, limit);
-        List<HistoryMessage> historyMessages=new ArrayList<HistoryMessage>();
-        if(list!=null && list.size()>0){
-            for(Map<String,Object> map1 :list){
-                HistoryMessage historyMessage=new HistoryMessage();
-                BeanUtils.populate(historyMessage,map1);
-                historyMessages.add(historyMessage);
-            }
-        }
-        
-        return historyMessages;
-    }
-
-    public Integer listHistoryMessagesStoreCount(Map<String, Object> map) throws Exception {
-        String sql="select count(id) from ext_ofHistory where 1=1";
-        String projectId=ObjectUtils.toString(map.get("projectId"));
-        String message=ObjectUtils.toString(map.get("message"));
-        String startTime=ObjectUtils.toString(map.get("startTime"));
-        String endTime=ObjectUtils.toString(map.get("endTime"));
-        String fromNick=ObjectUtils.toString(map.get("fromNick"));
-        if(StringUtils.isNotEmpty(projectId)){
-            sql+=" and toId='"+projectId+"'";
-        }
-        if(StringUtils.isNotEmpty(message)){
-            message="%"+message+"%";
-            sql+=" and message like '"+message+"'";
-        }
-        if(StringUtils.isNotEmpty(fromNick)){
-            sql+=" and fromNick = '"+fromNick+"'";
-        }
-        if(StringUtils.isNotEmpty(startTime)){
-            sql+=" and createDate >= '"+startTime+"'";
-        }
-        if(StringUtils.isNotEmpty(endTime)){
-            sql+=" and createDate <= '"+endTime+"'";
-        }
-        Integer count=jdbcTemplate.queryForObject(sql, Integer.class);
-        return count;
-    }
-
-    public List<HistoryMessage> listManagerMessages(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        List<Map<String,Object>> list=null;
-        String sql="select * from ext_ofHistory where toId=? and manager=?   order by createDate desc limit ?,?";
-        String toId= ObjectUtils.toString(map.get("projectId"));
-        String manager=ObjectUtils.toString(map.get("manager"));
-        if(StringUtils.isEmpty(manager)){
-            manager="1";
-        }
-        list=jdbcTemplate.queryForList(sql,toId,manager,start,limit);
-        List<HistoryMessage> historyMessages=new ArrayList<HistoryMessage>();
-        if(list!=null && list.size()>0){
-            for(Map<String,Object> map1 :list){
-                HistoryMessage historyMessage=new HistoryMessage();
-                BeanUtils.populate(historyMessage,map1);
-                historyMessages.add(historyMessage);
-            }
-        }
-        return historyMessages;
-    }
-
-    public Integer listManagerMessagesCount(Map<String, Object> map) throws Exception {
-        String sql="select count(id) from ext_ofHistory where toId=? and manager=?   order by createDate desc limit ?,?";
-        String toId= ObjectUtils.toString(map.get("projectId"));
-        String manager=ObjectUtils.toString(map.get("manager"));
-        if(StringUtils.isEmpty(manager)){
-            manager="1";
-        }
-        Integer list=jdbcTemplate.queryForObject(sql, Integer.class,toId, manager);
-        return list;
+    public boolean checkExportDataExist(Date startTime, Date endTime, Long projectId) {
+        String sql = "select id from ext_ofHistory where createDate>=? and createDate<=? and toId=? limit 1";
+        List list = jdbcTemplate.queryForList(sql, startTime, endTime, projectId);
+        return list != null && !list.isEmpty();
     }
 
     public void deleteMessage(Long projectId, String messageId) {
-        String sql="update ext_ofHistory set deleted=1 where projectId=? and messageId=?";
+        String sql = "update ext_ofHistory set deleted=1 where toId=? and id=?";
         jdbcTemplate.update(sql, projectId, messageId);
+    }
+
+    public List<Map<String, String>> search(String message, Date startDate, Date endDate, Long fromId, Long projectId, Long manager,Long deleted, Integer start, Integer limit) throws Exception {
+        IndexReader indexReader = luceneInstance.getIndexReader();
+        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        int maxDoc = indexReader.maxDoc();
+        BooleanQuery query = search(message, fromId, projectId, manager, deleted,startDate, endDate);
+        BooleanClause[] clauses = query.getClauses();
+        if (clauses != null && clauses.length < 1) {
+            query.add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST);
+        }
+        Sort sort = new Sort(new SortField("id", SortField.Type.LONG, true));
+        TopDocs paged = null;
+        if (start == 0) {
+            FieldDoc lastBottom = new FieldDoc(maxDoc - (start + 1), 1.0f, new Object[]{Long.MAX_VALUE});
+            paged = indexSearcher.searchAfter(lastBottom, query, null, limit, sort);
+        } else {
+            FieldDoc lastBottom = new FieldDoc(maxDoc - (start + 1), 1.0f, new Object[]{new Long(maxDoc - (start + 1))});
+            paged = indexSearcher.searchAfter(lastBottom, query, null, limit, sort);
+        }
+        if (paged == null) {
+            return list;
+        }
+        ScoreDoc[] scoreDocs = paged.scoreDocs;
+        int total = paged.totalHits;
+        for (int i = 0; i < scoreDocs.length; i++) {
+            Map<String, String> map = new HashMap<String, String>();
+            Document doc = indexSearcher.doc(scoreDocs[i].doc);
+            map.put("id", doc.get("id"));
+            map.put("fromNick", doc.get("fromNick"));
+            map.put("fromId", doc.get("fromId"));
+            map.put("toId", doc.get("toId"));
+            map.put("createDate", doc.get("createDate"));
+            map.put("message", doc.get("message"));
+            map.put("total", total + "");
+            list.add(map);
+        }
+        try {
+        } finally {
+            luceneInstance.close(indexReader);
+        }
+        return list;
+    }
+
+    public Long addIndex(Long minId) throws Exception {
+        IndexReader indexReader=luceneInstance.getIndexReader();
+        int maxDoc=indexReader.maxDoc();
+        if(maxDoc!=0){
+            Document maxDocument=indexReader.document(maxDoc-1);
+            Long docMaxId= NumberUtils.toLong(maxDocument.get("id"));
+            minId=Math.max(minId,docMaxId);
+        }
+        luceneInstance.close(indexReader);
+        
+        IndexWriter indexWriter = luceneInstance.getIndexWriter();
+        Long maxId = minId;
+        Long returnMaxId=maxId;
+        do {
+            returnMaxId=maxId;
+            maxId = addIndex(indexWriter, maxId);
+        } while (maxId != 0);
+        luceneInstance.close(indexWriter);
+        return returnMaxId;
+    }
+
+    public void deleteIndex(Date startDate, Date endDate, Long projectId) throws Exception {
+        BooleanQuery query = new BooleanQuery();
+        if (startDate != null) {
+            if (endDate == null) {
+                endDate = new Date();
+            }
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("createDate", startDate.getTime(), endDate.getTime(), true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+
+        if (projectId != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("toId", projectId, projectId, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        IndexWriter indexWriter = luceneInstance.getIndexWriter();
+        indexWriter.deleteDocuments(query);
+        indexWriter.commit();
+        try {
+        } finally {
+            luceneInstance.close(indexWriter);
+        }
+    }
+
+    public List<Map<String, Object>> getHistory(Long projectId, Integer start, Integer limit) throws Exception {
+        String sql="select * from ext_ofHistory where toId=? and deleted=0 order by id desc limit ?,?";
+        return jdbcTemplate.queryForList(sql,projectId,start,limit);
+    }
+
+    public Integer getHistoryCount(Long projectId) {
+        String sql="select count(id) from ext_ofHistory where toId=? and deleted=0";
+        return jdbcTemplate.queryForObject(sql, Integer.class,projectId);
+    }
+
+    public Long addIndex(IndexWriter indexWriter, Long minId) throws Exception {
+        String sql = "select * from ext_ofHistory  where id>? limit ?";
+        Connection con = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        Long maxId = minId;
+        try {
+            con = jdbcTemplate.getDataSource().getConnection();
+            statement = con.prepareStatement(sql);
+            statement.setLong(1, minId);
+            statement.setInt(2, maxIndexItem);
+            resultSet = statement.executeQuery();
+            if (!resultSet.next()) {
+                maxId = 0L;
+                return maxId;
+            }
+            resultSet.close();
+
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                Date createDate = resultSet.getTimestamp("createDate");
+                Long fromId = resultSet.getLong("fromId");
+                Long toId = resultSet.getLong("toId");
+                Long manager = resultSet.getLong("manager");
+                String message = resultSet.getString("message");
+                String fromNick = resultSet.getString("fromNick");
+                Integer deleted = resultSet.getInt("deleted");
+                Document document = new Document();
+                document.add(new LongField("id", id, Field.Store.YES));
+                if (StringUtils.isNotEmpty(message)) {
+                    document.add(new StringField("message", message, Field.Store.YES));
+                }
+                if (createDate != null) {
+                    document.add(new LongField("createDate", createDate.getTime(), Field.Store.YES));
+                }
+                if (fromId != null) {
+                    document.add(new LongField("fromId", fromId, Field.Store.YES));
+                }
+                if (toId != null) {
+                    document.add(new LongField("toId", toId, Field.Store.YES));
+                }
+                if (manager != null) {
+                    document.add(new LongField("manager", manager, Field.Store.YES));
+                }
+                if(deleted!=null){
+                    document.add(new LongField("deleted", deleted, Field.Store.YES));
+                }
+                if (StringUtils.isNotEmpty(fromNick)) {
+                    document.add(new StringField("fromNick", fromNick, Field.Store.YES));
+                }
+                indexWriter.addDocument(document);
+                maxId = id;
+            }
+            return maxId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            JdbcUtils.closeResultSet(resultSet);
+            JdbcUtils.closeStatement(statement);
+            JdbcUtils.closeConnection(con);
+        }
+    }
+
+    private static BooleanQuery search(String message, Long fromId, Long toId, Long manager,Long deleted, Date startTime, Date endTime) throws Exception {
+        BooleanQuery query = new BooleanQuery();
+        if (StringUtils.isNotEmpty(message)) {
+            RegexpQuery regexpQuery = new RegexpQuery(new Term("message", ".*" + message + ".*"));
+            query.add(regexpQuery, BooleanClause.Occur.MUST);
+        }
+        if (fromId != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("fromId", fromId, fromId, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        if (toId != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("toId", toId, toId, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        if (manager != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("manager", toId, toId, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        if (deleted != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("deleted", deleted, deleted, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+
+        if (startTime != null) {
+            if (endTime == null) {
+                endTime = new Date();
+            }
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("createDate", startTime.getTime(), endTime.getTime(), true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        return query;
     }
 }

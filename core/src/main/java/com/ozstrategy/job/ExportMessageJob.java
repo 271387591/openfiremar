@@ -32,7 +32,7 @@ public class ExportMessageJob {
     private ProjectManager projectManager;
     
     private Log log= LogFactory.getLog(getClass());
-    public void exportMessage(){
+    public void exportMessage() throws Exception{
         List<Project> projects=projectManager.listAllProjects();
         if(projects!=null && projects.size()>0){
             for(Project project : projects){

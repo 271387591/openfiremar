@@ -40,9 +40,26 @@ public class PattonTest {
         System.out.println(uid);
         
     }
+
+    /***
+     * 接口名称：注册
+     *接口参数: 
+     * 1、username：用户名，请验证用户名规则如上的testUsername
+     * 2、password：用户密码
+     * 3、nickName：用户昵称
+     * 3、projectId：工程ID
+     * 3、activationCode：工程激活码
+     * 返回参数：
+      
+     * 
+     * 具体格式请参照下面得junit测试
+     * 
+     * 
+     * 
+     * @throws Exception
+     */
     @Test
     public void testRegister() throws Exception{
-//        String url="http://localhost:9095/openfiremar/app/register";
         String url="http://120.24.234.71/im/app/register";
         HttpPost httpost = new HttpPost(url);
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -83,6 +100,30 @@ public class PattonTest {
         System.out.println(body);
         httpclient.getConnectionManager().shutdown();
     }
+
+    /***
+     * 接口名称：登陆             d
+     * 接口参数：
+     * 1、username：用户名
+     * 2、password：密码
+     * 3、projectId：工程ID
+     * 
+     * 返回参数：
+     * 1、id，用户ID
+     * 2、username，用户名
+     * 3、openfireUsername，登陆openfire的用户名
+     * 4、nickName，昵称
+     * 5、authentication是否认证
+     * 6、sessionId，用户登陆唯一回话，该参数文件上传时需要
+     * 7、projectId，用户所属工程ID
+     * 8、projectName，工程名称
+     * 9、manager是否为工程管理员
+     * 10、roles用户角色
+     * 11、features用户权限
+     *
+     * 
+     * @throws Exception
+     */
     @Test
     public void testLogin() throws Exception{
         String url="http://120.24.234.71/im/app/login";
@@ -107,16 +148,23 @@ public class PattonTest {
         httpclient.getConnectionManager().shutdown();
         
     }
+
+    /***
+     * 接口名称：获取工程列表
+     * 接口参数：无
+     * 返回参数：
+     * 1、id，工程ID
+     * 2、name，工程名称
+     * 3、serialNumber，工程序号
+     * 4、description，工程描述
+     * 5、activationCode，工程激活码
+     * @throws Exception
+     */
     @Test
     public void testGetProjects() throws Exception{
         String url="http://120.24.234.71/im/app/getProjects";
 //        String url="http://localhost:9095/openfiremar/app/getProjects";
         HttpPost httpost = new HttpPost(url);
-//        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-
-//        nvps.add(new BasicNameValuePair("username", "admin"));
-//        nvps.add(new BasicNameValuePair("password", "tomcat"));
-//        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;
         response = httpclient.execute(httpost);
@@ -154,7 +202,6 @@ public class PattonTest {
      * createDate：发送时间
      * manager：是否为管理员消息，1表示管理员，0表示普通用户
      * deleted：表示是否为删除的数据，1表示是，0表示否
-     * messageId：openfire每次发送消息时的id,该参数在管理员删除信息时需要
      * @throws Exception
      */
     
@@ -266,7 +313,24 @@ public class PattonTest {
         httpclient.getConnectionManager().shutdown();
         
     }
-    
+
+    /***
+     * 接口名称：搜索
+     * 接口参数：
+     * 1、startTime（可选），开始时间，格式：yyyy-MM-dd HH:mm:ss
+     * 2、endTime（可选），结束时间，格式：yyyy-MM-dd HH:mm:ss
+     * 3、start（必须），搜索起始位置，详细说明请参照获取历史消息或者其他类似接口
+     * 4、limit（可选，默认25条），搜索的条数
+     * 5、fromNick（可选），用户昵称
+     * 6、message（可选），消息关键字
+     * 7、projectId(必须)，工程ID
+     * 返回参数：
+     * 详细请参照请求历史消息接口
+     * 
+     * 
+     * 
+     * @throws Exception
+     */
     
     
     @Test
@@ -277,8 +341,7 @@ public class PattonTest {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
 //        nvps.add(new BasicNameValuePair("message", "admin"));
-//        nvps.add(new BasicNameValuePair("fromNick", "tomcat"));
-//        nvps.add(new BasicNameValuePair("toNick", "tomcat"));
+        nvps.add(new BasicNameValuePair("projectId", "7"));
         nvps.add(new BasicNameValuePair("startTime", "2014-12-23 12:23:34"));
         nvps.add(new BasicNameValuePair("endTime", "2015-12-23 12:23:34"));
         nvps.add(new BasicNameValuePair("start", "0"));
@@ -297,6 +360,7 @@ public class PattonTest {
         httpclient.getConnectionManager().shutdown();
         
     }
+    
     
     
     

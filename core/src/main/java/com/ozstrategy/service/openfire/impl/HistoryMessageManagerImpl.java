@@ -1,19 +1,16 @@
 package com.ozstrategy.service.openfire.impl;
 
-import com.ozstrategy.Constants;
 import com.ozstrategy.dao.system.ApplicationConfigDao;
 import com.ozstrategy.jdbc.message.HistoryMessageDao;
-import com.ozstrategy.model.openfire.HistoryMessage;
 import com.ozstrategy.model.system.ApplicationConfig;
 import com.ozstrategy.service.openfire.HistoryMessageManager;
-import com.ozstrategy.util.LuceneUtils;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,84 +24,71 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
     private HistoryMessageDao historyMessageDao;
     @Autowired
     private ApplicationConfigDao applicationConfigDao;
-
-    public List<HistoryMessage> listHistoryMessages(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        String message = ObjectUtils.toString(map.get("message"));
-        String fromNick = ObjectUtils.toString(map.get("fromNick"));
-        String toNick = ObjectUtils.toString(map.get("toNick"));
-        String startTimeStr = ObjectUtils.toString(map.get("startTime"));
-        String endTimeStr = ObjectUtils.toString(map.get("endTime"));
-        Long startTime = null;
-        Long endTime = null;
-        if (StringUtils.isNotEmpty(startTimeStr)) {
-            Date sDate = DateUtils.parseDate(startTimeStr, new String[]{Constants.YMDHMS, Constants.YMD});
-            startTime = sDate.getTime();
-        }
-        if (StringUtils.isNotEmpty(endTimeStr)) {
-            Date sDate = DateUtils.parseDate(endTimeStr, new String[]{Constants.YMDHMS, Constants.YMD});
-            endTime = sDate.getTime();
-        }
-        return LuceneUtils.search(message, fromNick, toNick, startTime, endTime, limit, start);
-    }
+    private static final Integer deleteItem=50000;
 
     @Transactional(rollbackFor = Throwable.class)
-    public void addIndex(Long index_max_id) throws Exception {
-        Long id=historyMessageDao.addIndex(index_max_id);
-        applicationConfigDao.put(ApplicationConfig.index_max_id, id.toString());
+    public Long addIndex() throws Exception {
+        Long maxId=maxId();
+        Long indexMaxId= NumberUtils.toLong(applicationConfigDao.get(ApplicationConfig.index_max_id));
+        if(indexMaxId<maxId){
+            Long id=historyMessageDao.addIndex(indexMaxId);
+            applicationConfigDao.put(ApplicationConfig.index_max_id, id.toString());
+        }
+        return maxId;
     }
     @Transactional(rollbackFor = Throwable.class)
     public void delete(Date startTime, Date endTime,Long projectId)  throws Exception{
-        historyMessageDao.delete(startTime,endTime,projectId);
-//        LuceneUtils.deleteIndex(startTime.getTime(),endTime.getTime());
-        
+        Map<String,Object> maxMinId=historyMessageDao.maxMinIdByTime(startTime,endTime,projectId);
+        Long maxId=0L;
+        Long minId=0L;
+        if(maxMinId!=null && maxMinId.size()>0){
+            maxId=NumberUtils.toLong(ObjectUtils.toString(maxMinId.get("max")));
+            if(maxId==null){
+                maxId=0L;
+            }
+            minId=NumberUtils.toLong(ObjectUtils.toString(maxMinId.get("min")));
+            if(minId==null){
+                minId=0L;
+            }
+            Long mId=minId;
+            do {
+                mId=delete(mId,maxId,projectId);
+            }while (mId!=minId);
+            historyMessageDao.deleteIndex(startTime,endTime,projectId);
+        }
     }
-
-    public List<HistoryMessage> listHistoryMessagesStore(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        return historyMessageDao.listHistoryMessagesStore(map,start,limit);
-    }
-
-    public Integer listHistoryMessagesStoreCount(Map<String, Object> map) throws Exception {
-        return historyMessageDao.listHistoryMessagesStoreCount(map);
-    }
-
-    public List<HistoryMessage> listManagerMessages(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        return historyMessageDao.listManagerMessages(map,start,limit);
-    }
-
-    public Integer listManagerMessagesCount(Map<String, Object> map) throws Exception {
-        return historyMessageDao.listManagerMessagesCount(map);
+    private Long delete(Long minId,Long maxId,Long projectId) throws Exception{
+        Long mId=0L;
+        List<Map<String,Object>> list=historyMessageDao.getIdByBetween(minId,maxId,projectId,deleteItem);
+        if(list!=null && list.size()>0){
+            List<Long> longs=new ArrayList<Long>();
+            for(Map<String,Object> map : list){
+                Long id=NumberUtils.toLong(ObjectUtils.toString(map.get("id")));
+                longs.add(id);
+                mId=id;
+            }
+            historyMessageDao.deleteByIds(longs);
+        }else{
+            mId=minId;
+        }
+        return mId;
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void deleteMessage(Long projectId, String messageId) {
+    public void deleteMessage(Long projectId, String messageId) throws Exception {
         historyMessageDao.deleteMessage(projectId,messageId);
     }
 
-    public Integer listHistoryMessagesCount(Map<String, Object> map) throws Exception {
-        String message = ObjectUtils.toString(map.get("message"));
-        String fromNick = ObjectUtils.toString(map.get("fromNick"));
-        String toNick = ObjectUtils.toString(map.get("toNick"));
-        String startTimeStr = ObjectUtils.toString(map.get("startTime"));
-        String endTimeStr = ObjectUtils.toString(map.get("endTime"));
-        Long startTime = null;
-        Long endTime = null;
-        if (StringUtils.isNotEmpty(startTimeStr)) {
-            Date sDate = DateUtils.parseDate(startTimeStr, new String[]{Constants.YMDHMS, Constants.YMD});
-            startTime = sDate.getTime();
-        }
-        if (StringUtils.isNotEmpty(endTimeStr)) {
-            Date sDate = DateUtils.parseDate(endTimeStr, new String[]{Constants.YMDHMS, Constants.YMD});
-            endTime = sDate.getTime();
-        }
-        return LuceneUtils.count(message, fromNick, toNick, startTime, endTime);
+    public List<Map<String, String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Integer start, Integer limit) throws Exception {
+        return historyMessageDao.search(message, startDate, endDate, fromId, projectId, manager, deleted,start, limit);
     }
 
-    public List<HistoryMessage> listHistoryMessagesFromDb(Map<String, Object> map, Integer start, Integer limit) throws Exception {
-        return historyMessageDao.listHistoryMessagesFromDb(map,start,limit);
+    public List<Map<String, Object>> getHistory(Long projectId, Integer start, Integer limit) throws Exception {
+        return historyMessageDao.getHistory(projectId,start,limit);
     }
 
-    public Integer listHistoryMessagesFromDbCount(Map<String, Object> map) throws Exception {
-        return historyMessageDao.listHistoryMessagesFromDbCount(map);
+    public Integer getHistoryCount(Long projectId) {
+        return historyMessageDao.getHistoryCount(projectId);
     }
 
     public Long maxId() {

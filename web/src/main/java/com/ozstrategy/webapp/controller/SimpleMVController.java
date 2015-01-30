@@ -70,7 +70,11 @@ public class SimpleMVController implements InitializingBean {
         if(StringUtils.isNotEmpty(projectId)){
             id=Long.parseLong(projectId);
         }
-        User user = userManager.getUserByUsername(request.getRemoteUser(),id);
+        User user = null;
+        try {
+            user = userManager.getUserByUsername(request.getRemoteUser(),id);
+        } catch (Exception e) {
+        }
         if(user==null){
             return new UserCommand();
         }
