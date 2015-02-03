@@ -44,7 +44,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                             {
                                 xtype:'fieldset',
                                 layout:'column',
-                                title:'文字、图片',
+                                title:projectRes.exportPic,
                                 autoScroll: true,
                                 items:[
                                     {
@@ -52,13 +52,13 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                         border:false,
                                         items:[
                                             {
-                                                fieldLabel:'开始时间',
+                                                fieldLabel:globalRes.buttons.startTime,
                                                 xtype : 'datefield',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
                                                 itemId:'picStartTime',
-                                                format:'Y-m-d 00:00:00',
+                                                format:'Y-m-d',
                                                 maxValue:new Date(),
                                                 minValue:function(){
                                                     var newValue=new Date();
@@ -70,12 +70,12 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 name : 'startTime'
                                             },
                                             {
-                                                fieldLabel:'结束时间',
+                                                fieldLabel:globalRes.buttons.endTime,
                                                 xtype : 'datefield',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
-                                                format:'Y-m-d 23:59:59',
+                                                format:'Y-m-d',
                                                 maxValue:new Date(),
                                                 itemId : 'picEndTime',
                                                 name : 'endTime',
@@ -108,7 +108,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 width:120,
                                                 margin:1,
                                                 formBind: true,
-                                                text: '导出',
+                                                text: projectRes.buttons.exportBtn,
                                                 handler: function () {
                                                     var form=me.down('#picForm').getForm();
                                                     var data=form.getValues();
@@ -120,7 +120,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                             win.show();
                                                             win.fireEvent('startBar');
                                                         }else{
-                                                            Ext.Msg.alert('错误',result.message);
+                                                            Ext.Msg.alert(globalRes.title.fail,result.message);
                                                         }
                                                     });
                                                 }
@@ -142,7 +142,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                             {
                                 xtype:'fieldset',
                                 layout:'column',
-                                title:'语音信息',
+                                title:projectRes.exportVoi,
                                 autoScroll: true,
                                 items:[
                                     {
@@ -150,9 +150,9 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                         border:false,
                                         items:[
                                             {
-                                                fieldLabel:'开始时间',
+                                                fieldLabel:globalRes.buttons.startTime,
                                                 xtype : 'datefield',
-                                                format:'Y-m-d 00:00:00',
+                                                format:'Y-m-d',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
@@ -168,13 +168,13 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 name : 'startTime'
                                             },
                                             {
-                                                fieldLabel:'结束时间',
+                                                fieldLabel:globalRes.buttons.endTime,
                                                 xtype : 'datefield',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
                                                 name : 'endTime',
-                                                format:'Y-m-d 23:59:59',
+                                                format:'Y-m-d',
                                                 maxValue:new Date(),
                                                 itemId : 'vcEndTime',
                                                 listeners:{
@@ -207,7 +207,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 width:120,
                                                 margin:1,
                                                 formBind: true,
-                                                text: '导出',
+                                                text: projectRes.buttons.exportBtn,
                                                 handler: function () {
                                                     var form=me.down('#vcForm').getForm();
                                                     var data=form.getValues();
@@ -219,7 +219,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                             win.show();
                                                             win.fireEvent('startBar');
                                                         }else{
-                                                            Ext.Msg.alert('错误',result.message);
+                                                            Ext.Msg.alert(globalRes.title.fail,result.message);
                                                         }
                                                     });
 
@@ -241,7 +241,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                 border:true,
                 region:'center',
                 store:store,
-                title:'导出历史',
+                title:projectRes.exportGrid,
                 viewConfig:{
                     getRowClass: function (record) {
                         if (!record.get('hasFile')) {
@@ -259,45 +259,45 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                 ],
                 columns:[
                     {
-                        header: '执行时间',
+                        header: projectRes.header.executeDate,
                         flex:1,
                         dataIndex:'executeDate'
                     },
                     {
-                        header: '导出类容',
+                        header: projectRes.header.type,
                         dataIndex: 'type',
                         flex:1,
                         renderer: function (v) {
                             if(v=='MessagePicture'){
-                                return '文字，图片';
+                                return projectRes.exportPic;
                             }
-                            return '语音';
+                            return projectRes.exportVoi;
                         }
                     },
                     {
-                        header: '状态',
+                        header: projectRes.header.hasFile,
                         dataIndex: 'hasFile',
                         flex:1,
                         renderer: function (v) {
                             if(v){
-                                return '成功';
+                                return globalRes.title.success;
                             }
-                            return '失败';
+                            return globalRes.title.fail;
                         }
                     },
                     {
-                        header: '操作者(用户名)',
+                        header: projectRes.header.exportor,
                         flex:1,
                         dataIndex: 'exportor',
                         renderer: function (v) {
                             if(!v){
-                                return '系统自动执行';
+                                return projectRes.header.exportorDefault;
                             }
                             return v;
                         }
                     },
                     {
-                        header:'下载',
+                        header:globalRes.buttons.download,
                         width:50,
                         xtype:'actioncolumn',
                         dataIndex:'hasFile',
@@ -317,7 +317,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                 },
                                 getTip:function(v,metadata,record,rowIndex,colIndex,store){
 
-                                    return '下载';
+                                    return globalRes.buttons.download;
                                 },
                                 handler:function(grid, rowIndex, colIndex,item,e,rec){
                                     var multiFile=rec.get('multiFile');
@@ -357,17 +357,17 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
     createExportWin:function(){
         var me=this;
         var pmb = Ext.create('Ext.ProgressBar', {
-            text:'正在导出...'
+            text:projectRes.exporting
         });
         var runnerProgress = new Ext.util.TaskRunner();
         pmb.wait({
             interval: 500,
             //duration: 50000,
             increment: 15,
-            text: '正在导出...',
+            text: projectRes.exporting,
             scope: this,
             fn: function(){
-                pmb.updateText('成功!');
+                pmb.updateText(globalRes.title.success);
             }
         });
         var win=Ext.widget('window', {
@@ -376,10 +376,10 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
             closable:false,
             modal: true,
             bodyPadding:10,
-            title:'导出',
+            title:projectRes.buttons.exportBtn,
             buttons:[
                 {
-                    text:'关闭',
+                    text:globalRes.buttons.close,
                     disabled:true,
                     itemId:'closeBtn',
                     handler:function(){
@@ -414,14 +414,14 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                 runnerProgress.stopAll();
                                 runnerProgress.destroy();
                                 pmb.reset();
-                                pmb.updateText('导出成功,请点击下方的下载按钮下载文件。');
+                                pmb.updateText(projectRes.exportSuccess);
                                 win.down('#closeBtn').setDisabled(false);
 
                             }else{
                                 runnerProgress.stopAll();
                                 runnerProgress.destroy();
                                 pmb.reset();
-                                pmb.updateText('导出失败,请重试。');
+                                pmb.updateText(projectRes.exportFail);
                                 win.down('#closeBtn').setDisabled(false);
                             }
                         }

@@ -30,6 +30,24 @@
         select ff.*,u.username from (select f.*,rf.roleId from ext_feature f join ext_rolefeature rf on f.id=rf.featureId) ff join ext_user u on u.defaultRoleId=ff.roleId WHERE u.id=#{id} and ff.enabled=1  
     </select>
     
+    <insert id="save" flushCache="true" parameterType="com.ozstrategy.model.userrole.Feature">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO ext_feature
+        (id,enabled,criteria,description,name,createDate,displayName,lastUpdateDate)
+        VALUES (#{id},#{enabled},#{criteria},#{description},#{name},#{createDate},#{displayName},#{lastUpdateDate})
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.userrole.Feature" flushCache="true">
+        UPDATE ext_feature
+        SET enabled=#{enabled},criteria=#{criteria},description=#{description},name=#{name},createDate=#{createDate},displayName=#{displayName},lastUpdateDate=#{lastUpdateDate}
+        WHERE (id=#{id})
+    </update>
+    <delete id="delete" parameterType="com.ozstrategy.model.userrole.Feature" flushCache="true">
+      DELETE FROM ext_feature
+      WHERE (id=#{id})
+    </delete>
+    
     
     
 </mapper>

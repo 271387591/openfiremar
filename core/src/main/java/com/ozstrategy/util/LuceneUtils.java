@@ -1,17 +1,17 @@
 package com.ozstrategy.util;
 
 import com.ozstrategy.Constants;
-import com.ozstrategy.lucene.LuceneInstance;
 import com.ozstrategy.model.openfire.HistoryMessage;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
@@ -200,24 +200,90 @@ public class LuceneUtils {
     public static List<Map<String,String>> search(Long id,String message,String fromNick,String toNick,Long toId,Long startTime,Long endTime, int pageSize, int start,Long formId) throws Exception {
         Directory directory = FSDirectory.open(new File(INDEX_DIR));
         IndexReader ir = DirectoryReader.open(directory);
+        
         IndexSearcher indexSearcher = new IndexSearcher(ir);
         List<Map<String,String>> list=new ArrayList<Map<String,String>>();
         int maxDoc=ir.maxDoc();
-        System.out.println(maxDoc);
+//        for(int i=0;i<maxDoc;i++){
+//            Document document=indexSearcher.doc(i);
+//            System.out.println("doc==="+i+"---id===="+document.get("id"));
+//        }
+        System.out.println("maxDoc=="+maxDoc);
+        System.out.println("numDocs=="+ir.numDocs());
+        System.out.println("numDeletedDocs=="+ir.numDeletedDocs());
         BooleanQuery query=search(id,message,fromNick,toNick,toId,startTime,endTime,formId);
         BooleanClause[] clauses = query.getClauses();
         if(clauses!=null && clauses.length<1){
             query.add(new MatchAllDocsQuery(),BooleanClause.Occur.MUST);
         }
         Sort sort = new Sort(new SortField("id", SortField.Type.LONG,true));
-        TopDocs paged=null;
-        if(start==0){
-            FieldDoc lastBottom=new FieldDoc(maxDoc-(start+1),1.0f,new Object[]{Long.MAX_VALUE});
-            paged=indexSearcher.searchAfter(lastBottom, query, null, pageSize,sort);
-        }else{
-            FieldDoc lastBottom=new FieldDoc(maxDoc-(start+1),1.0f,new Object[]{new Long(maxDoc-(start+1))});
-            paged=indexSearcher.searchAfter(lastBottom, query, null, pageSize,sort);
+        int page=new Double(Math.ceil(start / pageSize)).intValue()+1;
+        TopDocs paged=indexSearcher.search(query,1);
+        
+        
+        System.out.println("getMaxScore=="+paged.getMaxScore());
+        int allTotal=paged.totalHits;
+        if(start>=allTotal){
+            return list;
         }
+        
+        int maxSelectSize=100000;
+        int index=1;
+        if(start>maxSelectSize){
+            index=start/maxSelectSize;
+        }
+        if(start==0){
+            index=0;
+        }
+        
+
+        FieldDoc lastBottom=null;
+        for(int i=0;i<index;i++){
+            paged=indexSearcher.searchAfter(lastBottom, query, null, Math.min(start,maxSelectSize),sort);
+            ScoreDoc[] scoreDocs = paged.scoreDocs;
+            int len=scoreDocs.length;
+            if(len>0){
+                int  last = scoreDocs[len-1].doc;
+                Document doc = indexSearcher.doc(last);
+                Long lastId =NumberUtils.toLong(doc.get("id"));
+                lastBottom=new FieldDoc(last,1.0f,new Object[]{lastId});
+            }
+            scoreDocs=null;
+            paged=null;
+            
+        }
+        if(start>maxSelectSize){
+            paged=indexSearcher.searchAfter(lastBottom, query, null, start-index*maxSelectSize,sort);
+            ScoreDoc[] scoreDocs = paged.scoreDocs;
+            int len=scoreDocs.length;
+            if(len>0){
+                int  last = scoreDocs[len-1].doc;
+                Document doc = indexSearcher.doc(last);
+                Long lastId =NumberUtils.toLong(doc.get("id"));
+                lastBottom=new FieldDoc(last,1.0f,new Object[]{lastId});
+            }
+        }
+        
+        
+
+        paged=indexSearcher.searchAfter(lastBottom, query, null, pageSize,sort);
+        
+        
+        
+//        FieldDoc lastBottom=null;
+//        int indexPage=0;
+//        do{
+//            paged=indexSearcher.searchAfter(lastBottom, query, null, pageSize,sort);
+//            ScoreDoc[] scoreDocs = paged.scoreDocs;
+//            int len=scoreDocs.length;
+//            if(len>0){
+//                int  last = scoreDocs[len-1].doc;
+//                Document doc = indexSearcher.doc(last);
+//                Long lastId =NumberUtils.toLong(doc.get("id"));
+//                lastBottom=new FieldDoc(last,1.0f,new Object[]{lastId});
+//            }
+//            indexPage++;
+//        }while (indexPage<page);
         if(paged==null){
             return list;
         }
@@ -263,8 +329,17 @@ public class LuceneUtils {
         if (IndexWriter.isLocked(dir)) {
             IndexWriter.unlock(dir);
         }
+
+        Document newDoc=new Document();
+        newDoc.add(new LongField("id",id,Field.Store.YES));
+        
         IndexWriter indexWriter = new IndexWriter(dir, config);
         indexWriter.deleteDocuments(query);
+//        indexWriter.forceMerge(indexWriter.numDocs());
+//        indexWriter.deleteUnusedFiles();
+//        indexWriter.forceMergeDeletes();
+//        indexWriter.deleteDocuments(new Term("id", id.toString()));
+//        indexWriter.updateDocument(new Term("id", id.toString()), newDoc);
         indexWriter.commit();
         try {
         } finally {
@@ -341,78 +416,78 @@ public class LuceneUtils {
 
     public static void main(String[] args) {
         try {
-            
-//            updateIndex(1L,1L);
-//            Long sTime= DateUtils.parseDate("2015-01-01 16:09:43",new String[]{"yyyy-MM-dd HH:mm:ss"}).getTime();
-//            Long eTime= DateUtils.parseDate("2015-01-27 23:09:44", new String[]{"yyyy-MM-dd HH:mm:ss"}).getTime();
-//            List<Map<String,String>> historyMessages=search(null,null,null,null,7L,null,null,25,0,1L);
-//            for(Map<String,String> map:historyMessages){                   
-//                System.out.print("id==" + map.get("id"));
-//                System.out.print("----");
-//                System.out.print("message==" + map.get("message"));
-//                System.out.print("----");
-//                System.out.print("deleted==" + map.get("deleted"));
-//                System.out.print("----");
-//                
-//                System.out.print("total==" + map.get("total"));
-//                System.out.print("----");
-//                
-//                System.out.print("date==" + DateFormatUtils.format(new Date(NumberUtils.toLong(map.get("createDate"))), "yyyy-MM-dd HH:mm:ss"));
-//                System.out.println();
-//            }
+            Long sTime= DateUtils.parseDate("2015-01-01 16:09:43", new String[]{"yyyy-MM-dd HH:mm:ss"}).getTime();
+            Long eTime= DateUtils.parseDate("2015-01-31 23:09:44", new String[]{"yyyy-MM-dd HH:mm:ss"}).getTime();
+            List<Map<String,String>> historyMessages=search(null,null,null,null,1l,null,null,25,284746-25,null);
+            for(Map<String,String> map:historyMessages){                   
+                System.out.print("id==" + map.get("id"));
+                System.out.print("----");
+                System.out.print("message==" + map.get("message"));
+                System.out.print("----");
+                System.out.print("deleted==" + map.get("deleted"));
+                System.out.print("----");
+                
+                System.out.print("total==" + map.get("total"));
+                System.out.print("----");
+                
+                System.out.print("date==" + DateFormatUtils.format(new Date(NumberUtils.toLong(map.get("createDate"))), "yyyy-MM-dd HH:mm:ss"));
+                System.out.println();
+            }
 
-//            LuceneUtils.deleteIndex(sTime,eTime);
+//            LuceneUtils.deleteIndex(5L,sTime,eTime);
             
 //            LuceneUtils.index();
 //            LuceneUtils.search("离开", 50, 1);
-            final LuceneInstance instance = LuceneInstance.getInstance();
-            for(int i=0;i<5;i++){
-                final int index=i;
-                Thread thread = new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            
-                            IndexWriter indexWriter = instance.getIndexWriter1();
-                            for(int j=0;j<index;j++){
-                                BooleanQuery query = new BooleanQuery();
-                                NumericRangeQuery numericRangeQuery=NumericRangeQuery.newIntRange("j", j, j, true, true);
-                                query.add(numericRangeQuery, BooleanClause.Occur.MUST);
-                                indexWriter.deleteDocuments(query);
-                                indexWriter.commit();
-                                Document document = new Document();
-                                document.add(new IntField("j",j,Field.Store.YES));
-                                indexWriter.addDocument(document);
-                            }
-                            indexWriter.commit();
-                            
-//                            instance.close(indexWriter);
-                            
-                            IndexReader reader=instance.getIndexReader1();
+//            final LuceneInstance instance = LuceneInstance.getInstance();
+//            for(int i=0;i<5;i++){
+//                final int index=i;
+//                Thread thread = new Thread(new Runnable() {
+//                    public void run() {
+//                        try {
 //                            
-                            System.out.println(Thread.currentThread().getName()+"-----max=="+reader.maxDoc());
-                            instance.close(reader);
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                });
-                
-                System.out.println("线程===="+thread.getName());
-                thread.start();
-                thread.sleep(2000);
-                
-            }
-            IndexReader reader=instance.getIndexReader1();
+////                            IndexWriter indexWriter = instance.getIndexWriter1();
+////                            for(int j=0;j<index;j++){
+////                                BooleanQuery query = new BooleanQuery();
+////                                NumericRangeQuery numericRangeQuery=NumericRangeQuery.newIntRange("j", j, j, true, true);
+////                                query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+////                                indexWriter.deleteDocuments(query);
+////                                indexWriter.commit();
+////                                Document document = new Document();
+////                                document.add(new IntField("j",j,Field.Store.YES));
+////                                indexWriter.addDocument(document);
+////                            }
+////                            indexWriter.commit();
 //                            
-            System.out.println(Thread.currentThread().getName()+"--all---max=="+reader.maxDoc());
+////                            instance.close(indexWriter);
+//
+//                            BooleanQuery query = new BooleanQuery();
+//                            NumericRangeQuery numericRangeQuery=NumericRangeQuery.newIntRange("j", 1, 1, true, true);
+////                            IndexReader reader=instance.getIndexReader1();
+////                            FieldDoc lastBottom=new FieldDoc(maxDoc-(start+1),1.0f,new Object[]{Long.MAX_VALUE});
+////                            paged=indexSearcher.searchAfter(lastBottom, query, null, 5,sort);
+////                            
+////                            System.out.println(Thread.currentThread().getName()+"-----max=="+reader.maxDoc());
+////                            instance.close(reader);
+//                            
+//                            
+//                            
+//                            
+//                            
+//                            
+//                            
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                    }
+//                });
+//                
+//                System.out.println("线程===="+thread.getName());
+//                thread.start();
+//                thread.sleep(2000);
+//                
+//            }
+//                            
 
 //            IndexWriter indexWriter = instance.getIndexWriter();
 //            BooleanQuery query = new BooleanQuery();

@@ -40,7 +40,6 @@ public class ProjectManagerImpl implements ProjectManager {
     public Integer listProjectsCount(Map<String, Object> map) throws Exception {
         return projectDao.listProjectsCount(map);
     }
-
     public Project getProjectById(Long id) throws Exception {
         return projectDao.getProjectById(id);
     }
@@ -68,5 +67,6 @@ public class ProjectManagerImpl implements ProjectManager {
     public void delete(Project project) throws Exception {
         openfireMucRoomDao.delete(project.getId());
         projectDao.delete(project);
+        
     }
 }

@@ -59,17 +59,17 @@ Ext.define('FlexCenter.App', {
         var me = this, ret = me.callParent(), shortcutDataArray = [];
         shortcutDataArray.push({name: userRoleRes.title, iconCls: 'manageUser-shortcut', module: 'unitUserView'});
         shortcutDataArray.push({
-            name: '搜索管理',
+            name: projectRes.searchTitle,
             iconCls: 'search-shortcut',
             module: 'historyMessageManager'
         });
         shortcutDataArray.push({
-            name: '数据导出',
+            name: projectRes.exportTitle,
             iconCls: 'export-shortcut',
             module: 'exportManager'
         });
         shortcutDataArray.push({
-            name: '应用版本管理',
+            name: appStoreRes.title,
             iconCls: 'appStore-shortcut',
             module: 'appStoreManager'
         });
@@ -94,18 +94,18 @@ Ext.define('FlexCenter.App', {
         var me = this, ret = me.callParent();
 
         return Ext.apply(ret, {
-            title: globalRes.userFullName,
+            title: globalRes.nickName,
             iconCls: 'user',
             height: 300,
             toolConfig: {
                 width: 150,
                 items: [
-                    //{
-                    //    text: userRoleRes.passwordTilte,
-                    //    iconCls: 'user-edit',
-                    //    handler: me.onChangePassword,
-                    //    scope: me
-                    //},
+                    {
+                        text: userRoleRes.passwordTilte,
+                        iconCls: 'user-edit',
+                        handler: me.onChangePassword,
+                        scope: me
+                    },
                     {
                         text: globalRes.changeBackground,
                         iconCls: 'settings',
@@ -141,14 +141,14 @@ Ext.define('FlexCenter.App', {
                     '-',
                     '->',
                     {
-                        text: '退出当前工程',
-                        iconCls: 'app-logout',
+                        text: projectRes.logoutProject,
+                        iconCls: 'exit_project',
                         handler: me.onLogoutProject,
                         scope: me
                     },
                     {
                         text: globalRes.title.logout,
-                        iconCls: 'app-logout',
+                        iconCls: 'gnome_logout',
                         handler: me.onLogout,
                         scope: me
                     }
@@ -232,7 +232,8 @@ Ext.define('FlexCenter.App', {
             }
         };
         var quitProject=Ext.create('Ext.Button', {
-            text: '退出当前工程',
+            text: projectRes.logoutProject,
+            iconCls: 'exit_project',
             handler: me.onLogoutProject
         });
 
@@ -270,17 +271,17 @@ Ext.define('FlexCenter.App', {
         });
     },
     onLogoutProject:function(){
-        Ext.Msg.alert('退出工程',"你确定要退出该工程吗？",function(btn){
+        Ext.Msg.alert(projectRes.logoutProject,projectRes.logoutProjectTitle,function(btn){
             if(btn=='ok'){
                 var pmb = Ext.create('Ext.ProgressBar', {
-                    text:'正在退出...'
+                    text:projectRes.logoutingProject
                 });
                 var runnerProgress = new Ext.util.TaskRunner();
                 pmb.wait({
                     interval: 100,
                     duration: 1000,
                     increment: 10,
-                    text: '正在退出...',
+                    text: projectRes.logoutingProject,
                     scope: this,
                     fn: function(){
                         var projectViewport=Ext.ComponentQuery.query('#projectViewport')[0];
@@ -298,7 +299,7 @@ Ext.define('FlexCenter.App', {
                     closable:false,
                     modal: true,
                     bodyPadding:10,
-                    title:'退出工程',
+                    title:projectRes.logoutingProject,
                     onCancel:function(){
                         win.close();
                         runnerProgress.stopAll();
@@ -356,7 +357,7 @@ Ext.define('FlexCenter.App', {
                         Ext.MessageBox.show({
                             title: userRoleRes.passwordTilte,
                             width: 300,
-                            msg: result.message,
+                            msg: globalRes.removeSuccess,
                             buttons: Ext.MessageBox.OK,
                             icon: Ext.MessageBox.INFO
                         });

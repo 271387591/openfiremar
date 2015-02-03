@@ -26,5 +26,22 @@
     <select id="getRoleByUserId" resultMap="roleResult" parameterType="java.lang.Long">
         select * from ext_role r JOIN ext_userrole ur on r.id=ur.roleId where ur.userId=#{userId} and r.enabled=1
     </select>
+    <insert id="save" parameterType="com.ozstrategy.model.userrole.Role" flushCache="true">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO ext_role
+         (id,enabled,description,name,projectId,createDate,displayName,lastUpdateDate)
+        VALUES (#{id},#{enabled},#{description},#{name},#{projectId},#{createDate},#{displayName},#{lastUpdateDate})
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.userrole.Role" flushCache="true">
+        UPDATE ext_role
+        SET enabled=#{enabled},description=#{description},name=#{name},projectId=#{projectId},createDate=#{createDate},displayName=#{displayName},lastUpdateDate=#{lastUpdateDate}
+        WHERE (id=#{id})
+    </update>
+    <delete id="delete" parameterType="com.ozstrategy.model.userrole.Role" flushCache="true">
+        DELETE FROM ext_role
+        WHERE (id=#{id})
+    </delete>
 
 </mapper>

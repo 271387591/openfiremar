@@ -18,6 +18,7 @@ var globalRes = {
     removeFail: '<fmt:message key="globalRes.removeFail" />',
     textLengthTooLong: '<fmt:message key="globalRes.textLengthTooLong" />',
     selectAllText: '<fmt:message key="globalRes.selectAllText" />',
+    keyword: '<fmt:message key="globalRes.keyword" />',
     title:{
         resetLocale: '<fmt:message key="globalRes.title.resetLocale" />',
         logout: '<fmt:message key="globalRes.title.logout" />',
@@ -57,6 +58,11 @@ var globalRes = {
         lookFor: '<fmt:message key="globalRes.buttons.lookFor" />',
         managerBtn: '<fmt:message key="globalRes.buttons.managerBtn" />',
         logout: '<fmt:message key="globalRes.buttons.logout" />',
+        fileText: '<fmt:message key="globalRes.buttons.fileText" />',
+        fileLoading: '<fmt:message key="globalRes.buttons.fileLoading" />',
+        startTime: '<fmt:message key="globalRes.buttons.startTime" />',
+        endTime: '<fmt:message key="globalRes.buttons.endTime" />',
+        download: '<fmt:message key="globalRes.buttons.download" />',
         close: '<fmt:message key="globalRes.buttons.close" />'
     },
     msg: {

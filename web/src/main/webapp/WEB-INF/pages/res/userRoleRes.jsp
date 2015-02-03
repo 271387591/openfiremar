@@ -3,6 +3,7 @@
 
 var userRoleRes = {
         title: '<fmt:message key="userRoleRes.title" />',
+        authenticationUser: '<fmt:message key="userRoleRes.authenticationUser" />',
         lockUser: '<fmt:message key="userRoleRes.lockUser" />',
         disableUser: '<fmt:message key="userRoleRes.disableUser" />',
         unDisableUser: '<fmt:message key="userRoleRes.unDisableUser" />',
@@ -61,6 +62,8 @@ var userRoleRes = {
             roleInfo: '<fmt:message key="userRoleRes.header.roleInfo" />',
             featureName: '<fmt:message key="userRoleRes.header.featureName" />',
             featureCriteria: '<fmt:message key="userRoleRes.header.featureCriteria" />',
+            nickName: '<fmt:message key="userRoleRes.header.nickName" />',
+            authentication: '<fmt:message key="userRoleRes.header.authentication" />',
             enabled: '<fmt:message key="userRoleRes.header.enabled" />'
         },
         manageUser: '<fmt:message key="userRoleRes.manageUser" />',

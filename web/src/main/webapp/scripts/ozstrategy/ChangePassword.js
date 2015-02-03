@@ -26,7 +26,7 @@ Ext.define('FlexCenter.ChangePassword', {
         var me = this;
         Ext.apply(this, {
           layout: 'fit',
-          title: '修改密码',
+          title: userRoleRes.passwordTilte,
           modal: true,
           width: 380,
           autoHeight: true,
@@ -53,7 +53,7 @@ Ext.define('FlexCenter.ChangePassword', {
                 name: 'id'
               },
               {
-                fieldLabel: '旧密码',
+                fieldLabel: userRoleRes.oldPassword,
                 name: 'oldPassword',
                 itemId:'oldPassword',
                 blankText:'必填',
@@ -62,7 +62,7 @@ Ext.define('FlexCenter.ChangePassword', {
                 allowBlank: false
               },
               {
-                fieldLabel: '新密码',
+                fieldLabel: userRoleRes.newPassword,
                 name: 'newPassword',
                 itemId:'newPassword',
                 blankText:'必填',
@@ -72,7 +72,7 @@ Ext.define('FlexCenter.ChangePassword', {
                 showCapsWarning: true
               },
               {
-                fieldLabel: '确认密码',
+                fieldLabel: userRoleRes.passwordAffirm,
                 name: 'confirmPassword',
                 blankText:'必填',
                 inputType: 'password',
@@ -85,14 +85,14 @@ Ext.define('FlexCenter.ChangePassword', {
                     return true;
                   }
                   else {
-                    return '两次密码输入不一致';
+                    return userRoleRes.passwordHitNotAllow;
                   }
                 }
               }
             ],
             buttons: [
               {
-                text: '保存',
+                text: globalRes.buttons.save,
                 formBind: true,
                 handler: function() {
                   var win = this.up('window');
@@ -100,7 +100,7 @@ Ext.define('FlexCenter.ChangePassword', {
                 }
               },
               {
-                text: '取消',
+                text: globalRes.buttons.cancel,
                 hidden : me.avoidClose,
                 handler: function() {
                   var win = this.up('window');
@@ -108,7 +108,7 @@ Ext.define('FlexCenter.ChangePassword', {
                 }
               },
               {
-                text:'退出',
+                text:globalRes.buttons.logout,
                 iconCls:'logout',
                 hidden : !me.avoidClose,
                 handler: me.onLogout,

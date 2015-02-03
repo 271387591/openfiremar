@@ -41,4 +41,21 @@
     <select id="getUserByNickName" parameterType="Map" resultMap="userResult">
           select u.* from ext_user u where u.projectId=#{projectId} and u.nickName=#{nickName} 
     </select>
+    <insert id="save" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO ext_user
+        (id,enabled,lastName,manager,projectId,accountExpired,password,accountLocked,lastUpdateDate,version,username,phoneNumber,email,nickName,authentication,userNo,credentialsExpired,gender,createDate,firstName,mobile)
+        VALUES (#{id},#{enabled},#{lastName},#{manager},#{project.id},#{accountExpired},#{password},#{accountLocked},#{lastUpdateDate},#{version},#{username},#{phoneNumber},#{email},#{nickName},#{authentication},#{userNo},#{credentialsExpired},#{gender},#{createDate},#{firstName},#{mobile})
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
+        UPDATE ext_user
+        SET enabled=#{enabled},lastName=#{lastName},manager=#{manager},projectId=#{project.id},accountExpired=#{accountExpired},password=#{password},accountLocked=#{accountLocked},lastUpdateDate=#{lastUpdateDate},version=#{version},username=#{username},phoneNumber=#{phoneNumber},email=#{email},nickName=#{nickName},authentication=#{authentication},userNo=#{userNo},credentialsExpired=#{credentialsExpired},gender=#{gender},createDate=#{createDate},firstName=#{firstName},mobile=#{mobile}
+        WHERE (id=#{id})
+    </update>
+    <delete id="delete" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
+      DELETE FROM ext_user
+      WHERE (id=#{id})
+    </delete>
 </mapper>

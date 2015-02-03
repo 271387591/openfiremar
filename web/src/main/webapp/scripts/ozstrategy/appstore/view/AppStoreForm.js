@@ -57,7 +57,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreForm', {
                     {
                         xtype: 'fieldset',
                         checkboxToggle: false,
-                        title: '版本信息',
+                        title: appStoreRes.header.title,
                         autoHeight: true,
                         defaultType: 'textfield',
                         defaults: {               // defaults are applied to items, not the container
@@ -70,7 +70,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreForm', {
                                 name: 'id'
                             },
                             {
-                                fieldLabel: '<font color="red">*</font>版本号',
+                                fieldLabel: '<font color="red">*</font>'+appStoreRes.header.version,
                                 name: 'version',
                                 maxLength: 50,
                                 minLength: 1,
@@ -80,7 +80,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreForm', {
                             {
                                 xtype: 'filefield',
                                 name: 'fileName',
-                                fieldLabel: '<font color="red">*</font>文件',
+                                fieldLabel: '<font color="red">*</font>'+appStoreRes.header.fileName,
                                 msgTarget: 'side',
                                 allowBlank: false,
                                 //listeners:{
@@ -92,10 +92,10 @@ Ext.define('FlexCenter.appstore.view.AppStoreForm', {
                                 //        
                                 //    }
                                 //},
-                                buttonText: '选择文件'
+                                buttonText: globalRes.buttons.fileText
                             },
                             {
-                                fieldLabel:'<font color="red">*</font>选择平台',
+                                fieldLabel:'<font color="red">*</font>'+appStoreRes.header.platform,
                                 xtype:'combo',
                                 name:'platform',
                                 mode:'local',
@@ -110,7 +110,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreForm', {
                             {
                                 xtype:'textareafield',
                                 grow: true,
-                                fieldLabel: '工程简介',
+                                fieldLabel: appStoreRes.header.description,
                                 anchor: '100%',
                                 name: 'description'
                             }

@@ -45,22 +45,22 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
         me.columns=[
             {xtype: 'rownumberer'},
             {
-                header: '平台',
+                header: appStoreRes.header.platform,
                 dataIndex: 'platform'
             },
             {
-                header: '版本号',
+                header: appStoreRes.header.version,
                 dataIndex: 'version'
             },
             {
-                header: '下载地址',
+                header: appStoreRes.header.url,
                 dataIndex: 'url',
                 renderer: function (v) {
                     return '<a href="'+v+'" target="_blank">'+v+'</a>';
                 }
             },
             {
-                header: '版本简介',
+                header: appStoreRes.header.description,
                 dataIndex: 'description'
             },
             {
@@ -69,12 +69,12 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
             },
             {
                 xtype:'actioncolumn',
-                header:'编辑',
+                header:globalRes.buttons.edit,
                 width:40,
                 items:[
                     {
                         iconCls:'table-edit',
-                        tooltip:'编辑',
+                        tooltip:globalRes.buttons.edit,
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
                             me.onAddClick(rec);
@@ -84,12 +84,12 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
             },
             {
                 xtype:'actioncolumn',
-                header:'删除',
+                header:globalRes.buttons.remove,
                 width:40,
                 items:[
                     {
                         iconCls:'table-delete',
-                        tooltip:'删除',
+                        tooltip:globalRes.buttons.remove,
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
                             me.onDeleteClick(rec);
@@ -108,7 +108,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
     onAddClick:function(rec){
         var me=this;
         var edit = Ext.widget('appStoreForm', {
-            title:(rec?'编辑':'添加')
+            title:(rec?globalRes.buttons.edit:globalRes.buttons.add)
         });
         edit.setActiveRecord(rec);
         edit.show();
@@ -116,16 +116,16 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
             var data=form.getValues();
             form.submit({
                 url: 'appStoreController.do?method=save',
-                waitMsg: '正在上传...',
+                waitMsg: globalRes.buttons.fileLoading,
                 params:data,
                 success: function(fp, o) {
-                    Ext.Msg.alert('提示', '保存成功！',function(){
+                    Ext.Msg.alert(globalRes.title.prompt, globalRes.addSuccess,function(){
                         win.close();
                     });
                     me.getStore().load();
                 },
                 failure:function(){
-                    Ext.Msg.alert('提示', '保存失败！');
+                    Ext.Msg.alert(globalRes.title.prompt, globalRes.addFail);
                 }
             });
             
@@ -136,7 +136,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
     onDeleteClick: function (record) {
         var me = this;
         if (record) {
-            Ext.Msg.confirm('删除', Ext.String.format('确定要删除此版本：{0}', record.data.version), function (txt) {
+            Ext.Msg.confirm(globalRes.buttons.remove, Ext.String.format(appStoreRes.removeAlert, record.data.version), function (txt) {
                 if (txt === 'yes') {
                     Ext.Ajax.request({
                         url: 'appStoreController.do?method=delete',

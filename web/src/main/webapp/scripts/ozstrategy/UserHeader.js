@@ -46,7 +46,7 @@ Ext.define('FlexCenter.UserHeader', {
                           items: [
                               {
                                   colspan: 2,
-                                  iconCls:'app-logout',
+                                  iconCls:'gnome_logout',
                                   text: globalRes.buttons.logout,
                                   scale: 'small',
                                   width: 130,

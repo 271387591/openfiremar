@@ -17,6 +17,8 @@ public interface UniversalDao<T extends BaseEntity,PK extends Serializable> {
     public int save(T entity);
     @UpdateProvider(type = SqlHelper.class,method = "update")
     public int update(T entity);
+    @UpdateProvider(type = SqlHelper.class,method = "merge")
+    public int merge(Object[] objects);
     @DeleteProvider(type = SqlHelper.class,method = "delete")
     public int delete(T entity);
 }

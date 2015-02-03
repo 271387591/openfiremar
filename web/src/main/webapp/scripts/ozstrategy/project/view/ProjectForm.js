@@ -58,7 +58,7 @@ Ext.define('FlexCenter.project.view.ProjectForm', {
                     {
                         xtype: 'fieldset',
                         checkboxToggle: false,
-                        title: '工程信息',
+                        title: projectRes.projectInfo,
                         autoHeight: true,
                         defaultType: 'textfield',
                         defaults: {               // defaults are applied to items, not the container
@@ -76,7 +76,7 @@ Ext.define('FlexCenter.project.view.ProjectForm', {
                                 itemId:'managerIds'
                             },
                             {
-                                fieldLabel: '<font color="red">*</font>工程编号',
+                                fieldLabel: '<font color="red">*</font>'+projectRes.header.serialNumber,
                                 name: 'serialNumber',
                                 maxLength: 50,
                                 minLength: 1,
@@ -84,7 +84,7 @@ Ext.define('FlexCenter.project.view.ProjectForm', {
                                 allowBlank: false
                             },
                             {
-                                fieldLabel: '<font color="red">*</font>工程名称',
+                                fieldLabel: '<font color="red">*</font>'+projectRes.header.projectName,
                                 name: 'name',
                                 maxLength: 50,
                                 minLength: 1,
@@ -92,7 +92,7 @@ Ext.define('FlexCenter.project.view.ProjectForm', {
                                 allowBlank: false
                             },
                             {
-                                fieldLabel: '<font color="red">*</font>激活码',
+                                fieldLabel: '<font color="red">*</font>'+projectRes.header.activationCode,
                                 name: 'activationCode',
                                 maxLength: 6,
                                 minLength: 1,
@@ -102,7 +102,7 @@ Ext.define('FlexCenter.project.view.ProjectForm', {
                             {
                                 xtype:'textareafield',
                                 grow: true,
-                                fieldLabel: '工程简介',
+                                fieldLabel: projectRes.header.projectDes,
                                 anchor: '100%',
                                 name: 'description'
                             }

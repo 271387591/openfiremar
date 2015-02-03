@@ -337,7 +337,7 @@ public class UserController extends BaseController {
             if(admin){
                 user=userManager.getUserById(parseLong(id));
             }else{
-                user = userManager.getUserByUsername(request.getRemoteUser(),parseLong(projectId));
+                user = userManager.getUserByUsername(request.getRemoteUser(),null);
             }
             if(user!=null){
                 Integer result=userManager.updateUserPassword(user,oldPassword,newPassword,admin);
@@ -442,7 +442,7 @@ public class UserController extends BaseController {
             user.setEmail(email);
             user.setNickName(nickName);
             user.setUserNo(userNo);
-            user.setProjectId(project.getId());
+            user.setProject(project);
             
             Set<Role> roleSet  = new HashSet<Role>();
             if(StringUtils.isNotEmpty(roleIds)){

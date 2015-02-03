@@ -156,12 +156,6 @@ html{
 .disabled-row .x-grid-cell-inner {
     color: darkgray;
 }
-.app-logout {
-    background-image: url(icons/logout.png) !important;
-    width: 16px;
-    height: 16px;
-}
-
 .manageUser-shortcut img {
   width: 48px;
   height: 48px;
@@ -300,6 +294,12 @@ html{
     background-image: url(icons/app_store.png);
     /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
+.appStore-shortcut-16 {
+    width: 16px;
+    height: 16px;
+    background-image: url(icons/app_store16.png);
+}
+
 .project-shortcut img {
     width: 48px;
     height: 48px;
@@ -310,14 +310,26 @@ html{
     width: 48px;
     height: 48px;
     background-image: url(icons/search_manager.png);
-    /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
+.search-shortcut-16 {
+    width: 16px;
+    height: 16px;
+    background-image: url(icons/search_manager16_16.png);
+}
+
 .export-shortcut img {
     width: 48px;
     height: 48px;
     background-image: url(icons/export.png);
     /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
 }
+.export-shortcut-16 {
+    width: 16px;
+    height: 16px;
+    background-image: url(icons/export16.png);
+    /*filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../styles/default/desktop/images/type-48.png', sizingMethod='scale');*/
+}
+
 
 
 
@@ -524,6 +536,18 @@ html{
     width: 16px;
     height: 16px;
 }
+.exit_project{
+    background-image: url(icons/exit.png);
+    width: 16px;
+    height: 16px;
+}
+.gnome_logout{
+    background-image: url(icons/gnome_logout.png);
+    width: 16px;
+    height: 16px;
+}
+
+
 
 
 

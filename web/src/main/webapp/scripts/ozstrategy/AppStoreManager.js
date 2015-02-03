@@ -16,8 +16,8 @@ Ext.define('FlexCenter.AppStoreManager', {
 
     init: function () {
         this.launcher = {
-            text: '应用版本管理',
-            iconCls: 'user-man16',
+            text: appStoreRes.title,
+            iconCls: 'appStore-shortcut-16',
             handler: this.createWindow,
             scope: this
         };
@@ -33,7 +33,7 @@ Ext.define('FlexCenter.AppStoreManager', {
         if (!win) {
             win = desktop.createWindow({
                 id: 'myAppStoreManager',
-                title: '应用版本管理',
+                title: appStoreRes.title,
                 width: 900,
                 height: 500,
                 shim: false,

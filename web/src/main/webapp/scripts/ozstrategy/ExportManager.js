@@ -16,8 +16,8 @@ Ext.define('FlexCenter.ExportManager', {
 
     init: function () {
         this.launcher = {
-            text: '数据导出',
-            iconCls: 'user-man16',
+            text: projectRes.exportTitle,
+            iconCls: 'export-shortcut-16',
             handler: this.createWindow,
             scope: this
         };
@@ -33,7 +33,7 @@ Ext.define('FlexCenter.ExportManager', {
         if (!win) {
             win = desktop.createWindow({
                 id: 'myExportManager',
-                title: '数据导出',
+                title: projectRes.exportTitle,
                 width: 900,
                 height: 550,
                 shim: false,

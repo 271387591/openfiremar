@@ -2,6 +2,7 @@ package com.ozstrategy.jdbc.message.impl;
 
 import com.ozstrategy.Constants;
 import com.ozstrategy.jdbc.message.HistoryMessageDao;
+import com.ozstrategy.lucene.DeleteIndexInstance;
 import com.ozstrategy.lucene.LuceneInstance;
 import com.ozstrategy.model.openfire.MessageType;
 import org.apache.commons.io.IOUtils;
@@ -17,10 +18,12 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FieldCacheRewriteMethod;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -54,6 +57,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by lihao on 1/15/15.
@@ -64,8 +68,14 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
     private JdbcTemplate jdbcTemplate;
     private Integer maxExportItem =20000;
     private Integer maxIndexItem = 200000;
+    private Integer maxSelectSize=500000;
     @Autowired
     private LuceneInstance luceneInstance;
+    @Autowired
+    private DeleteIndexInstance deleteIndexInstance;
+    @Autowired
+    private Properties variable;
+    
 
     public Long maxId() {
         String sql = "SELECT max(id) from ext_ofHistory";
@@ -76,20 +86,23 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
         return maxId;
     }
 
+   
+
     public Map<String, Object> maxMinIdByTime(Date startTime, Date endTime, Long projectId) {
         String sql = "SELECT max(id) as max,min(id) as min from ext_ofHistory where toId=? and createDate>=? and createDate<=?";
         return jdbcTemplate.queryForMap(sql, projectId, startTime, endTime);
     }
 
     public void deleteByIds(List<Long> ids) {
-        String sql = "DELETE FROM ext_ofHistory WHERE id in(?)";
+        String sql = "DELETE FROM ext_ofHistory WHERE 1=1 ";
         String idsd=StringUtils.join(ids.iterator(),",");
-        jdbcTemplate.update(sql, idsd);
+        sql+=" and id in ("+idsd+")";
+        jdbcTemplate.update(sql);
     }
 
     public List<Map<String, Object>> getIdByBetween(Long minId, Long maxId, Long projectId, Integer limit) {
-        String sql = "SELECT id from ext_ofHistory WHERE id>=? AND id<=? and toId=? limit ?";
-        return jdbcTemplate.queryForList(sql, maxId, maxId, projectId, limit);
+        String sql = "SELECT id from ext_ofHistory WHERE id>? AND id<? and toId=? limit ?";
+        return jdbcTemplate.queryForList(sql, minId, maxId, projectId, limit);
     }
 
 
@@ -141,6 +154,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
 
     private Long exportVoice(File folder, Long minId, Long maxId, Long projectId) throws Exception {
         final String sql = "select * from ext_ofHistory  where id >? and id<? and toId=? limit ?";
+        maxExportItem= NumberUtils.toInt(variable.get("maxExportItem").toString());
         Connection con = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -192,6 +206,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
 
     private Long exportMessage(File folder, Long minId, Long maxId, Long projectId, Integer fileIndex) throws Exception {
         final String sql = "select * from ext_ofHistory  where id>? and id<? and toId=? limit ?";
+        maxExportItem= NumberUtils.toInt(variable.get("maxExportItem").toString());
         final String sheetName = "聊天记录";
         Connection con = null;
         PreparedStatement statement = null;
@@ -395,24 +410,58 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
     }
 
     public List<Map<String, String>> search(String message, Date startDate, Date endDate, Long fromId, Long projectId, Long manager,Long deleted, Integer start, Integer limit) throws Exception {
-        IndexReader indexReader = luceneInstance.getIndexReader();
+        IndexReader indexReader = luceneInstance.getReader();
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        int maxDoc = indexReader.maxDoc();
         BooleanQuery query = search(message, fromId, projectId, manager, deleted,startDate, endDate);
         BooleanClause[] clauses = query.getClauses();
         if (clauses != null && clauses.length < 1) {
             query.add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST);
         }
         Sort sort = new Sort(new SortField("id", SortField.Type.LONG, true));
-        TopDocs paged = null;
-        if (start == 0) {
-            FieldDoc lastBottom = new FieldDoc(maxDoc - (start + 1), 1.0f, new Object[]{Long.MAX_VALUE});
-            paged = indexSearcher.searchAfter(lastBottom, query, null, limit, sort);
-        } else {
-            FieldDoc lastBottom = new FieldDoc(maxDoc - (start + 1), 1.0f, new Object[]{new Long(maxDoc - (start + 1))});
-            paged = indexSearcher.searchAfter(lastBottom, query, null, limit, sort);
+        TopDocs paged=indexSearcher.search(query,1);
+
+        int allTotal=paged.totalHits;
+        if(start>=allTotal){
+            return list;
         }
+        
+        int index=1;
+        if(start>maxSelectSize){
+            index=start/maxSelectSize;
+        }
+        if(start==0){
+            index=0;
+        }
+
+        FieldDoc lastBottom=null;
+        for(int i=0;i<index;i++){
+            paged=indexSearcher.searchAfter(lastBottom, query, null, Math.min(start,maxSelectSize),sort);
+            ScoreDoc[] scoreDocs = paged.scoreDocs;
+            int len=scoreDocs.length;
+            if(len>0){
+                int  last = scoreDocs[len-1].doc;
+                Document doc = indexSearcher.doc(last);
+                Long lastId =NumberUtils.toLong(doc.get("id"));
+                lastBottom=new FieldDoc(last,1.0f,new Object[]{lastId});
+            }
+            scoreDocs=null;
+            paged=null;
+
+        }
+        if(start>maxSelectSize){
+            paged=indexSearcher.searchAfter(lastBottom, query, null, start-index*maxSelectSize,sort);
+            ScoreDoc[] scoreDocs = paged.scoreDocs;
+            int len=scoreDocs.length;
+            if(len>0){
+                int  last = scoreDocs[len-1].doc;
+                Document doc = indexSearcher.doc(last);
+                Long lastId =NumberUtils.toLong(doc.get("id"));
+                lastBottom=new FieldDoc(last,1.0f,new Object[]{lastId});
+            }
+        }
+        paged=indexSearcher.searchAfter(lastBottom, query, null, limit,sort);
+        
         if (paged == null) {
             return list;
         }
@@ -430,55 +479,28 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
             map.put("total", total + "");
             list.add(map);
         }
-        try {
-        } finally {
-            luceneInstance.close(indexReader);
-        }
         return list;
     }
 
     public Long addIndex(Long minId) throws Exception {
-        IndexReader indexReader=luceneInstance.getIndexReader();
-        int maxDoc=indexReader.maxDoc();
-        if(maxDoc!=0){
-            Document maxDocument=indexReader.document(maxDoc-1);
-            Long docMaxId= NumberUtils.toLong(maxDocument.get("id"));
-            minId=Math.max(minId,docMaxId);
-        }
-        luceneInstance.close(indexReader);
-        
-        IndexWriter indexWriter = luceneInstance.getIndexWriter();
-        Long maxId = minId;
-        Long returnMaxId=maxId;
-        do {
+        Long returnMaxId=null;
+        try{
+            IndexWriter indexWriter = luceneInstance.getWriter();
+            Long maxId = minId;
             returnMaxId=maxId;
-            maxId = addIndex(indexWriter, maxId);
-        } while (maxId != 0);
-        luceneInstance.close(indexWriter);
+            do {
+                returnMaxId=maxId;
+                maxId = addIndex(indexWriter, maxId);
+            } while (maxId != 0);
+            indexWriter.commit();
+        }finally {
+            luceneInstance.closeAll(); 
+        }
         return returnMaxId;
     }
 
     public void deleteIndex(Date startDate, Date endDate, Long projectId) throws Exception {
-        BooleanQuery query = new BooleanQuery();
-        if (startDate != null) {
-            if (endDate == null) {
-                endDate = new Date();
-            }
-            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("createDate", startDate.getTime(), endDate.getTime(), true, true);
-            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
-        }
-
-        if (projectId != null) {
-            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("toId", projectId, projectId, true, true);
-            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
-        }
-        IndexWriter indexWriter = luceneInstance.getIndexWriter();
-        indexWriter.deleteDocuments(query);
-        indexWriter.commit();
-        try {
-        } finally {
-            luceneInstance.close(indexWriter);
-        }
+        deleteIndexInstance.deleteIndex(startDate, endDate, projectId);
     }
 
     public List<Map<String, Object>> getHistory(Long projectId, Integer start, Integer limit) throws Exception {
@@ -493,6 +515,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
 
     public Long addIndex(IndexWriter indexWriter, Long minId) throws Exception {
         String sql = "select * from ext_ofHistory  where id>? limit ?";
+        maxIndexItem=NumberUtils.toInt(variable.get("maxIndexItem").toString());
         Connection con = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;

@@ -105,16 +105,7 @@
             <artifactId>mybatis-ehcache</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>${cglib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-            <version>${ehcache.version}</version>
-        </dependency>
+        
         
         <!--<dependency>-->
             <!--<groupId>org.hibernate</groupId>-->

@@ -19,5 +19,7 @@ public interface HistoryMessageManager {
     List<Map<String,Object>> getHistory(Long projectId,Integer start,Integer limit) throws Exception;
     Integer getHistoryCount(Long projectId);
     
+    Long maxIndex() throws Exception;
+    
     
 }

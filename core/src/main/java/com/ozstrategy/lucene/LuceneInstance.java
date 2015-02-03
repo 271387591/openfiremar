@@ -23,15 +23,12 @@ import java.io.IOException;
 public class LuceneInstance {
     private Object lock_w=new Object();
     private Object lock_r=new Object();
-    private Object lock_d=new Object();
     private IndexWriter writer;
     private IndexReader reader;
     
     private static String INDEX_DIR = Constants.imDataDir + "/index";
     private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_44);
     private static Log log= LogFactory.getLog(LuceneInstance.class);
-    private ThreadLocal<IndexWriter> indexWriterThreadLocal=new ThreadLocal<IndexWriter>();
-    private ThreadLocal<IndexReader> indexReaderThreadLocal=new ThreadLocal<IndexReader>();
     
     private volatile static LuceneInstance instance=null;
     private LuceneInstance(){} 
@@ -45,33 +42,9 @@ public class LuceneInstance {
         }
         return instance;
     }
-    
-    
-    synchronized public IndexWriter getIndexWriter() throws CorruptIndexException, LockObtainFailedException, IOException {
-        IndexWriter indexWriter=indexWriterThreadLocal.get();
-        if(indexWriter==null){
-            File file=new File(INDEX_DIR);
-            if(!file.exists()){
-                file.mkdirs();
-            }
-            FSDirectory directory= FSDirectory.open(file);
-            if(IndexWriter.isLocked(directory)){
-                IndexWriter.unlock(directory);
-            }
-            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_44, analyzer);
-            config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-            indexWriter = new IndexWriter(directory, config);
-            indexWriterThreadLocal.set(indexWriter);
-        }
-        return indexWriter;
-    }
-
-    public IndexWriter getIndexWriter1() throws CorruptIndexException, LockObtainFailedException, IOException {
-        
-        
+    public IndexWriter getWriter() throws CorruptIndexException, LockObtainFailedException, IOException{
         synchronized (lock_w){
             if(writer==null){
-                System.out.println("创建IndexWriter");
                 File file=new File(INDEX_DIR);
                 if(!file.exists()){
                     file.mkdirs();
@@ -83,26 +56,13 @@ public class LuceneInstance {
                 IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_44, analyzer);
                 config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
                 writer = new IndexWriter(directory, config);
+                System.out.println("创建IndexWriter");
             }
         }
         return writer;
-    }
+    } 
     
-    public IndexReader getIndexReader() throws CorruptIndexException, IOException{
-        IndexReader indexReader=indexReaderThreadLocal.get();
-        if(indexReader==null){
-            File file=new File(INDEX_DIR);
-            if(!file.exists()){
-                file.mkdirs();
-            }
-            FSDirectory directory= FSDirectory.open(file);
-            indexReader = DirectoryReader.open(directory);
-            indexReaderThreadLocal.set(indexReader);
-        }
-        return indexReader;
-    }
-    public IndexReader getIndexReader1() throws CorruptIndexException, IOException{
-        
+    public IndexReader getReader() throws CorruptIndexException, IOException{
         synchronized (lock_r){
             if(reader==null){
                 System.out.println("创建IndexReader");
@@ -122,6 +82,7 @@ public class LuceneInstance {
             try {
                 writer.close();
                 writer=null;
+                lock_w=new Object();
             } catch (IOException e) {
             }
         }
@@ -131,32 +92,14 @@ public class LuceneInstance {
             try {
                 reader.close();
                 reader=null;
+                lock_r=new Object();
             } catch (IOException e) {
             }
         }
     }
-    
-    public void close(IndexWriter indexWriter){
-        if(indexWriter!=null){
-            try {
-                indexWriter.close();
-                indexWriterThreadLocal.set(null);
-            } catch (IOException e) {
-                log.error("close IndexWriter error",e);
-            }
-        }
-        
+    public void closeAll(){
+        this.closeReader();
+        this.closeWriter();
     }
-    public void close(IndexReader indexReader){
-        if(indexReader!=null){
-            try {
-                indexReader.close();
-                indexReaderThreadLocal.set(null);
-            } catch (IOException e) {
-                log.error("close IndexReader error",e);
-            }
-        }
-    }
-    
     
 }

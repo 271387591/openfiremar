@@ -1,6 +1,7 @@
 package com.ozstrategy.webapp.controller.openfire;
 
 import com.ozstrategy.model.userrole.User;
+import com.ozstrategy.service.export.MessageExportManager;
 import com.ozstrategy.service.openfire.HistoryMessageManager;
 import com.ozstrategy.service.userrole.UserManager;
 import com.ozstrategy.webapp.command.BaseResultCommand;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by lihao on 1/7/15.
@@ -28,8 +30,14 @@ import java.util.Map;
 @Controller
 @RequestMapping("historyMessageController.do")
 public class HistoryMessageController extends BaseController {
+    
+    private static Map<String,Boolean> deleteMap=new ConcurrentHashMap<String, Boolean>();
+    private static Map<String,Boolean> finishedMap=new ConcurrentHashMap<String, Boolean>();
     @Autowired
     private HistoryMessageManager historyMessageManager;
+    @Autowired
+    private MessageExportManager messageExportManager;
+    
     @Autowired
     private UserManager userManager;
     @RequestMapping(params = "method=deleteMessage")
@@ -39,7 +47,7 @@ public class HistoryMessageController extends BaseController {
             Long projectId=parseLong(request.getParameter("projectId"));
             String messageId=request.getParameter("messageId");
             if(projectId==null){
-                return new BaseResultCommand("缺少projectId",false);
+                return new BaseResultCommand(getZhMessage("projectRes.noProjectId"),false);
             }
             if(StringUtils.isEmpty(messageId)){
                 return new BaseResultCommand("缺少messageId",false);
@@ -52,6 +60,19 @@ public class HistoryMessageController extends BaseController {
         }
         return new BaseResultCommand("删除消息失败",false);
     }
+    @RequestMapping(params = "method=addIndex")
+    @ResponseBody
+    public BaseResultCommand addIndex(HttpServletRequest request){
+        try{
+            historyMessageManager.addIndex();
+            return new BaseResultCommand("",true);
+        }catch (Exception e){
+            logger.error("list HistoryMessage",e);
+            
+        }
+        return new BaseResultCommand(getZhMessage("projectRes.addIndexFail"),false);
+    }
+    
     
     @RequestMapping(params = "method=listStore")
     @ResponseBody
@@ -67,13 +88,13 @@ public class HistoryMessageController extends BaseController {
             Long manager=parseLong(request.getParameter("manager"));
             Long deleted=parseLong(request.getParameter("deleted"));
             if(projectId==null){
-                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"缺少projectId");
+                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.noProjectId"));
             }
             Long fromId=null;
             if(StringUtils.isNotEmpty(formNick)){
                 User user=userManager.getUserByNickName(projectId,formNick);
                 if(user==null){
-                    return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"昵称不存在");
+                    return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.noNickName"));
                 }
                 fromId=user.getId();
             }
@@ -85,7 +106,7 @@ public class HistoryMessageController extends BaseController {
             if(StringUtils.isNotEmpty(endTime)){
                 eDate=DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
             }
-            Long maxId=historyMessageManager.addIndex();
+            Long maxId=historyMessageManager.maxIndex();
             if(maxId==0L){
                 return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),true,0,"");
             }
@@ -113,7 +134,7 @@ public class HistoryMessageController extends BaseController {
             logger.error("list HistoryMessage",e);
             
         }
-        return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"数据查询失败");
+        return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.queryDataError"));
     }
     @RequestMapping(params = "method=getHistory")
     @ResponseBody
@@ -123,7 +144,7 @@ public class HistoryMessageController extends BaseController {
             Integer limit=parseInteger(request.getParameter("limit"));
             Long projectId=parseLong(request.getParameter("projectId"));
             if(projectId==null){
-                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"缺少projectId");
+                return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.noProjectId"));
             }
             List<Map<String,Object>> projects=historyMessageManager.getHistory(projectId, start, limit);
             Integer count=historyMessageManager.getHistoryCount(projectId);
@@ -133,21 +154,60 @@ public class HistoryMessageController extends BaseController {
             logger.error("list HistoryMessage",e);
             
         }
-        return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,"数据查询失败");
+        return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.queryDataError"));
     }
     
     @RequestMapping(params = "method=delete")
     @ResponseBody
     public BaseResultCommand delete(HttpServletRequest request){
+        String username=request.getRemoteUser();
         try{
+            
+            
+            deleteMap.put(username,false);
+            finishedMap.put(username,false);
             Date sDate=DateUtils.parseDate(request.getParameter("startTime"), new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
             Date eDate=DateUtils.parseDate(request.getParameter("endTime"), new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
-            Long projectId=parseLong(request.getParameter("projectId"));
+            Long projectId=parseLong(request.getParameter("projectId")); 
+            if(!messageExportManager.checkExportDataExist(sDate,eDate,projectId)){
+                finishedMap.put(username,true);
+                deleteMap.put(username,true);
+                return new BaseResultCommand(getZhMessage("projectRes.noDataDelete"),Boolean.FALSE);
+            }
             historyMessageManager.delete(sDate,eDate,projectId);
+            deleteMap.put(username,true);
+            finishedMap.put(username,true);
             return new BaseResultCommand("",true);
         }catch (Exception e){
             logger.error("delete message",e);
+            deleteMap.put(username,false);
+            finishedMap.put(username,true);
         }
         return new BaseResultCommand(getMessage("globalRes.removeFail",request),Boolean.FALSE);
     }
+    @RequestMapping(params = "method=pullNotification")
+    @ResponseBody
+    public Map<String,Boolean> pullNotification(HttpServletRequest request){
+        Map<String,Boolean> map=new HashMap<String, Boolean>();
+        try{
+            String username=request.getRemoteUser();
+            Boolean result = deleteMap.get(username);
+            Boolean finished = finishedMap.get(username);
+            if(result==null){
+                result=Boolean.FALSE;
+            }
+            if(finished==null){
+                finished=Boolean.FALSE;
+            }
+            
+            map.put("state",result);
+            map.put("finished",finished);
+            map.put("success",true);
+            return map;
+        }catch (Exception e){
+            logger.error("delete message",e);
+        }
+        return map;
+    }
+    
 }

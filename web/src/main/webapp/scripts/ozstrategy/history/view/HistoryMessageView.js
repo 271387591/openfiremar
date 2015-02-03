@@ -45,13 +45,13 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         border:false,
                         items:[
                             {
-                                fieldLabel:'关键字',
+                                fieldLabel:globalRes.keyword,
                                 xtype : 'textfield',
                                 itemId:'message',
                                 name : 'message'
                             },
                             {
-                                fieldLabel:'用户昵称',
+                                fieldLabel:projectRes.header.nickName,
                                 xtype : 'textfield',
                                 name : 'fromNick'
                             }
@@ -63,16 +63,18 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         bodyStyle:'padding:5px 0 5px 5px',
                         items:[
                             {
-                                fieldLabel:'开始时间',
+                                fieldLabel:globalRes.buttons.startTime,
                                 xtype : 'datetimefield',
                                 editable:false,
-                                name : 'startTime'
+                                name : 'startTime',
+                                maxValue:new Date()
                             },
                             {
-                                fieldLabel:'结束时间',
+                                fieldLabel:globalRes.buttons.endTime,
                                 xtype : 'datetimefield',
                                 editable:false,
-                                name : 'endTime'
+                                name : 'endTime',
+                                maxValue:new Date()
                             }
                         ]
                     },
@@ -125,18 +127,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         xtype: 'pagingtoolbar',
                         store: store,
                         dock: 'bottom',
-                        prependButtons:true,
-                        displayInfo: true,
-                        beforePageText:'',
-                        afterPageText:'共{0}页',
-                        listeners:{
-                            afterrender:function(f){
-                                var last= f.down('#last');
-                                var inputItem= f.down('#inputItem');
-                                //last.hide();
-                                //inputItem.hide();
-                            }
-                        }
+                        displayInfo: true
                     }
                 ],
                 tbar:[
@@ -144,24 +135,24 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         frame: true,
                         iconCls: 'table-delete',
                         xtype: 'button',
-                        text: '删除',
+                        text: globalRes.buttons.remove,
                         itemId: 'userEditBtn',
                         scope: this,
                         handler: this.onDeleteClick
                     }
-                    
                 ],
                 columns:[
                     {
-                        header: '用户昵称',
+                        header: projectRes.header.nickName,
                         width:200,
                         dataIndex:'fromNick'
                     },
                     {
-                        header: '聊天内容',
+                        header: projectRes.header.message,
                         flex:1,
                         dataIndex: 'message',
                         renderer: function (v,metaData,rec) {
+                            console.log(rec.get('id'))
                             var message=me.down('#message').getValue();
                             if(message){
                                 var reg = new RegExp(message, "g");
@@ -175,7 +166,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         }
                     },
                     {
-                        header: '发送时间',
+                        header: projectRes.header.sendDate,
                         width:120,
                         dataIndex: 'createDate'
                     }
@@ -193,7 +184,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
     onDeleteClick:function(){
         var me = this;
         var win=Ext.widget('window',{
-            title:'删除',
+            title:globalRes.buttons.remove,
             width:400,
             layout: 'fit',
             autoShow: true,
@@ -220,21 +211,13 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                             handler: function () {
                                 var form=win.down('form').getForm();
                                 var data=form.getValues();
-                                ajaxPostRequest('historyMessageController.do?method=delete',data,function(result){
-                                    if(result.success){
-                                        me.down('grid').getStore().load();
-                                        Ext.Msg.alert(globalRes.title.prompt,globalRes.removeSuccess,function(){
-                                            win.close();
-                                        });
-                                    }else{
-                                        Ext.MessageBox.alert({
-                                            title:globalRes.title.warning,
-                                            icon: Ext.MessageBox.ERROR,
-                                            msg:result.message,
-                                            buttons:Ext.MessageBox.OK
-                                        });
-                                    }
-                                });
+                                data.projectId=projectId;
+                                ajaxPostRequest('historyMessageController.do?method=delete',data,function(result){});
+                                var bar=me.createDeleteBar(win);
+                                bar.show();
+                                Ext.Function.defer(function(){
+                                    bar.fireEvent('startBar');
+                                }, 1000);
                             }
                         },
                         {
@@ -252,11 +235,11 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                             hidden:true
                         },
                         {
-                            fieldLabel:'开始时间',
+                            fieldLabel:globalRes.buttons.startTime,
                             xtype : 'datefield',
                             editable:false,
                             allowBlank: false,
-                            format:'Y-m-d 00:00:00',
+                            format:'Y-m-d',
                             maxValue:new Date(),
                             minValue:function(){
                                 var newValue=new Date(); 
@@ -269,13 +252,13 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                             name : 'startTime'
                         },
                         {
-                            fieldLabel:'结束时间',
+                            fieldLabel:globalRes.buttons.endTime,
                             xtype : 'datefield',
                             editable:false,
                             allowBlank: false,
                             name : 'endTime',
-                            format:'Y-m-d 23:59:59',
-                            maxValue:new Date(),
+                            format:'Y-m-d',
+                            //maxValue:new Date(),
                             listeners:{
                                 change:function( f, newValue, oldValue, eOpts ){
                                     var s=win.down('#startTime');
@@ -300,5 +283,93 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
             ]
         });
         win.show();
+    },
+    createDeleteBar:function(pWin){
+        var me=this;
+        var pmb = Ext.create('Ext.ProgressBar', {
+            text:projectRes.removing
+        });
+        var runnerProgress = new Ext.util.TaskRunner();
+        pmb.wait({
+            interval: 500,
+            //duration: 50000,
+            increment: 15,
+            text: projectRes.removing,
+            scope: this,
+            fn: function(){
+                pmb.updateText(globalRes.title.success);
+            }
+        });
+        var win=Ext.widget('window', {
+            width: 600,
+            height:100,
+            closable:false,
+            modal: true,
+            bodyPadding:10,
+            title:projectRes.removing,
+            buttons:[
+                {
+                    text:globalRes.buttons.close,
+                    disabled:true,
+                    itemId:'closeBtn',
+                    handler:function(){
+                        win.close();
+                        if(pWin){
+                            pWin.close();
+                        }
+                        me.down('grid').getStore().load();
+                    }
+
+                }
+            ],
+            onCancel:function(){
+                win.close();
+                runnerProgress.stopAll();
+                runnerProgress.destroy();
+            },
+            items:[
+                pmb
+            ]
+        });
+        me.mon(win,'startBar',function(){
+            var fn = function() {
+                var running=true;
+                Ext.Ajax.request({
+                    url: 'historyMessageController.do?method=pullNotification',
+                    params: {},
+                    method: 'POST',
+                    success: function (response, options) {
+                        var result = Ext.decode(response.responseText,true);
+                        if(result.finished){
+                            if(result.state){
+                                runnerProgress.stopAll();
+                                runnerProgress.destroy();
+                                pmb.reset();
+                                pmb.updateText(globalRes.removeSuccess);
+                                win.down('#closeBtn').setDisabled(false);
+
+                            }else{
+                                runnerProgress.stopAll();
+                                runnerProgress.destroy();
+                                pmb.reset();
+                                pmb.updateText(globalRes.removeFail);
+                                win.down('#closeBtn').setDisabled(false);
+                            }
+                        }
+                    },
+                    failure: function (response, options) {
+                        Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout,response.status));
+                    }
+                });
+                return running;
+            };
+            var task={
+                run: fn,
+                interval: 1000
+            };
+            runnerProgress.start(task);
+        });
+        return win;
+
     }
 });

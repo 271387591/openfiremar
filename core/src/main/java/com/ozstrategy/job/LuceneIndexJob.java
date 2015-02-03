@@ -27,6 +27,7 @@ public class LuceneIndexJob {
             jobLog.setCreateDate(new Date());
             jobLog.setSuccess(Boolean.TRUE);
             applicationConfigManager.insertJobLog(jobLog);
+            System.out.println("添加索引完成");
         }catch (Exception e){
             log.error("write index fail",e);
             JobLog jobLog=new JobLog();

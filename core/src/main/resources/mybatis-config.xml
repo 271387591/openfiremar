@@ -33,7 +33,6 @@
 		<!--<setting name="aggressiveLazyLoading" value="false"/>-->
     </settings>
 	<mappers>
-		<mapper class="com.ozstrategy.dao.UniversalDao"/>
 		<mapper resource="com/ozstrategy/dao/userrole/UserMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/UserRoleMapper.xml"/>
 		<mapper resource="com/ozstrategy/dao/userrole/RoleMapper.xml"/>

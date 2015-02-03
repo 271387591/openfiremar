@@ -82,7 +82,7 @@ Ext.define('FlexCenter.user.view.UserView', {
             },
             {
                 iconCls: 'btn-authorization',
-                text: '认证用户',
+                text: userRoleRes.authenticationUser,
                 scope: this,
                 itemId: 'authorizationBtn',
                 plugins: Ext.create('Oz.access.RoleAccess', {
@@ -98,7 +98,6 @@ Ext.define('FlexCenter.user.view.UserView', {
                 itemId: 'lockUserBtn',
                 text: userRoleRes.lockUser,
                 scope: this,
-                itemId: 'userLockUserBtn',
                 plugins: Ext.create('Oz.access.RoleAccess', {
                     featureName: 'lockUser',
                     mode: 'hide',
@@ -139,7 +138,7 @@ Ext.define('FlexCenter.user.view.UserView', {
             ftype: 'detail',
             tplDetail: [
                 '<tpl for=".">',
-                '昵称' + ' : <b>{nickName}</b><br/>',
+                userRoleRes.header.nickName + ' : <b>{nickName}</b><br/>',
                 userRoleRes.userRoles + ' : <b><tpl for="simpleRoles"><tpl if="xindex != 1">, </tpl>{#}. {displayName}</tpl></b><br/>',
                 globalRes.header.createDate + ' : <b>{createDate}</b><br/>',
                 '</tpl>'
@@ -148,7 +147,7 @@ Ext.define('FlexCenter.user.view.UserView', {
         me.columns=[
             {xtype: 'rownumberer'},
             {
-                header: '用户昵称',
+                header: userRoleRes.header.nickName,
                 dataIndex: 'nickName'
             },
 
@@ -164,7 +163,7 @@ Ext.define('FlexCenter.user.view.UserView', {
                 }
             },
             {
-                header: '认证状态',
+                header: userRoleRes.header.authentication,
                 dataIndex: 'authentication',
                 renderer: function (v) {
                     return v ? globalRes.yes : globalRes.no;
@@ -195,6 +194,14 @@ Ext.define('FlexCenter.user.view.UserView', {
                     me.down('#authorizationBtn').setDisabled(true);
                 }else{
                     me.down('#authorizationBtn').setDisabled(false);
+                }
+                var accountLocked=record.get('accountLocked');
+                if(accountLocked){
+                    me.down('#lockUserBtn').setDisabled(true);
+                    me.down('#unLockUserBtn').setDisabled(false);
+                }else{
+                    me.down('#unLockUserBtn').setDisabled(true);
+                    me.down('#lockUserBtn').setDisabled(false);
                 }
                 
             }
@@ -387,11 +394,11 @@ Ext.define('FlexCenter.user.view.UserView', {
         var record = me.getView().getSelectionModel().getSelection()[0];
         if (record) {
             var userId = record.data.id;
-            var username = record.data.fullName;
+            var nickName = record.data.nickName;
             Ext.MessageBox.show({
                 title: '认证用户',
                 width: 400,
-                msg: '你确定要认证此用户？',
+                msg: '你确定要认证用户['+nickName+']？',
                 buttons: Ext.MessageBox.YESNO,
                 icon: Ext.MessageBox.QUESTION,
                 fn: function (btn) {
@@ -450,7 +457,7 @@ Ext.define('FlexCenter.user.view.UserView', {
                 width: 500,
                 modal: true,
                 border: false,
-                title: userRoleRes.passwordTilte + '[' + record.data.fullName + "]",
+                title: userRoleRes.passwordTilte + '[' + record.data.nickName + "]",
                 items: Ext.create('Ext.form.Panel', {
                     bodyPadding: 5,
                     layout: 'anchor',
@@ -618,7 +625,7 @@ Ext.define('FlexCenter.user.view.UserView', {
             var title = lock ? userRoleRes.lockUser : userRoleRes.unLockUser;
             var url = lock ? 'lockUser' : 'unLockUser';
             var userId = record.data.id;
-            var username = record.data.fullName;
+            var username = record.data.nickName;
 
             Ext.MessageBox.show({
                 title: title,

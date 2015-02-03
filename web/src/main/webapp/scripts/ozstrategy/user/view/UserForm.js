@@ -119,7 +119,7 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                     allowBlank: false
                                 },
                                 {
-                                    fieldLabel: '<font color="red">*</font>' + '用户昵称',
+                                    fieldLabel: '<font color="red">*</font>' + userRoleRes.header.nickName,
                                     name: 'nickName',
                                     maxLength: 50,
                                     minLength: 1,

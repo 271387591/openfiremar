@@ -23,6 +23,9 @@ public class Project extends BaseEntity{
     @Column
     private String  activationCode;
     
+    @Column
+    private Boolean deleted=Boolean.FALSE;
+    
     public String getSerialNumber() {
         return serialNumber;
     }
@@ -55,6 +58,13 @@ public class Project extends BaseEntity{
         this.activationCode = activationCode;
     }
 
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
 
     @Override
     public boolean equals(Object o) {

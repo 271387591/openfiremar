@@ -7,21 +7,39 @@
     </resultMap>
     
     <select id="listProjects" resultMap="ProjectResult" parameterType="Map">
-        select f.* from ext_project f where 1=1 
+        select f.* from ext_project f where f.deleted=0 
         <if test="keyword!=null and keyword!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
         order by f.createDate desc
     </select>
     <select id="listProjectsCount" resultType="java.lang.Integer" parameterType="Map">
-        select count(id) from ext_project f where 1=1
+        select count(id) from ext_project f where  f.deleted=0
         <if test="keyword!=null and keyword!=''">and f.name like CONCAT(CONCAT('%', #{keyword}), '%')</if>
     </select>
     <select id="getProjectById" resultMap="ProjectResult" parameterType="long">
-        SELECT * from ext_project where id=#{id}
+        SELECT * from ext_project where id=#{id}  and deleted=0
     </select>
     <select id="getProjectByName" resultMap="ProjectResult" parameterType="string">
-        SELECT * from ext_project u where u.name=#{name}
+        SELECT * from ext_project u where u.name=#{name} and u.deleted=0
     </select>
     <select id="getProjectBySno" resultMap="ProjectResult" parameterType="string">
-        SELECT * from ext_project u where u.serialNumber=#{serialNumber}
+        SELECT * from ext_project u where u.serialNumber=#{serialNumber} and u.deleted=0
     </select>
+    <insert id="save" flushCache="true" parameterType="com.ozstrategy.model.project.Project">
+        <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
+            select LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO ext_project
+        (id,description,activationCode,name,serialNumber,deleted,createDate,lastUpdateDate)
+        VALUES (#{id},#{description},#{activationCode},#{name},#{serialNumber},#{deleted},#{createDate},#{lastUpdateDate})
+    </insert>
+    <update id="update" parameterType="com.ozstrategy.model.project.Project" flushCache="true">
+        UPDATE ext_project
+        SET description=#{description},activationCode=#{activationCode},name=#{name},serialNumber=#{serialNumber},createDate=#{createDate},lastUpdateDate=#{lastUpdateDate}
+        WHERE (id=#{id})
+    </update>
+    <update id="delete" parameterType="com.ozstrategy.model.project.Project" flushCache="true">
+        UPDATE ext_project
+        SET deleted=1
+        WHERE id=#{id}
+    </update>
 </mapper>

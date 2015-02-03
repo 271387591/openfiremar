@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
        default-lazy-init="true">
 
     <!--<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>-->
+    
+    <util:properties id="variable">
+        <prop key="maxExportItem">20000</prop>
+        <prop key="maxIndexItem">200000</prop>
+        <prop key="deleteItem">50000</prop> 
+    </util:properties>
 
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
@@ -32,6 +39,9 @@
     <context:component-scan base-package="com.ozstrategy.jdbc"/>
     
     <bean id="luceneInstance" class="com.ozstrategy.lucene.LuceneInstance" init-method="getInstance"/>
+    <bean id="deleteIndexInstance" class="com.ozstrategy.lucene.DeleteIndexInstance" init-method="getInstance">
+        <property name="luceneInstance" ref="luceneInstance" />
+    </bean>
     
 
 </beans>

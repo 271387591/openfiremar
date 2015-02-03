@@ -86,7 +86,7 @@ public class ProjectController extends BaseController {
             projectManager.delete(project);
             return new BaseResultCommand("",true);
         }else{
-            return new BaseResultCommand("工程未找到",false);
+            return new BaseResultCommand(getZhMessage("projectRes.noProject"),false);
         }      
     }
     @RequestMapping(params = "method=saveProjectUser")
@@ -109,7 +109,7 @@ public class ProjectController extends BaseController {
         if(StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(projectId)){
             return new BaseResultCommand("",true);
         }
-        return new BaseResultCommand("操作失败",true);
+        return new BaseResultCommand(getZhMessage("message.error.execute.fail"),true);
     }
     @RequestMapping(params = "method=removeUser")
     @ResponseBody
@@ -124,7 +124,7 @@ public class ProjectController extends BaseController {
             }
             return new BaseResultCommand("",true);
         }
-        return new BaseResultCommand("操作失败",true);
+        return new BaseResultCommand(getZhMessage("message.error.execute.fail"),true);
     }
     
     

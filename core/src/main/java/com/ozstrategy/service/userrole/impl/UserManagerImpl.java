@@ -67,12 +67,14 @@ public class UserManagerImpl implements UserManager {
         if(admin){
             user.setPassword(passwordEncoder.encodePassword(newPassword, null));
         }else{
-            if(!password.equals(passwordEncoder.encodePassword(oldPassword,null))){
+            if(!passwordEncoder.isPasswordValid(password,oldPassword,null)){
                 return 1;
             }
             user.setPassword(passwordEncoder.encodePassword(newPassword, null));
         }
         userDao.update(user);
+        OpenfireUser openfireUser=new OpenfireUser().copy(user);
+        openfireUserDao.update(openfireUser);
         return 0;
     }
 

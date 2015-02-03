@@ -13,8 +13,8 @@ Ext.define('FlexCenter.HistoryMessageManager', {
 
     init:function () {
         this.launcher = {
-            text:'搜索管理',
-            iconCls:'workflow-manager-16',
+            text:projectRes.searchTitle,
+            iconCls:'search-shortcut-16',
             handler:this.createWindow,
             scope:this
         };
@@ -26,7 +26,7 @@ Ext.define('FlexCenter.HistoryMessageManager', {
         if (!win) {
             win = desktop.createWindow({
                 id:'myHistoryMessageManager',
-                title:'搜索管理',
+                title:projectRes.searchTitle,
                 shim:false,
                 border:false,
                 maximized: true,

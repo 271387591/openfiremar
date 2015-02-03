@@ -20,7 +20,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
     border: false,
     forceFit: true,
     autoScroll: true,
-    title: '工程管理',
+    title: projectRes.projectTitle,
     initComponent: function () {
         var me=this;
         
@@ -65,24 +65,24 @@ Ext.define('FlexCenter.project.view.ProjectView', {
         me.columns=[
             {xtype: 'rownumberer'},
             {
-                header: '工程编号',
+                header: projectRes.header.serialNumber,
                 dataIndex: 'serialNumber'
             },
 
             {
-                header: '工程名称',
+                header: projectRes.header.projectName,
                 dataIndex: 'name'
             },
             {
-                header: '激活码',
+                header: projectRes.header.activationCode,
                 dataIndex: 'activationCode'
             },
             {
-                header: '工程人数',
+                header: projectRes.header.userCount,
                 dataIndex: 'userCount'
             },
             {
-                header: '工程简介',
+                header: projectRes.header.projectDes,
                 dataIndex: 'description'
             },
             {
@@ -91,26 +91,26 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             },
             {
                 xtype:'actioncolumn',
-                header:'进入',
+                header:projectRes.header.inProject,
                 width:40,
                 items:[
                     {
                         iconCls:'project-in',
-                        tooltip:'进入',
+                        tooltip:projectRes.header.inProject,
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
                             projectId=rec.get('id');
                             projectName=rec.get('name');
                             porjectActivationCode=rec.get('activationCode');
                             var pmb = Ext.create('Ext.ProgressBar', {
-                                text:'进入工程...'
+                                text:projectRes.inProjectLoading
                             });
                             var runnerProgress = new Ext.util.TaskRunner();
                             pmb.wait({
                                 interval: 100,
                                 duration: 1000,
                                 increment: 10,
-                                text: '进入工程...',
+                                text: projectRes.inProjectLoading,
                                 scope: this,
                                 fn: function(){
                                     var flexCenterApp = new FlexCenter.App();
@@ -127,7 +127,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
                                 closable:false,
                                 modal: true,
                                 bodyPadding:10,
-                                title:'进入工程',
+                                title:projectRes.inProjectLoading,
                                 onCancel:function(){
                                     win.close();
                                     runnerProgress.stopAll();
@@ -146,12 +146,12 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             },
             {
                 xtype:'actioncolumn',
-                header:'编辑',
+                header:globalRes.buttons.edit,
                 width:40,
                 items:[
                     {
                         iconCls:'table-edit',
-                        tooltip:'编辑',
+                        tooltip:globalRes.buttons.edit,
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
                             me.editClick(rec);
@@ -161,12 +161,12 @@ Ext.define('FlexCenter.project.view.ProjectView', {
             },
             {
                 xtype:'actioncolumn',
-                header:'删除',
+                header:globalRes.buttons.remove,
                 width:40,
                 items:[
                     {
                         iconCls:'table-delete',
-                        tooltip:'删除',
+                        tooltip:globalRes.buttons.remove,
                         handler:function(grid, rowIndex, colIndex){
                             var rec = grid.getStore().getAt(rowIndex);
                             me.onDeleteClick(rec);
@@ -187,7 +187,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
     onAddClick:function(){
         var me=this;
         var edit = Ext.widget('projectForm', {
-            title:'添加工程'
+            title:globalRes.buttons.add
         });
         edit.setActiveRecord(null);
         edit.show();
@@ -246,7 +246,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
         var me = this;
         if (selection) {
             var edit = Ext.widget('projectForm', {
-                title:'编辑工程'
+                title:globalRes.buttons.edit
             });
             edit.setActiveRecord(selection);
             edit.show();
@@ -283,9 +283,9 @@ Ext.define('FlexCenter.project.view.ProjectView', {
         }
         else {
             Ext.MessageBox.show({
-                title: '编辑工程',
+                title: globalRes.buttons.edit,
                 width: 300,
-                msg: '请选择要编辑的工程',
+                msg: projectRes.alertUpdateProject,
                 buttons: Ext.MessageBox.OK,
                 icon: Ext.MessageBox.INFO
             });
@@ -294,7 +294,7 @@ Ext.define('FlexCenter.project.view.ProjectView', {
     onDeleteClick: function (record) {
         var me = this;
         if (record) {
-            Ext.Msg.confirm('删除', Ext.String.format('确定要删除工程：{0}', record.data.name), function (txt) {
+            Ext.Msg.confirm(globalRes.buttons.remove, Ext.String.format(projectRes.alertDeleteProject, record.data.name), function (txt) {
                 if (txt === 'yes') {
                     Ext.Ajax.request({
                         url: 'projectController.do?method=deleteProject',

@@ -124,12 +124,12 @@ public class MessageExportController extends BaseController {
         try {
             if(!messageExportManager.checkExportDataExist(sDate,eDate,projectId)){
                 result.put("success",false);
-                result.put("message","没有数据可导出");
+                result.put("message",getZhMessage("projectRes.noDataExport"));
                 return result;
             }
         } catch (Exception e) {
             result.put("success",false);
-            result.put("message","查询数据错误");
+            result.put("message",getZhMessage("projectRes.queryDataError"));
             return result;
         }
         String contextPath= request.getRealPath("/") + "/"+exportFileDir+"/";
@@ -325,7 +325,7 @@ public class MessageExportController extends BaseController {
             detailMap.put(username, false);
         }
         result.put("success",false);
-        result.put("message","导出数据异常");
+        result.put("message",getZhMessage("projectRes.exportDataException"));
         finishedMap.put(username,true);
         return result;
     }
