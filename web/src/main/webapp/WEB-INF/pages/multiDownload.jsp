@@ -11,11 +11,13 @@
 <html>
 <head>
     <title></title>
+  
 </head>
 <body>
-<ul>
+<ul style="list-style-type: none">
   <c:forEach var="d" items="${data}" varStatus="status">
-    <li>${status.index+1}、<a href="${d.httpPath}">${d.name}</a></li>
+    <li style="list-style-type: none">${status.index+1}、<a href="${d.httpPath}">${d.name}</a></li><br>
+    ----------------------------------------------------------------------------------------------
   </c:forEach>
 </ul>
 </body>

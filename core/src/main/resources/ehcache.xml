@@ -48,9 +48,13 @@
         timeToLiveSeconds="120"
         diskPersistent="false"
         diskExpiryThreadIntervalSeconds="120"/>
-    <cache name="messageCache" eternal="false"
-           maxElementsInMemory="1000" overflowToDisk="false" diskPersistent="false"
-           timeToIdleSeconds="0" timeToLiveSeconds="86400"
+    <cache name="messageCache" 
+           eternal="false"
+           maxElementsInMemory="1000" 
+           overflowToDisk="false" 
+           diskPersistent="false"
+           timeToIdleSeconds="0" 
+           timeToLiveSeconds="86400"
            memoryStoreEvictionPolicy="LRU"/>
     
         

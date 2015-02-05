@@ -29,7 +29,7 @@
                     <!--always-use-default-target="false"-->
                     <!--authentication-success-handler-ref="authSuccessLogger"-->
                     <!--authentication-failure-handler-ref="authFailLogger"/>-->
-        <remember-me user-service-ref="userManager" key="e37f4b31-0c45-11dd-bd0b-0800200c9a66"/>
+        <!--<remember-me user-service-ref="userManager" key="e37f4b31-0c45-11dd-bd0b-0800200c9a66"/>-->
         <custom-filter ref="multiParamsAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
     </http>
     

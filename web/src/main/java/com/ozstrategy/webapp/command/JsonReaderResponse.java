@@ -29,7 +29,7 @@ public class JsonReaderResponse<T> {
   public String message;
 
   /** DOCUMENT ME! */
-  public Boolean success;
+  public Boolean success=true;
 
   /** DOCUMENT ME! */
   public int total = 0;

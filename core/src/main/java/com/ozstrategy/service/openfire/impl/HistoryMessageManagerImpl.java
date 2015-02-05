@@ -7,6 +7,7 @@ import com.ozstrategy.service.openfire.HistoryMessageManager;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
     @Autowired
     private Properties variable;
 
+    @CacheEvict(value = "messageCache")
     @Transactional(rollbackFor = Throwable.class)
     public Long addIndex() throws Exception {
         Long maxId=maxId();
@@ -40,6 +42,7 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
         }
         return maxId;
     }
+    @CacheEvict(value = "messageCache")
     @Transactional(rollbackFor = Throwable.class)
     public void delete(Date startTime, Date endTime,Long projectId)  throws Exception{
         Map<String,Object> maxMinId=historyMessageDao.maxMinIdByTime(startTime,endTime,projectId);

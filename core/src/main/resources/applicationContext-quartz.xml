@@ -20,8 +20,8 @@
             <ref bean="luceneIndexDetail" />
         </property>
         <property name="cronExpression">
-            <!--<value>0 34 3 ? * *</value>-->
-            <value>0 0/3 * * * ?</value>
+            <value>0 34 3 ? * *</value>
+            <!--<value>0 0/3 * * * ?</value>-->
         </property>
     </bean>
     <bean id="luceneIndexDetail"
