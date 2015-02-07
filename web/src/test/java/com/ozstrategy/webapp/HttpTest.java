@@ -215,7 +215,7 @@ public class HttpTest {
 
         nvps.add(new BasicNameValuePair("start", "0"));
         nvps.add(new BasicNameValuePair("limit", "25"));
-        nvps.add(new BasicNameValuePair("projectId", "2"));
+        nvps.add(new BasicNameValuePair("projectId", "1"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;

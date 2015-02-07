@@ -45,10 +45,10 @@ public class RoleManagerImpl  implements RoleManager {
         }else {
             roleDao.save(role);
         }
+        if(!save){
+            roleFeatureDao.removeRoleFeatureByRoleId(role.getId());
+        }
         if(features!=null && features.size()>0){
-            if(!save){
-                roleFeatureDao.removeRoleFeatureByRoleId(role.getId());
-            }
             for(Feature feature : features){
                 RoleFeature roleFeature=new RoleFeature();
                 roleFeature.setFeature(feature);

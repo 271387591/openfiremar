@@ -71,18 +71,18 @@
         <!--lucene end-->
         
         
-        
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${javamail.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.subethamail</groupId>
-            <artifactId>subethasmtp-wiser</artifactId>
-            <version>${wiser.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!---->
+        <!--<dependency>-->
+            <!--<groupId>javax.mail</groupId>-->
+            <!--<artifactId>mail</artifactId>-->
+            <!--<version>${javamail.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.subethamail</groupId>-->
+            <!--<artifactId>subethasmtp-wiser</artifactId>-->
+            <!--<version>${wiser.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         
         
         <dependency>

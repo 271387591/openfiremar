@@ -216,9 +216,6 @@
                                     <include>scripts/desktop/js/Desktop.js</include>
                                     <include>scripts/desktop/js/App.js</include>
                                     <include>scripts/ux/Oz/access/RoleAccess.js</include>
-                                    <include>scripts/ux/Oz/app/TabMenu.js</include>
-                                    <include>scripts/ux/Oz/app/Tabs.js</include>
-                                    <include>scripts/ux/Oz/app/ThumbList.js</include>
                                     <include>scripts/ux/Oz/data/DwrProxy.js</include>
                                     <include>scripts/ux/Oz/desktop/Module.js</include>
                                     
@@ -228,8 +225,8 @@
                                     <include>scripts/ozstrategy/Constants.js</include>
                                     
 
-                                    <include>scripts/ozstrategy/model/LabelValue.js</include>
-                                    <include>scripts/ozstrategy/model/WallpaperModel.js</include>
+                                    <!--<include>scripts/ozstrategy/model/LabelValue.js</include>-->
+                                    <!--<include>scripts/ozstrategy/model/WallpaperModel.js</include>-->
 
                                     <include>scripts/ozstrategy/store/Base.js</include>
 

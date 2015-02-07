@@ -21,13 +21,10 @@ Ext.define('FlexCenter.user.view.UserView', {
     ],
 
     getStore: function () {
-        var store = Ext.StoreManager.lookup('userStore');
-        if (!store) {
-            store = Ext.create('FlexCenter.user.store.Users', {
-                storeId: 'userStore',
-                pageSize: 25
-            });
-        }
+        var store  = Ext.create('FlexCenter.user.store.Users', {
+            storeId: 'userStore',
+            pageSize: 25
+        });
         store.getProxy().extraParams={projectId:projectId};
         return store;
     },
@@ -36,7 +33,6 @@ Ext.define('FlexCenter.user.view.UserView', {
     autoScroll: true,
 
     initComponent: function () {
-
         var me = this;
         var userStore = me.getStore();
         userStore.load();
@@ -303,6 +299,8 @@ Ext.define('FlexCenter.user.view.UserView', {
     },
     onEditClick: function () {
         var me = this;
+        var selection = me.getSelectionModel().getSelection()[0];
+        selection=me.store.getById(selection.get('id'));
         ajaxPostRequest('userRoleController.do?method=readAvailableRoles', {projectId:projectId}, function (result) {
             if (result.success) {
                 var availableRoleStore = Ext.create('FlexCenter.user.store.Roles', {
@@ -318,14 +316,14 @@ Ext.define('FlexCenter.user.view.UserView', {
                         }
                     }
                 });
-                me.editClick(availableRoleStore);
+                me.editClick(availableRoleStore,selection);
             }
         });
     },
 
-    editClick: function (availableRoleStore) {
+    editClick: function (availableRoleStore,selection) {
         var me = this;
-        var selection = me.getView().getSelectionModel().getSelection()[0];
+        
         if (selection) {
             var edit;
             edit = Ext.widget('userForm', {
@@ -333,33 +331,18 @@ Ext.define('FlexCenter.user.view.UserView', {
                 availableRoleStore: availableRoleStore
             }).show();
             edit.setActiveRecord(selection);
-
-            this.mon(edit, 'update', function (win, form, active, roleids) {
-                var fields = active.fields,
-                    values = form.getValues(),
-                    name,
-                    obj = {};
-                fields.each(function (f) {
-                    name = f.name;
-                    if (name == 'simpleRoles') {
-                        return false;
-                    }
-                    if (name in values) {
-                        obj[name] = values[name];
-                    }
-                });
-                obj.roleIds = roleids.join(',');
+            this.mon(edit, 'update', function (win, data) {
                 Ext.Ajax.request({
                     url: 'userController.do?method=updateUser',
-                    params: obj,
+                    params: data,
                     method: 'POST',
                     success: function (response, options) {
                         var result = Ext.decode(response.responseText);
                         if (result.success) {
-                            me.getStore().load();
                             me.editWin = win;
                             Ext.Msg.alert(globalRes.title.prompt, globalRes.updateSuccess, function () {
                                 me.editWin.close();
+                                me.store.loadPage(1);
                             });
                         } else {
                             if (result.message) {

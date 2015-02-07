@@ -223,7 +223,8 @@ Ext.define('FlexCenter.user.view.RoleView', {
     },
     editClick: function (availableRoleStore) {
         var me = this;
-        var selection = me.getView().getSelectionModel().getSelection()[0];
+        var selection = me.getSelectionModel().getSelection()[0];
+        selection=me.store.getById(selection.get('id'));
         if (selection) {
             var edit;
             edit = Ext.widget('roleForm', {
@@ -239,7 +240,7 @@ Ext.define('FlexCenter.user.view.RoleView', {
                     success: function (response, options) {
                         var result = Ext.decode(response.responseText);
                         if (result.success) {
-                            me.getStore().load();
+                            me.store.load();
                             me.editWin = win;
                             Ext.Msg.alert(globalRes.title.prompt, globalRes.updateSuccess, function () {
                                 me.editWin.close();

@@ -99,11 +99,11 @@ public class UserManagerImpl implements UserManager {
             }
             userDao.save(user);
         }
+        if(!save){
+            userRoleDao.removeUserRoleByUserId(user.getId());
+        }
         Set<Role> roleSet=user.getRoles();
         if(roleSet!=null && roleSet.size()>0){
-            if(!save){
-                userRoleDao.removeUserRoleByUserId(user.getId());
-            }
             for(Role role : roleSet){
                 Map<String,Object> map=new HashMap<String, Object>();
                 map.put("userId",user.getId());

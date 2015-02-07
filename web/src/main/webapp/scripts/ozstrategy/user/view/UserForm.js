@@ -85,25 +85,14 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                     name: 'id'
                                 },
                                 {
+                                    xtype: 'hidden',
                                     name:'projectId',
-                                    value:projectId,
-                                    hidden:true
+                                    value:projectId
                                 },
                                 {
+                                    xtype: 'hidden',
                                     name:'activationCode',
-                                    value:porjectActivationCode,
-                                    hidden:true
-                                },
-                                
-                                {
-                                    xtype: 'hidden',
-                                    name: 'defaultRoleId',
-                                    itemId: 'defaultRoleId'
-                                },
-                                {
-                                    xtype: 'hidden',
-                                    name: 'activationCode',
-                                    itemId: 'activationCode'
+                                    value:porjectActivationCode
                                 },
                                 {
                                     fieldLabel: '<font color="red">*</font>' + userRoleRes.header.username,
@@ -321,7 +310,7 @@ Ext.define('FlexCenter.user.view.UserForm', {
             datas = form.getValues(), simpleRoles = datas.simpleRoles, roleids = [];
         Ext.each(simpleRoles, function (data) {
             roleids.push(data.id);
-        })
+        });
         //if (roleids.length == 0) {
         //    Ext.MessageBox.alert(globalRes.title.prompt, userRoleRes.msg.addUserHasRole);
         //    return;
@@ -332,7 +321,7 @@ Ext.define('FlexCenter.user.view.UserForm', {
                 this.fireEvent('create', this, datas);
             }
             else {
-                this.fireEvent('update', this, form, active, roleids);
+                this.fireEvent('update', this, datas);
             }
         }
     },
