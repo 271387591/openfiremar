@@ -64,8 +64,8 @@ public class RoleManagerImpl  implements RoleManager {
         roleDao.delete(role);
     }
 
-    public Role getRoleByName(String name) {
-        return roleDao.getRoleByName(name);
+    public Role getRoleByName(String name,Long projectId) {
+        return roleDao.getRoleByName(name,projectId);
     }
 
     public Role getRoleById(Long id) {
@@ -78,7 +78,7 @@ public class RoleManagerImpl  implements RoleManager {
 
     public boolean authenticatedContext(Set<String> roleNames,String context) {
         for(String roleName:roleNames){
-            Role role = roleDao.getRoleByName(roleName);
+            Role role = roleDao.getRoleByName(roleName,null);
             if(role==null){
                 return false;
             }

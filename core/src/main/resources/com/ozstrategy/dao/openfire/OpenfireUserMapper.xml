@@ -16,4 +16,7 @@
         u.modificationDate=#{modificationDate}
         where u.username=#{username}
     </update>
+    <delete id="delete" parameterType="com.ozstrategy.model.openfire.OpenfireUser" flushCache="true">
+        delete from ofUser where  username=#{username}
+    </delete>
 </mapper>

@@ -42,6 +42,9 @@
     <bean id="deleteIndexInstance" class="com.ozstrategy.lucene.DeleteIndexInstance" init-method="getInstance">
         <property name="luceneInstance" ref="luceneInstance" />
     </bean>
+    <bean class="com.ozstrategy.lucene.AddIndexInstance" id="addIndexInstance" init-method="getInstance">
+        <property name="historyMessageManager" ref="historyMessageManager"/>
+    </bean>
     
 
 </beans>

@@ -152,7 +152,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                             {
                                                 fieldLabel:globalRes.buttons.startTime,
                                                 xtype : 'datefield',
-                                                format:'Y-m-d',
+                                                format:'Y-m-d 00:00:00',
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
@@ -174,7 +174,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 allowBlank: false,
                                                 width:300,
                                                 name : 'endTime',
-                                                format:'Y-m-d',
+                                                format:'Y-m-d 23:59:59',
                                                 maxValue:new Date(),
                                                 itemId : 'vcEndTime',
                                                 listeners:{

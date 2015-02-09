@@ -132,8 +132,8 @@ public class PattonTest {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
         nvps.add(new BasicNameValuePair("username", "admin"));
-        nvps.add(new BasicNameValuePair("password", "tomcat"));
-        nvps.add(new BasicNameValuePair("projectId", "9"));
+        nvps.add(new BasicNameValuePair("password", "111111"));
+        nvps.add(new BasicNameValuePair("projectId", "7"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;

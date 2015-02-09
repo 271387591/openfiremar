@@ -1,7 +1,7 @@
 package com.ozstrategy.job;
 
+import com.ozstrategy.lucene.AddIndexInstance;
 import com.ozstrategy.model.system.JobLog;
-import com.ozstrategy.service.openfire.HistoryMessageManager;
 import com.ozstrategy.service.system.ApplicationConfigManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,13 +14,13 @@ import java.util.Date;
  */
 public class LuceneIndexJob {
     @Autowired
-    private HistoryMessageManager historyMessageManager;
+    private AddIndexInstance addIndexInstance;
     @Autowired
     private ApplicationConfigManager applicationConfigManager;
     private Log log= LogFactory.getLog(getClass());
     public void writeIndex() throws Exception{
         try{
-            historyMessageManager.addIndex();
+            addIndexInstance.addIndex();
             JobLog jobLog=new JobLog();
             jobLog.setJob(getClass().getSimpleName());
             jobLog.setLastUpdateDate(new Date());

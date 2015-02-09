@@ -65,6 +65,21 @@ Ext.define('FlexCenter.user.view.UserView', {
                 handler: this.onEditClick
             },
             {
+                frame: true,
+                iconCls: 'user-delete',
+                xtype: 'button',
+                text: '删除',
+                itemId: 'userDeleteBtn',
+                plugins: Ext.create('Oz.access.RoleAccess', {
+                    featureName: 'updateUser',
+                    mode: 'hide',
+                    byPass: globalRes.isAdmin
+                }),
+                scope: this,
+                handler: this.onDeleteClick
+            },
+            
+            {
                 iconCls: 'user-edit',
                 text: userRoleRes.passwordTilte,
                 scope: this,
@@ -76,6 +91,7 @@ Ext.define('FlexCenter.user.view.UserView', {
                 }),
                 handler: this.onChangePasswordClick
             },
+            
             {
                 iconCls: 'btn-authorization',
                 text: userRoleRes.authenticationUser,
@@ -211,6 +227,60 @@ Ext.define('FlexCenter.user.view.UserView', {
         }];
         this.callParent();
     },
+    onDeleteClick:function(){
+        var me=this;
+        var selection = me.getSelectionModel().getSelection()[0];
+        if (selection) {
+            var userId = selection.data.id;
+            var nickName = selection.data.nickName;
+            Ext.MessageBox.show({
+                title: '删除用户',
+                width: 400,
+                msg: '你确定要删除用户['+nickName+']？',
+                buttons: Ext.MessageBox.YESNO,
+                icon: Ext.MessageBox.QUESTION,
+                fn: function (btn) {
+                    if (btn === 'yes') {
+                        Ext.Ajax.request({
+                            url: 'userController.do?method=deleteUser',
+                            params: {id: userId},
+                            method: 'POST',
+                            success: function (response, options) {
+                                var result = Ext.decode(response.responseText);
+                                if (result.success) {
+                                    Ext.Msg.alert(globalRes.title.prompt, globalRes.removeSuccess);
+                                    me.store.load();
+                                }
+                                else {
+                                    Ext.MessageBox.show({
+                                        title: title,
+                                        width: 300,
+                                        msg: result.message,
+                                        buttons: Ext.MessageBox.OK,
+                                        icon: Ext.MessageBox.ERROR
+                                    });
+                                }
+                            },
+                            failure: function (response, options) {
+                                Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout, response.status));
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        else {
+            Ext.MessageBox.show({
+                title: '删除用户',
+                width: 300,
+                msg: '请选择要删除的用户',
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.INFO
+            });
+        }
+        
+        
+    },
     onAddClick: function () {
         var me = this;
         ajaxPostRequest('userRoleController.do?method=readAvailableRoles', {projectId:projectId}, function (result) {
@@ -300,7 +370,18 @@ Ext.define('FlexCenter.user.view.UserView', {
     onEditClick: function () {
         var me = this;
         var selection = me.getSelectionModel().getSelection()[0];
-        selection=me.store.getById(selection.get('id'));
+        if(selection){
+            selection=me.store.getById(selection.get('id'));
+        }else{
+            Ext.MessageBox.show({
+                title: userRoleRes.editUser,
+                width: 300,
+                msg: userRoleRes.msg.editUser,
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.INFO
+            });
+        }
+        
         ajaxPostRequest('userRoleController.do?method=readAvailableRoles', {projectId:projectId}, function (result) {
             if (result.success) {
                 var availableRoleStore = Ext.create('FlexCenter.user.store.Roles', {
@@ -393,8 +474,9 @@ Ext.define('FlexCenter.user.view.UserView', {
                             success: function (response, options) {
                                 var result = Ext.decode(response.responseText);
                                 if (result.success) {
+                                    Ext.Msg.alert(globalRes.title.prompt, globalRes.updateSuccess);
                                     //Ext.Msg.alert(globalRes.title.prompt, globalRes.addSuccess);
-                                    me.getStore().load();
+                                    me.store.load();
 //                                    Ext.MessageBox.show({
 //                                        title: title,
 //                                        width: 300,
@@ -626,7 +708,7 @@ Ext.define('FlexCenter.user.view.UserView', {
                                 var result = Ext.decode(response.responseText);
                                 if (result.success) {
                                     Ext.Msg.alert(globalRes.title.prompt, globalRes.updateSuccess);
-                                    me.getStore().load();
+                                    me.store.load();
                                 } else {
                                     Ext.MessageBox.show({
                                         title: title,

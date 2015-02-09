@@ -59,6 +59,10 @@ public class UserManagerImpl implements UserManager {
 
     @Transactional(rollbackFor = Throwable.class)
     public void deleteUser(Long userId) throws Exception{
+        User user=userDao.getUserById(userId);
+        userRoleDao.removeUserRoleByUserId(userId);
+        userDao.delete(user);
+        openfireUserDao.delete(new OpenfireUser().copy(user));
     }
 
     @Transactional(rollbackFor = Throwable.class)

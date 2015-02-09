@@ -56,6 +56,6 @@
     </update>
     <delete id="delete" parameterType="com.ozstrategy.model.userrole.User" flushCache="true">
       DELETE FROM ext_user
-      WHERE (id=#{id})
+      WHERE id=#{id}
     </delete>
 </mapper>

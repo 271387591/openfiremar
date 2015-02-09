@@ -15,7 +15,7 @@ public interface RoleManager  {
     Integer listRolesCount(Map<String,Object> map);
     void saveOrUpdate(Role role,List<Feature> features) throws Exception;
     void removeRoleById(Role role);
-    Role getRoleByName(String name);
+    Role getRoleByName(String name,Long projectId);
     Role getRoleById(Long id);
     boolean hasFeature(Set<String> roleName,String feature);
     boolean authenticatedContext(Set<String> roleName,String context);

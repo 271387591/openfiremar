@@ -93,6 +93,16 @@ Ext.define('FlexCenter.user.view.RoleView', {
                 dataIndex: 'description',
                 flex: 1
             }, {
+                header: '角色分类',
+                dataIndex: 'projectId',
+                renderer:function(v){
+                    if(!v){
+                        return '系统角色';
+                    }
+                    return '工程角色';
+                },
+                flex: 1
+            }, {
                 header: globalRes.header.createDate,
                 dataIndex: 'createDate',
                 flex: 1
@@ -126,7 +136,28 @@ Ext.define('FlexCenter.user.view.RoleView', {
         }];
         me.listeners = {
             itemdblclick: function (view, record, item, index, e, eOpts) {
+                var projectId=record.get('projectId');
+                if(!projectId){
+                    return;
+                }
                 me.onEditClick();
+            },
+            itemclick:function (view, record, item, index, e, eOpts) {
+                var projectId=record.get('projectId');
+                if(!projectId){
+                    me.down('#roleEditBtn').setDisabled(true);
+                    me.down('#roleDeleteBtn').setDisabled(true);
+                }else{
+                    me.down('#roleEditBtn').setDisabled(false);
+                    me.down('#roleDeleteBtn').setDisabled(false);
+                }
+            }
+        };
+        me.viewConfig= {
+            getRowClass: function (record) {
+                if (!record.get('projectId')) {
+                    return 'locked-row';
+                }
             }
         };
 
@@ -224,9 +255,10 @@ Ext.define('FlexCenter.user.view.RoleView', {
     editClick: function (availableRoleStore) {
         var me = this;
         var selection = me.getSelectionModel().getSelection()[0];
-        selection=me.store.getById(selection.get('id'));
+        
         if (selection) {
             var edit;
+            selection=me.store.getById(selection.get('id'));
             edit = Ext.widget('roleForm', {
                 isEdit: true,
                 availableFeatureStore: availableRoleStore

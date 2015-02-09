@@ -1,5 +1,6 @@
 package com.ozstrategy.webapp.controller.openfire;
 
+import com.ozstrategy.lucene.AddIndexInstance;
 import com.ozstrategy.model.userrole.User;
 import com.ozstrategy.service.export.MessageExportManager;
 import com.ozstrategy.service.openfire.HistoryMessageManager;
@@ -37,6 +38,8 @@ public class HistoryMessageController extends BaseController {
     private HistoryMessageManager historyMessageManager;
     @Autowired
     private MessageExportManager messageExportManager;
+    @Autowired
+    private AddIndexInstance addIndexInstance;
     
     @Autowired
     private UserManager userManager;
@@ -106,11 +109,11 @@ public class HistoryMessageController extends BaseController {
             if(StringUtils.isNotEmpty(endTime)){
                 eDate=DateUtils.parseDate(endTime, new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
             }
+            addIndexInstance.addIndex();
             Long maxId=historyMessageManager.maxIndex();
             if(maxId==0L){
                 return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),true,0,"");
             }
-           
             List<Map<String,String>> projects=historyMessageManager.search(message,sDate, eDate, fromId, projectId,manager,deleted,start, limit);
             List<Map<String,Object>> list=new ArrayList<Map<String, Object>>();
             if(projects!=null && projects.size()>0){

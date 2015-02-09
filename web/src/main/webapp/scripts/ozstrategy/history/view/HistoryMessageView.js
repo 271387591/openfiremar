@@ -64,16 +64,20 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         items:[
                             {
                                 fieldLabel:globalRes.buttons.startTime,
-                                xtype : 'datetimefield',
+                                xtype : 'datefield',
                                 editable:false,
                                 name : 'startTime',
+                                format:'Y-m-d 00:00:00',
+                                width:260,
                                 maxValue:new Date()
                             },
                             {
                                 fieldLabel:globalRes.buttons.endTime,
-                                xtype : 'datetimefield',
+                                xtype : 'datefield',
                                 editable:false,
                                 name : 'endTime',
+                                width:260,
+                                format:'Y-m-d 23:59:59',
                                 maxValue:new Date()
                             }
                         ]
@@ -239,7 +243,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                             xtype : 'datefield',
                             editable:false,
                             allowBlank: false,
-                            format:'Y-m-d',
+                            format:'Y-m-d 00:00:00',
                             maxValue:new Date(),
                             minValue:function(){
                                 var newValue=new Date(); 
@@ -257,7 +261,7 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                             editable:false,
                             allowBlank: false,
                             name : 'endTime',
-                            format:'Y-m-d',
+                            format:'Y-m-d 23:59:59',
                             //maxValue:new Date(),
                             listeners:{
                                 change:function( f, newValue, oldValue, eOpts ){

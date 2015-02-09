@@ -10,10 +10,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
  * @author Bryan Noll
  */
 public class MailEngineTest extends BaseManagerTestCase {
-    @Autowired
-    MailEngine mailEngine;
-    @Autowired
-    SimpleMailMessage mailMessage;
     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
     @Before

@@ -236,7 +236,7 @@ Ext.define('FlexCenter.user.view.UserForm', {
                                             header: userRoleRes.header.roleName,
                                             flex: 1,
                                             sortable: true,
-                                            dataIndex: 'displayName'
+                                            dataIndex: 'name'
                                         }, {
                                             header: userRoleRes.header.displayName,
                                             flex: 1,

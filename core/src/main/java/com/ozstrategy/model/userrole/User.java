@@ -57,7 +57,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String userNo;
     @Column
-    private Boolean authentication = Boolean.TRUE;
+    private Boolean authentication = Boolean.FALSE;
     @Column
     private String gender;
     @Column

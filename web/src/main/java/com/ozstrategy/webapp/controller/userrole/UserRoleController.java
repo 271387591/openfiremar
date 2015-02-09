@@ -14,6 +14,7 @@ import com.ozstrategy.webapp.command.userrole.RoleCommand;
 import com.ozstrategy.webapp.command.userrole.RoleTreeCommand;
 import com.ozstrategy.webapp.controller.BaseController;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -280,7 +281,7 @@ public class UserRoleController extends BaseController {
             Role role=null;
             if(save){
                 if(!checkIsEmpty(name)){
-                    role = roleManager.getRoleByName(name);
+                    role = roleManager.getRoleByName(name, NumberUtils.toLong(projectId));
                     if(role!=null){
                         return new BaseResultCommand(getMessage("message.error.role.exist",request),Boolean.FALSE);
                     }

@@ -7,18 +7,20 @@
         <!--<collection property="users" column="id" select="com.ozstrategy.dao.userrole.UserDao.getUserByRoleId" fetchType="lazy"/>-->
     </resultMap>
     <select id="listRoles" resultMap="roleResult"  parameterType="Map">
-        select * from ext_role r 
-        where r.enabled=1 and r.name!='ROLE_ADMIN' and projectId=#{projectId} 
+        select * from ext_role r
+        where (r.enabled=1 and projectId=#{projectId}
         <if test="keyword!=null and keyword!=''">and (r.name like CONCAT(CONCAT('%', #{keyword}), '%') or r.displayName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
+        ) or projectId is null  
         order by r.createDate desc
     </select>
     <select id="listRolesCount" resultType="java.lang.Integer" parameterType="Map">
         select count(*) from ext_role r  
-        where r.enabled=1 and r.name!='ROLE_ADMIN' and projectId=#{projectId}
+        where (r.enabled=1 and projectId=#{projectId}
         <if test="keyword!=null and keyword!=''">and (r.name like CONCAT(CONCAT('%', #{keyword}), '%') or r.displayName like CONCAT(CONCAT('%', #{keyword}), '%'))</if>
+        )  or projectId is null 
     </select>
-    <select id="getRoleByName" resultMap="roleResult" parameterType="java.lang.String">
-        select * from ext_role r where r.enabled=1 and r.name=#{name}
+    <select id="getRoleByName" resultMap="roleResult" parameterType="Map">
+        select * from ext_role r where r.enabled=1 and r.name=#{name} and (r.projectId=#{projectId} or r.projectId is null) 
     </select>
     <select id="getRoleById" resultMap="roleResult" parameterType="java.lang.Long">
         select * from ext_role r where r.enabled=1 and r.id=#{id}
