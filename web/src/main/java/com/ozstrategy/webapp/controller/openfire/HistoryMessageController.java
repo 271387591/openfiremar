@@ -90,6 +90,7 @@ public class HistoryMessageController extends BaseController {
             String message=request.getParameter("message");
             Long manager=parseLong(request.getParameter("manager"));
             Long deleted=parseLong(request.getParameter("deleted"));
+            Long roleB=parseLong(request.getParameter("roleB"));
             if(projectId==null){
                 return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.noProjectId"));
             }
@@ -114,7 +115,7 @@ public class HistoryMessageController extends BaseController {
             if(maxId==0L){
                 return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),true,0,"");
             }
-            List<Map<String,String>> projects=historyMessageManager.search(message,sDate, eDate, fromId, projectId,manager,deleted,start, limit);
+            List<Map<String,String>> projects=historyMessageManager.search(message,sDate, eDate, fromId, projectId,manager,deleted,roleB,start, limit);
             List<Map<String,Object>> list=new ArrayList<Map<String, Object>>();
             if(projects!=null && projects.size()>0){
                 for(Map<String,String> map:projects){
@@ -146,11 +147,13 @@ public class HistoryMessageController extends BaseController {
             Integer start=parseInteger(request.getParameter("start"));
             Integer limit=parseInteger(request.getParameter("limit"));
             Long projectId=parseLong(request.getParameter("projectId"));
+            Integer manager=parseInteger(request.getParameter("manager"));
+            Integer roleB=parseInteger(request.getParameter("roleB"));
             if(projectId==null){
                 return new JsonReaderResponse<Map<String,Object>>(Collections.<Map<String,Object>>emptyList(),false,0,getZhMessage("projectRes.noProjectId"));
             }
-            List<Map<String,Object>> projects=historyMessageManager.getHistory(projectId, start, limit);
-            Integer count=historyMessageManager.getHistoryCount(projectId);
+            List<Map<String,Object>> projects=historyMessageManager.getHistory(projectId, manager,roleB,start, limit);
+            Integer count=historyMessageManager.getHistoryCount(projectId,manager,roleB);
             return new JsonReaderResponse<Map<String,Object>>(projects,"",count);
         }catch (Exception e){
             e.printStackTrace();

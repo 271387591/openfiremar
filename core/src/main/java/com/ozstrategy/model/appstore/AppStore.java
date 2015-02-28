@@ -14,6 +14,7 @@ public class AppStore extends BaseObject {
     private String version;
     private String description;
     private Platform platform;
+    private Boolean currentVersion=Boolean.TRUE;
 
     public AppStore() {
     }
@@ -64,6 +65,14 @@ public class AppStore extends BaseObject {
 
     public void setPlatform(Platform platform) {
         this.platform = platform;
+    }
+
+    public Boolean getCurrentVersion() {
+        return currentVersion;
+    }
+
+    public void setCurrentVersion(Boolean currentVersion) {
+        this.currentVersion = currentVersion;
     }
 
     @Override

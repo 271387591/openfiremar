@@ -15,4 +15,5 @@ public interface AppStoreManager {
     void save(AppStore appStore) throws Exception;
     void update(AppStore appStore) throws Exception;
     void delete(Long id) throws Exception;
+    AppStore getCurrent(String platForm);
 }

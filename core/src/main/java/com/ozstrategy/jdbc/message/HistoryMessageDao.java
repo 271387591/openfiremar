@@ -22,15 +22,15 @@ public interface HistoryMessageDao {
     
     void deleteMessage(Long projectId,String messageId);
 
-    List<Map<String,String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Integer start, Integer limit) throws Exception;
+    List<Map<String,String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Long pillowTalk,Integer start, Integer limit) throws Exception;
     
     Long addIndex(Long minId)throws Exception;
     
     void deleteIndex(Date startDate,Date endDate,Long projectId) throws Exception;
 
 
-    List<Map<String,Object>> getHistory(Long projectId,Integer start,Integer limit) throws Exception;
-    Integer getHistoryCount(Long projectId);
+    List<Map<String,Object>> getHistory(Long projectId, Integer manager,Integer roleB,Integer start,Integer limit) throws Exception;
+    Integer getHistoryCount(Long projectId,Integer manager,Integer roleB);
     
     
     

@@ -45,4 +45,8 @@ public class AppStoreManagerImpl implements AppStoreManager {
     public void delete(Long id) throws Exception {
         appStoreDao.delete(id);
     }
+
+    public AppStore getCurrent(String platForm) {
+        return appStoreDao.getCurrent(platForm);
+    }
 }

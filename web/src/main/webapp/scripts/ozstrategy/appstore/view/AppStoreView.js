@@ -53,6 +53,14 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
                 dataIndex: 'version'
             },
             {
+                header: '最新版本',
+                dataIndex: 'currentVersion',
+                renderer: function (v) {
+                    return v?'是':'否';
+                }
+            },
+            
+            {
                 header: appStoreRes.header.url,
                 dataIndex: 'url',
                 renderer: function (v) {

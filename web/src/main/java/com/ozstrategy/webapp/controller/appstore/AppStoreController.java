@@ -66,6 +66,7 @@ public class AppStoreController extends BaseController {
         String version = request.getParameter("version");
         String description = request.getParameter("description");
         String platform=request.getParameter("platform");
+        String currentVersion=request.getParameter("currentVersion");
         response.setContentType("text/html;charset=utf-8");
         String attachFilesDirStr = Constants.imDataDir + "/"+Constants.appFileDir+"/";
         String host=request.getServerName();
@@ -108,6 +109,13 @@ public class AppStoreController extends BaseController {
                     contextPath=contextPath.substring(0,contextPath.length());
                 }
                 AppStore appStore=null;
+                if(StringUtils.equals("true",currentVersion)){
+                    appStore=appStoreManager.getCurrent(platform);
+                    if(appStore!=null){
+                        appStore.setCurrentVersion(Boolean.FALSE);
+                        appStoreManager.update(appStore);
+                    }
+                }
                 if(StringUtils.isNotEmpty(id)){
                     appStore=appStoreManager.getAppStoreById(parseLong(id));
                     path=appStore.getFilePath();
@@ -126,6 +134,7 @@ public class AppStoreController extends BaseController {
                 appStore.setLastUpdateDate(new Date());
                 appStore.setPlatform(Platform.valueOf(platform));
                 appStore.setVersion(version);
+                appStore.setCurrentVersion(Boolean.valueOf(currentVersion));
                 appStore.setUrl(httpPath);
                 appStoreManager.save(appStore);
                 writer.print("{success:true,msg:'上传成功!'}");
@@ -199,4 +208,14 @@ public class AppStoreController extends BaseController {
         }
         return new BaseResultCommand(getMessage("globalRes.removeFail",request),false);
     }
+    @RequestMapping(params = "method=checkVersion")
+    @ResponseBody
+    public BaseResultCommand checkVersion(HttpServletRequest request){
+        String platform=request.getParameter("platform");
+        if(StringUtils.isNotEmpty(platform)){
+            return new BaseResultCommand(appStoreManager.getCurrent(platform));
+        }
+        return new BaseResultCommand("当前版本不存在",false);
+    }
+    
 }

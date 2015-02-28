@@ -18,12 +18,10 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.FieldCacheRewriteMethod;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -409,11 +407,11 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
         jdbcTemplate.update(sql, projectId, messageId);
     }
 
-    public List<Map<String, String>> search(String message, Date startDate, Date endDate, Long fromId, Long projectId, Long manager,Long deleted, Integer start, Integer limit) throws Exception {
+    public List<Map<String, String>> search(String message, Date startDate, Date endDate, Long fromId, Long projectId, Long manager,Long deleted,Long pillowTalk, Integer start, Integer limit) throws Exception {
         IndexReader indexReader = luceneInstance.getReader();
         IndexSearcher indexSearcher = new IndexSearcher(indexReader);
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        BooleanQuery query = search(message, fromId, projectId, manager, deleted,startDate, endDate);
+        BooleanQuery query = search(message, fromId, projectId, manager, deleted,pillowTalk,startDate, endDate);
         BooleanClause[] clauses = query.getClauses();
         if (clauses != null && clauses.length < 1) {
             query.add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST);
@@ -503,13 +501,29 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
         deleteIndexInstance.deleteIndex(startDate, endDate, projectId);
     }
 
-    public List<Map<String, Object>> getHistory(Long projectId, Integer start, Integer limit) throws Exception {
+    public List<Map<String, Object>> getHistory(Long projectId, Integer manager,Integer roleB,Integer start, Integer limit) throws Exception {
         String sql="select * from ext_ofHistory where toId=? and deleted=0 order by id desc limit ?,?";
+        if(manager!=null){
+            sql="select * from ext_ofHistory where toId=? and deleted=0 and manager=? order by id desc limit ?,?";
+            return jdbcTemplate.queryForList(sql,projectId,manager,start,limit);
+        }
+        if(roleB!=null){
+            sql="select * from ext_ofHistory where toId=? and deleted=0 and pillowTalk=0 order by id desc limit ?,?";
+            return jdbcTemplate.queryForList(sql,projectId,start,limit);
+        }
         return jdbcTemplate.queryForList(sql,projectId,start,limit);
     }
 
-    public Integer getHistoryCount(Long projectId) {
+    public Integer getHistoryCount(Long projectId,Integer manager,Integer roleB) {
         String sql="select count(id) from ext_ofHistory where toId=? and deleted=0";
+        if(manager!=null){
+            sql="select count(id) from ext_ofHistory where toId=? and deleted=0 and manager=?";
+            return jdbcTemplate.queryForObject(sql, Integer.class,projectId, manager);
+        }
+        if(roleB!=null){
+            sql="select count(id) from ext_ofHistory where toId=? and deleted=0 and pillowTalk=0";
+            return jdbcTemplate.queryForObject(sql, Integer.class, projectId);
+        }
         return jdbcTemplate.queryForObject(sql, Integer.class,projectId);
     }
 
@@ -542,6 +556,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
                 String message = resultSet.getString("message");
                 String fromNick = resultSet.getString("fromNick");
                 Integer deleted = resultSet.getInt("deleted");
+                Integer pillowTalk = resultSet.getInt("pillowTalk");
                 Document document = new Document();
                 document.add(new LongField("id", id, Field.Store.YES));
                 if (StringUtils.isNotEmpty(message)) {
@@ -562,6 +577,10 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
                 if(deleted!=null){
                     document.add(new LongField("deleted", deleted, Field.Store.YES));
                 }
+                if(pillowTalk!=null){
+                    document.add(new LongField("pillowTalk", pillowTalk, Field.Store.YES));
+                }
+                
                 if (StringUtils.isNotEmpty(fromNick)) {
                     document.add(new StringField("fromNick", fromNick, Field.Store.YES));
                 }
@@ -579,7 +598,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
         }
     }
 
-    private static BooleanQuery search(String message, Long fromId, Long toId, Long manager,Long deleted, Date startTime, Date endTime) throws Exception {
+    private static BooleanQuery search(String message, Long fromId, Long toId, Long manager,Long deleted,Long pillowTalk, Date startTime, Date endTime) throws Exception {
         BooleanQuery query = new BooleanQuery();
         if (StringUtils.isNotEmpty(message)) {
             RegexpQuery regexpQuery = new RegexpQuery(new Term("message", ".*" + message + ".*"));
@@ -601,6 +620,11 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
             NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("deleted", deleted, deleted, true, true);
             query.add(numericRangeQuery, BooleanClause.Occur.MUST);
         }
+        if (pillowTalk != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("pillowTalk", 0L, 0L, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        
 
         if (startTime != null) {
             if (endTime == null) {
@@ -608,6 +632,13 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
             }
             NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("createDate", startTime.getTime(), endTime.getTime(), true, true);
             query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        if(endTime!=null){
+            Long startLong=0L;
+            if(startTime==null){
+                NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("createDate", startLong, endTime.getTime(), true, true);
+                query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+            }
         }
         return query;
     }

@@ -108,6 +108,20 @@ Ext.define('FlexCenter.appstore.view.AppStoreForm', {
                                 value:'Android'
                             },
                             {
+                                fieldLabel:'<font color="red">*</font>最新版本',
+                                xtype:'combo',
+                                name:'currentVersion',
+                                mode:'local',
+                                editable:false,
+                                triggerAction:'all',
+                                store:[
+                                    ['true', '是'],
+                                    ['false', '否']
+                                ],
+                                value:'true'
+                            },
+                            
+                            {
                                 xtype:'textareafield',
                                 grow: true,
                                 fieldLabel: appStoreRes.header.description,

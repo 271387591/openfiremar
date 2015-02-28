@@ -9,6 +9,7 @@ Ext.define('FlexCenter.appstore.model.AppStore', {
         'version',
         'description',
         'platform',
+        'currentVersion',
         {
             name: 'createDate', convert: function (v) {
             return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');

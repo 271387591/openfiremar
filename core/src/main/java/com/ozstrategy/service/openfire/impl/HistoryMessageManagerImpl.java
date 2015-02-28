@@ -88,16 +88,16 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
     }
 
     @Cacheable(value = "messageCache")
-    public List<Map<String, String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Integer start, Integer limit) throws Exception {
-        return historyMessageDao.search(message, startDate, endDate, fromId, projectId, manager, deleted,start, limit);
+    public List<Map<String, String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Long pillowTalk,Integer start, Integer limit) throws Exception {
+        return historyMessageDao.search(message, startDate, endDate, fromId, projectId, manager, deleted,pillowTalk,start, limit);
     }
 
-    public List<Map<String, Object>> getHistory(Long projectId, Integer start, Integer limit) throws Exception {
-        return historyMessageDao.getHistory(projectId,start,limit);
+    public List<Map<String, Object>> getHistory(Long projectId, Integer manager,Integer roleB,Integer start, Integer limit) throws Exception {
+        return historyMessageDao.getHistory(projectId,manager,roleB,start,limit);
     }
 
-    public Integer getHistoryCount(Long projectId) {
-        return historyMessageDao.getHistoryCount(projectId);
+    public Integer getHistoryCount(Long projectId,Integer manager,Integer roleB) {
+        return historyMessageDao.getHistoryCount(projectId,manager,roleB);
     }
 
     public Long maxIndex() throws Exception {

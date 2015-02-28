@@ -53,6 +53,11 @@
         <from>/app/getUser</from>
         <to>/service/userController.do?method=listAppUsers</to>
     </rule>
+    <rule>
+        <from>/app/checkVersion</from>
+        <to>/service/appStoreController.do?method=checkVersion</to>
+    </rule>
+    
     
     
     <rule>

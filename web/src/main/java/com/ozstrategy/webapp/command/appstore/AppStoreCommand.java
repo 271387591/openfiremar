@@ -12,6 +12,7 @@ public class AppStoreCommand extends BaseEntityCommand {
     private String version;
     private String description;
     private String platform;
+    private Boolean currentVersion;
     public AppStoreCommand(AppStore appStore) {
 //        super(appStore);
         this.id= appStore.getId();
@@ -19,6 +20,7 @@ public class AppStoreCommand extends BaseEntityCommand {
         this.version= appStore.getVersion();
         this.description= appStore.getDescription();
         this.platform=appStore.getPlatform()!=null?appStore.getPlatform().name():null;
+        this.currentVersion=appStore.getCurrentVersion();
     }
 
     public Long getId() {
@@ -59,5 +61,13 @@ public class AppStoreCommand extends BaseEntityCommand {
 
     public void setPlatform(String platform) {
         this.platform = platform;
+    }
+
+    public Boolean getCurrentVersion() {
+        return currentVersion;
+    }
+
+    public void setCurrentVersion(Boolean currentVersion) {
+        this.currentVersion = currentVersion;
     }
 }

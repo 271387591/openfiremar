@@ -15,17 +15,22 @@
     <select id="getAppStoreById" resultMap="AppStoreResult" parameterType="long">
         SELECT * from ext_appstore where id=#{id}
     </select>
+    <select id="getCurrent" resultMap="AppStoreResult">
+        SELECT * from ext_appstore where currentVersion=1 and platForm=#{platForm}
+    </select>
+    
     <insert id="save" parameterType="com.ozstrategy.model.appstore.AppStore" flushCache="true">
         <selectKey keyColumn="id" keyProperty="id" resultType="java.lang.Long">
             select LAST_INSERT_ID()
         </selectKey>
-        insert into ext_appstore(id,url,filePath,description,version,platform,createDate,lastUpdateDate) values(
+        insert into ext_appstore(id,url,filePath,description,version,platform,currentVersion,createDate,lastUpdateDate) values(
         #{id},
         #{url},
         #{filePath},
         #{description},
         #{version},
         #{platform,typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+        #{currentVersion},
         #{createDate},
         #{lastUpdateDate}
         )
@@ -36,6 +41,7 @@
         u.filePath=#{filePath},
         u.description=#{description},
         u.version=#{version},
+        u.currentVersion=#{currentVersion},
         u.platform=#{platform,typeHandler=org.apache.ibatis.type.EnumTypeHandler},
         u.lastUpdateDate=#{lastUpdateDate} WHERE u.id=#{id}
     </update>

@@ -184,6 +184,8 @@ public class HttpTest {
      * start:数据起始量，比如：从第0条数据开始，start=0,从第34条数据开始：start=34 （必须，并且为数字）
      * limit:每次获取的数据量,默认每次25条，（可以不传，默认25条）
      * projectId:工程ID（必须）
+     * manager：是否为管理员消息，1表示是，不传表示否。该参数为可选，当传时，且值为1表示获取管理员消息
+     * roleB：是否为乙方管理员，1表示是，不传表示否，（可选）
      *
      * 参数示例：比如每页显示30条数据，参数传递为：
      * 第一页：start=0&limit=30
@@ -216,6 +218,8 @@ public class HttpTest {
         nvps.add(new BasicNameValuePair("start", "0"));
         nvps.add(new BasicNameValuePair("limit", "25"));
         nvps.add(new BasicNameValuePair("projectId", "1"));
+        nvps.add(new BasicNameValuePair("manager", "1"));
+        nvps.add(new BasicNameValuePair("roleB", "1"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;
@@ -235,6 +239,7 @@ public class HttpTest {
      * start:数据起始量，比如：从第0条数据开始，start=0,从第34条数据开始：start=34 （必须，并且为数字）
      * limit:每次获取的数据量,默认每次25条，（可以不传，默认25条）
      * projectId:工程ID（必须）
+      
      *
      * 参数示例：比如每页显示30条数据，参数传递为：
      * 第一页：start=0&limit=30
@@ -283,6 +288,7 @@ public class HttpTest {
      * 5、fromNick（可选），用户昵称
      * 6、message（可选），消息关键字
      * 7、projectId(必须)，工程ID
+     * 8、 roleB：是否为乙方管理员，1表示是，不传表示否，(可选)
      * 返回参数：
      * 详细请参照请求历史消息接口
      *
@@ -305,6 +311,7 @@ public class HttpTest {
         nvps.add(new BasicNameValuePair("endTime", "2015-12-23 12:23:34"));
         nvps.add(new BasicNameValuePair("start", "0"));
         nvps.add(new BasicNameValuePair("limit", "2"));
+        nvps.add(new BasicNameValuePair("roleB", "1"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;
@@ -364,7 +371,43 @@ public class HttpTest {
         if (resEntity != null) {
             resEntity.consumeContent();
         }
-
-
     }
+    
+    /**
+     * 接口名称：查询最新版本
+     * 接口参数：
+     * 1、platform，平台，值为：Android或者Iphone
+     * 返回参数：
+     * 1、id：
+     * 2、url：下载地址
+     * 3、filePath：文件路径 
+     * 4、version：当前版本号 ，，，，，你只需要这个参数去判断，其他参数可以忽略
+     * 5、description：描述m
+     * 6、platform：平台
+     * 7、currentVersion：是否为当前最新版本
+     * @throws Exception
+     */
+
+
+    @Test
+    public void testCheckVersion() throws Exception{
+//        String url="http://120.24.234.71/im/app/checkVersion";
+        String url="http://localhost:9095/openfiremar/app/checkVersion";
+        HttpPost httppost = new HttpPost(url);
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("platform", "Android"));
+        httppost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = null;
+        response = httpclient.execute(httppost);
+        HttpEntity entity = response.getEntity();
+
+        String charset = EntityUtils.getContentCharSet(entity);
+
+        String body = null;
+        body = EntityUtils.toString(entity);
+        System.out.println(body);
+        httpclient.getConnectionManager().shutdown();
+    }
+    
 }
