@@ -156,7 +156,6 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         flex:1,
                         dataIndex: 'message',
                         renderer: function (v,metaData,rec) {
-                            console.log(rec.get('id'))
                             var message=me.down('#message').getValue();
                             if(message){
                                 var reg = new RegExp(message, "g");

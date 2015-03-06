@@ -217,8 +217,8 @@ public class HttpTest {
 
         nvps.add(new BasicNameValuePair("start", "0"));
         nvps.add(new BasicNameValuePair("limit", "25"));
-        nvps.add(new BasicNameValuePair("projectId", "1"));
-        nvps.add(new BasicNameValuePair("manager", "1"));
+        nvps.add(new BasicNameValuePair("projectId", "7"));
+//        nvps.add(new BasicNameValuePair("manager", "1"));
         nvps.add(new BasicNameValuePair("roleB", "1"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -300,8 +300,8 @@ public class HttpTest {
 
     @Test
     public void testSearch() throws Exception{
-//        String url="http://120.24.234.71/im/app/search";
-        String url="http://localhost:9095/openfiremar/app/search";
+        String url="http://120.24.234.71/im/app/search";
+//        String url="http://localhost:9095/openfiremar/app/search";
         HttpPost httpost = new HttpPost(url);
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
@@ -309,9 +309,9 @@ public class HttpTest {
         nvps.add(new BasicNameValuePair("projectId", "7"));
         nvps.add(new BasicNameValuePair("startTime", "2014-12-23 12:23:34"));
         nvps.add(new BasicNameValuePair("endTime", "2015-12-23 12:23:34"));
-        nvps.add(new BasicNameValuePair("start", "0"));
-        nvps.add(new BasicNameValuePair("limit", "2"));
-        nvps.add(new BasicNameValuePair("roleB", "1"));
+        nvps.add(new BasicNameValuePair("start", "20"));
+        nvps.add(new BasicNameValuePair("limit", "20"));
+        nvps.add(new BasicNameValuePair("roleB", "0"));
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = null;
