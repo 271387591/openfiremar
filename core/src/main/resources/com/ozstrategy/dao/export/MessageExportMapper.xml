@@ -20,8 +20,8 @@
             select LAST_INSERT_ID()
         </selectKey>
         INSERT INTO ext_messageExport
-        (id,exceptions,executeDate,filePath,projectId,createDate,type,multiFile,exportor,lastUpdateDate)
-        VALUES (#{id},#{exceptions},#{executeDate},#{filePath},#{projectId},#{createDate},#{type},#{multiFile},#{exportor},#{lastUpdateDate})
+        (id,exceptions,executeDate,filePath,projectId,createDate,type,multiFile,exportor,lastUpdateDate,startTime,endTime)
+        VALUES (#{id},#{exceptions},#{executeDate},#{filePath},#{projectId},#{createDate},#{type},#{multiFile},#{exportor},#{lastUpdateDate},#{startTime},#{endTime})
     </insert>
     <update id="update" parameterType="com.ozstrategy.model.export.MessageExport" flushCache="true">
         UPDATE ext_messageExport

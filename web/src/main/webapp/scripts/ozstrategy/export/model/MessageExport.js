@@ -18,6 +18,18 @@ Ext.define('FlexCenter.export.model.MessageExport', {
             name: 'createDate', convert: function (v) {
             return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
         }
+        },
+        {
+            name: 'startTime', convert: function (v) {
+            return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
         }
+        },
+        {
+            name: 'endTime', convert: function (v) {
+            return Ext.util.Format.date(new Date(v), 'Y-m-d H:i:s');
+        }
+        }
+        
+        
     ]
 });

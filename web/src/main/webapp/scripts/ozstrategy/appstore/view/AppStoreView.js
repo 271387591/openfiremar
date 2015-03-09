@@ -78,6 +78,7 @@ Ext.define('FlexCenter.appstore.view.AppStoreView', {
             {
                 xtype:'actioncolumn',
                 header:globalRes.buttons.edit,
+                hidden:true,
                 width:40,
                 items:[
                     {

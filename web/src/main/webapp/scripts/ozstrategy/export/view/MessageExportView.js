@@ -58,7 +58,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 allowBlank: false,
                                                 width:300,
                                                 itemId:'picStartTime',
-                                                format:'Y-m-d',
+                                                format:'Y-m-d 00:00:00',
                                                 maxValue:new Date(),
                                                 minValue:function(){
                                                     var newValue=new Date();
@@ -75,7 +75,7 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                                 editable:false,
                                                 allowBlank: false,
                                                 width:300,
-                                                format:'Y-m-d',
+                                                format:'Y-m-d 23:59:59',
                                                 maxValue:new Date(),
                                                 itemId : 'picEndTime',
                                                 name : 'endTime',
@@ -275,6 +275,16 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                         }
                     },
                     {
+                        header: '起始时间',
+                        dataIndex: 'startTime',
+                        flex:1
+                    },
+                    {
+                        header: '结束时间',
+                        dataIndex: 'endTime',
+                        flex:1
+                    },
+                    {
                         header: projectRes.header.hasFile,
                         dataIndex: 'hasFile',
                         flex:1,
@@ -345,14 +355,70 @@ Ext.define('FlexCenter.export.view.MessageExportView', {
                                 }
                             }
                         ]
-
+                    },
+                    {
+                        header:globalRes.buttons.remove,
+                        width:50,
+                        xtype:'actioncolumn',
+                        items:[
+                            {
+                                getClass: function(v, meta, record) {
+                                    return 'table-delete';
+                                },
+                                getTip:function(v,metadata,record,rowIndex,colIndex,store){
+                                    return globalRes.buttons.remove;
+                                },
+                                handler:function(grid, rowIndex, colIndex,item,e,rec){
+                                    me.onDeleteClick(rec);
+                                }
+                            }
+                        ]
                     }
-                    
                 ]
-                
             }
         ]
         me.callParent(arguments);
+    },
+    onDeleteClick: function (record) {
+        var me = this;
+        if (record) {
+            Ext.Msg.confirm(globalRes.buttons.remove, '你确定要删除', function (txt) {
+                if (txt === 'yes') {
+                    Ext.Ajax.request({
+                        url: 'messageExportController.do?method=delete',
+                        params: {id: record.data.id},
+                        method: 'POST',
+                        success: function (response, options) {
+                            var result = Ext.decode(response.responseText);
+                            if (result.success) {
+                                Ext.Msg.alert(globalRes.title.prompt, globalRes.removeSuccess);
+                                me.getStore().load();
+                            } else {
+                                Ext.MessageBox.show({
+                                    title: globalRes.title.prompt,
+                                    width: 300,
+                                    msg: result.message,
+                                    buttons: Ext.MessageBox.OK,
+                                    icon: Ext.MessageBox.ERROR
+                                });
+
+                            }
+                        },
+                        failure: function (response, options) {
+                            Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout, response.status));
+                        }
+                    });
+                }
+            });
+        } else {
+            Ext.MessageBox.show({
+                title: userRoleRes.removeRole,
+                width: 300,
+                msg: userRoleRes.editRole,
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.INFO
+            });
+        }
     },
     createExportWin:function(){
         var me=this;

@@ -97,7 +97,7 @@ Ext.define('FlexCenter.user.view.RoleView', {
                 dataIndex: 'projectId',
                 renderer:function(v){
                     if(!v){
-                        return '系统角色';
+                        return '系统默认角色';
                     }
                     return '工程角色';
                 },
@@ -346,7 +346,7 @@ Ext.define('FlexCenter.user.view.RoleView', {
             Ext.MessageBox.show({
                 title: userRoleRes.removeRole,
                 width: 300,
-                msg: userRoleRes.editRole,
+                msg: '请选择要删除的数据',
                 buttons: Ext.MessageBox.OK,
                 icon: Ext.MessageBox.INFO
             });

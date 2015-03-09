@@ -11,6 +11,7 @@ public interface HistoryMessageManager {
     Long maxId();
     Long addIndex()throws Exception;
     void delete(Date startTime,Date endTime,Long projectId) throws Exception;
+    void deleteById(Long id,Long projectId) throws Exception;
     
     void deleteMessage(Long projectId,String messageId) throws Exception;
     

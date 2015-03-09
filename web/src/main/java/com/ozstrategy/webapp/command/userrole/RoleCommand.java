@@ -33,6 +33,7 @@ public class RoleCommand {
 
 
 	private Date lastUpdateDate;
+	private Long projectId;
 
     private String context;
     private Long systemViewId;
@@ -50,6 +51,7 @@ public class RoleCommand {
 		this.description = role.getDescription();
 		this.createDate = role.getCreateDate();
 		this.lastUpdateDate = role.getLastUpdateDate();
+		this.projectId=role.getProjectId();
 		
 //        this.context=role.getSystemView().getContext();
 //        this.systemViewId=role.getSystemView().getId();
@@ -139,4 +141,12 @@ public class RoleCommand {
     public void setUsers(List<SimpleUserCommand> users) {
         this.users = users;
     }
+
+	public Long getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}
 }

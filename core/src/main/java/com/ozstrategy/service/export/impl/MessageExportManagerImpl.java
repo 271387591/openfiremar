@@ -52,4 +52,8 @@ public class MessageExportManagerImpl implements MessageExportManager {
     public boolean checkExportDataExist(Date startTime, Date endTime,Long projectId) throws Exception {
         return historyMessageDao.checkExportDataExist(startTime,endTime,projectId);
     }
+    @Transactional(rollbackFor = Throwable.class)
+    public void delete(MessageExport messageExport) throws Exception {
+        messageExportDao.delete(messageExport);
+    }
 }

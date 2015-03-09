@@ -18,4 +18,5 @@ public interface MessageExportManager {
     void exportMessage(Date startTime, Date endTime,File folder,Long projectId) throws Exception;
     void exportVoice(Date startTime, Date endTime,File folder,Long projectId) throws Exception;
     boolean checkExportDataExist(Date startTime,Date endTime,Long projectId) throws Exception;
+    void delete(MessageExport messageExport) throws Exception;
 }

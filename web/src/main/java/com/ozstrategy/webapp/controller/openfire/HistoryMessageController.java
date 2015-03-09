@@ -168,8 +168,6 @@ public class HistoryMessageController extends BaseController {
     public BaseResultCommand delete(HttpServletRequest request){
         String username=request.getRemoteUser();
         try{
-            
-            
             deleteMap.put(username,false);
             finishedMap.put(username,false);
             Date sDate=DateUtils.parseDate(request.getParameter("startTime"), new String[]{"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss"});
@@ -191,6 +189,20 @@ public class HistoryMessageController extends BaseController {
         }
         return new BaseResultCommand(getMessage("globalRes.removeFail",request),Boolean.FALSE);
     }
+    @RequestMapping(params = "method=deleteById")
+    @ResponseBody
+    public BaseResultCommand deleteById(HttpServletRequest request){
+        try{
+            Long projectId=parseLong(request.getParameter("projectId")); 
+            Long id=parseLong(request.getParameter("id")); 
+            historyMessageManager.deleteById(id,projectId);
+            return new BaseResultCommand("",true);
+        }catch (Exception e){
+            logger.error("delete message",e);
+        }
+        return new BaseResultCommand(getMessage("globalRes.removeFail",request),Boolean.FALSE);
+    }
+    
     @RequestMapping(params = "method=pullNotification")
     @ResponseBody
     public Map<String,Boolean> pullNotification(HttpServletRequest request){

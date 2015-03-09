@@ -147,7 +147,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
         Long mId = minId;
         do {
             mId = exportVoice(folder, mId, maxId, projectId);
-        } while (mId != minId);
+        } while (mId != 0);
     }
 
     private Long exportVoice(File folder, Long minId, Long maxId, Long projectId) throws Exception {
@@ -273,11 +273,11 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
                     try {
                         byte[] bytes = IOUtils.toByteArray(new URI(message));
                         HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
-                        HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 1022, 255, (short) 2, column, (short) 2, column + 3);
+                        HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 1022, 255, (short) 3, column, (short) 3, column + 6);
                         patriarch.createPicture(anchor, wb.addPicture(bytes, HSSFWorkbook.PICTURE_TYPE_JPEG));
                     } catch (Exception e) {
                     }
-                    column = column + 3;
+                    column = column + 6;
                 } else {
                     cell = sheetRow.createCell(3);
                     cell.setCellStyle(styleMap.get("cell"));
@@ -474,6 +474,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
             map.put("toId", doc.get("toId"));
             map.put("createDate", doc.get("createDate"));
             map.put("message", doc.get("message"));
+            map.put("type", doc.get("type"));
             map.put("total", total + "");
             list.add(map);
         }
@@ -499,6 +500,10 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
 
     public void deleteIndex(Date startDate, Date endDate, Long projectId) throws Exception {
         deleteIndexInstance.deleteIndex(startDate, endDate, projectId);
+    }
+
+    public void deleteIndexById(Long id, Long projectId) throws Exception {
+        deleteIndexInstance.deleteIndexById(id,projectId);
     }
 
     public List<Map<String, Object>> getHistory(Long projectId, Integer manager,Integer roleB,Integer start, Integer limit) throws Exception {
@@ -557,6 +562,7 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
                 String fromNick = resultSet.getString("fromNick");
                 Integer deleted = resultSet.getInt("deleted");
                 Integer pillowTalk = resultSet.getInt("pillowTalk");
+                Integer type = resultSet.getInt("type");
                 Document document = new Document();
                 document.add(new LongField("id", id, Field.Store.YES));
                 if (StringUtils.isNotEmpty(message)) {
@@ -580,6 +586,10 @@ public class HistoryMessageDaoImpl implements HistoryMessageDao {
                 if(pillowTalk!=null){
                     document.add(new LongField("pillowTalk", pillowTalk, Field.Store.YES));
                 }
+                if(type!=null){
+                    document.add(new LongField("type", type, Field.Store.YES));
+                }
+                
                 
                 if (StringUtils.isNotEmpty(fromNick)) {
                     document.add(new StringField("fromNick", fromNick, Field.Store.YES));

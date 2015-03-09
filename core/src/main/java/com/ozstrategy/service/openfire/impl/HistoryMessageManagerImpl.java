@@ -7,8 +7,6 @@ import com.ozstrategy.service.openfire.HistoryMessageManager;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +29,7 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
     @Autowired
     private Properties variable;
 
-    @CacheEvict(value = "messageCache")
+//    @CacheEvict(value = "messageCache")
     @Transactional(rollbackFor = Throwable.class)
     public Long addIndex() throws Exception {
         Long maxId=maxId();
@@ -42,7 +40,7 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
         }
         return maxId;
     }
-    @CacheEvict(value = "messageCache")
+//    @CacheEvict(value = "messageCache")
     @Transactional(rollbackFor = Throwable.class)
     public void delete(Date startTime, Date endTime,Long projectId)  throws Exception{
         Map<String,Object> maxMinId=historyMessageDao.maxMinIdByTime(startTime,endTime,projectId);
@@ -62,8 +60,21 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
                 mId=delete(mId,maxId,projectId);
             }while (mId!=maxId);
             historyMessageDao.deleteIndex(startTime,endTime,projectId);
+            Long nowMaxId=maxId();
+            applicationConfigDao.put(ApplicationConfig.index_max_id, nowMaxId.toString());
+            
         }
     }
+    @Transactional(rollbackFor = Throwable.class)
+    public void deleteById(Long id, Long projectId) throws Exception {
+        List<Long> ids=new ArrayList<Long>();
+        ids.add(id);
+        historyMessageDao.deleteByIds(ids);
+        historyMessageDao.deleteIndexById(id,projectId);
+        Long nowMaxId=maxId();
+        applicationConfigDao.put(ApplicationConfig.index_max_id, nowMaxId.toString());
+    }
+
     private Long delete(Long minId,Long maxId,Long projectId) throws Exception{
         Long mId=0L;
         deleteItem=NumberUtils.toInt(variable.get("deleteItem").toString());
@@ -87,7 +98,7 @@ public class HistoryMessageManagerImpl implements HistoryMessageManager {
         historyMessageDao.deleteMessage(projectId,messageId);
     }
 
-    @Cacheable(value = "messageCache")
+//    @Cacheable(value = "messageCache")
     public List<Map<String, String>> search(String message,Date startDate, Date endDate, Long fromId, Long projectId,Long manager, Long deleted,Long pillowTalk,Integer start, Integer limit) throws Exception {
         return historyMessageDao.search(message, startDate, endDate, fromId, projectId, manager, deleted,pillowTalk,start, limit);
     }

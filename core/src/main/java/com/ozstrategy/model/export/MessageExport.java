@@ -27,6 +27,9 @@ public class MessageExport extends BaseEntity {
     private Long projectId;
     @Column
     private Boolean multiFile=Boolean.FALSE;
+    
+    private Date startTime;
+    private Date endTime;
 
     public String getExportor() {
         return exportor;
@@ -82,6 +85,22 @@ public class MessageExport extends BaseEntity {
 
     public void setMultiFile(Boolean multiFile) {
         this.multiFile = multiFile;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     @Override

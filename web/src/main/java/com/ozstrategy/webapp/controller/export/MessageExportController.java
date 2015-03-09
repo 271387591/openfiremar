@@ -7,6 +7,7 @@ import com.ozstrategy.model.project.Project;
 import com.ozstrategy.service.export.MessageExportManager;
 import com.ozstrategy.service.project.ProjectManager;
 import com.ozstrategy.util.FileHelper;
+import com.ozstrategy.webapp.command.BaseResultCommand;
 import com.ozstrategy.webapp.command.JsonReaderResponse;
 import com.ozstrategy.webapp.command.export.MessageExportCommand;
 import com.ozstrategy.webapp.controller.BaseController;
@@ -87,6 +88,34 @@ public class MessageExportController extends BaseController {
         }
         return new JsonReaderResponse<MessageExportCommand>(commands,"",count);
     }
+    @RequestMapping(params = "method=delete")
+    @ResponseBody
+    public BaseResultCommand delete(HttpServletRequest request){
+        String ids=request.getParameter("id");
+        Long id=parseLong(ids);
+        try{
+            MessageExport messageExport=messageExportManager.getById(id);
+            if(messageExport!=null){
+                messageExportManager.delete(messageExport);
+                String path=messageExport.getFilePath();
+                File file=new File(path);
+                if(file!=null){
+                    if(file.isFile()){
+                        boolean del = file.delete();
+                        if(del){
+                            return new BaseResultCommand("",true);
+                        } 
+                    }else if(file.isDirectory()){
+                        FileHelper.deleteDirectory(file);
+                        return new BaseResultCommand("",true);
+                    }
+                }
+            }
+        }catch (Exception e){
+            logger.error("delete file fail",e);
+        }
+        return new BaseResultCommand(getMessage("globalRes.removeFail",request),false);
+    }
     @RequestMapping(params = "method=pullNotification")
     @ResponseBody
     public Map<String,Boolean> pullExportNotification(HttpServletRequest request){
@@ -145,6 +174,8 @@ public class MessageExportController extends BaseController {
                 messageExport.setExportor(username);
                 messageExport.setExecuteDate(new Date());
                 messageExport.setProjectId(projectId);
+                messageExport.setStartTime(sDate);
+                messageExport.setEndTime(eDate);
                 logger.error("create export dir fail");
                 try {
                     messageExportManager.save(messageExport);
@@ -210,6 +241,8 @@ public class MessageExportController extends BaseController {
                             messageExport.setFilePath(targetMultiFile.getAbsolutePath());
                             messageExport.setProjectId(projectId);
                             messageExport.setMultiFile(Boolean.TRUE);
+                            messageExport.setStartTime(sDate);
+                            messageExport.setEndTime(eDate);
                             messageExportManager.save(messageExport);
                             detailMap.put(username,true);
                             finishedMap.put(username,true);
@@ -225,6 +258,8 @@ public class MessageExportController extends BaseController {
                             messageExport.setExecuteDate(new Date());
                             messageExport.setFilePath(zipFile.getAbsolutePath());
                             messageExport.setProjectId(projectId);
+                            messageExport.setStartTime(sDate);
+                            messageExport.setEndTime(eDate);
                             messageExportManager.save(messageExport);
                             detailMap.put(username,true);
                             finishedMap.put(username,true);
@@ -273,6 +308,8 @@ public class MessageExportController extends BaseController {
                             messageExport.setFilePath(targetMultiFile.getAbsolutePath());
                             messageExport.setProjectId(projectId);
                             messageExport.setMultiFile(Boolean.TRUE);
+                            messageExport.setStartTime(sDate);
+                            messageExport.setEndTime(eDate);
                             messageExportManager.save(messageExport);
                             detailMap.put(username,true);
                             finishedMap.put(username,true);
@@ -288,6 +325,8 @@ public class MessageExportController extends BaseController {
                             messageExport.setExecuteDate(new Date());
                             messageExport.setFilePath(zipFile.getAbsolutePath());
                             messageExport.setProjectId(projectId);
+                            messageExport.setStartTime(sDate);
+                            messageExport.setEndTime(eDate);
                             messageExportManager.save(messageExport);
                             detailMap.put(username,true);
                             finishedMap.put(username,true);
@@ -302,6 +341,8 @@ public class MessageExportController extends BaseController {
                     messageExport.setExportor(username);
                     messageExport.setExecuteDate(new Date());
                     messageExport.setProjectId(projectId);
+                    messageExport.setStartTime(sDate);
+                    messageExport.setEndTime(eDate);
                     logger.error("export message fail",e);
                     try {
                         messageExportManager.save(messageExport);

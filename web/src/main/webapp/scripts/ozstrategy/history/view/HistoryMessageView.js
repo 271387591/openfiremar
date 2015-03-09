@@ -140,6 +140,14 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
                         iconCls: 'table-delete',
                         xtype: 'button',
                         text: globalRes.buttons.remove,
+                        scope: this,
+                        handler: this.onDeleteByIdClick
+                    },
+                    {
+                        frame: true,
+                        iconCls: 'table-delete',
+                        xtype: 'button',
+                        text: '按时间段删除',
                         itemId: 'userEditBtn',
                         scope: this,
                         handler: this.onDeleteClick
@@ -182,6 +190,47 @@ Ext.define('FlexCenter.history.view.HistoryMessageView', {
             }
         ];
         me.callParent(arguments);
+    },
+    onDeleteByIdClick: function () {
+        var me = this;
+        var record = me.down('grid').getSelectionModel().getSelection()[0];
+        if (record) {
+            Ext.Msg.confirm(globalRes.buttons.remove, '你确定要删除', function (txt) {
+                if (txt === 'yes') {
+                    Ext.Ajax.request({
+                        url: 'historyMessageController.do?method=deleteById',
+                        params: {id: record.data.id,projectId:projectId},
+                        method: 'POST',
+                        success: function (response, options) {
+                            var result = Ext.decode(response.responseText);
+                            if (result.success) {
+                                Ext.Msg.alert(globalRes.title.prompt, globalRes.removeSuccess);
+                                me.down('grid').getStore().load();
+                            } else {
+                                Ext.MessageBox.show({
+                                    title: globalRes.title.prompt,
+                                    width: 300,
+                                    msg: result.message,
+                                    buttons: Ext.MessageBox.OK,
+                                    icon: Ext.MessageBox.ERROR
+                                });
+                            }
+                        },
+                        failure: function (response, options) {
+                            Ext.MessageBox.alert(globalRes.title.fail, Ext.String.format(globalRes.remoteTimeout, response.status));
+                        }
+                    });
+                }
+            });
+        } else {
+            Ext.MessageBox.show({
+                title: globalRes.buttons.remove,
+                width: 300,
+                msg: '请选择要删除的数据',
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.INFO
+            });
+        }
     },
 
     onDeleteClick:function(){

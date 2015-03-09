@@ -19,6 +19,8 @@ public class MessageExportCommand extends BaseEntityCommand {
     protected Date createDate;
     protected Date lastUpdateDate;
     private Boolean multiFile=Boolean.FALSE;
+    private Date startTime;
+    private Date endTime;
     public MessageExportCommand(MessageExport export){
         this.id= export.getId();
         this.exportor= export.getExportor();
@@ -28,6 +30,8 @@ public class MessageExportCommand extends BaseEntityCommand {
         this.createDate=export.getCreateDate();
         this.lastUpdateDate=export.getLastUpdateDate();
         this.multiFile=export.getMultiFile();
+        this.startTime=export.getStartTime();
+        this.endTime=export.getEndTime();
         
     }
 
@@ -105,5 +109,21 @@ public class MessageExportCommand extends BaseEntityCommand {
 
     public void setMultiFile(Boolean multiFile) {
         this.multiFile = multiFile;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 }

@@ -27,6 +27,7 @@ public interface HistoryMessageDao {
     Long addIndex(Long minId)throws Exception;
     
     void deleteIndex(Date startDate,Date endDate,Long projectId) throws Exception;
+    void deleteIndexById(Long id,Long projectId) throws Exception;
 
 
     List<Map<String,Object>> getHistory(Long projectId, Integer manager,Integer roleB,Integer start,Integer limit) throws Exception;

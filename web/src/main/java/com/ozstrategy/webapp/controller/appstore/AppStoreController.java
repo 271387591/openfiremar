@@ -136,6 +136,7 @@ public class AppStoreController extends BaseController {
                 appStore.setVersion(version);
                 appStore.setCurrentVersion(Boolean.valueOf(currentVersion));
                 appStore.setUrl(httpPath);
+                appStore.setCreateDate(new Date());
                 appStoreManager.save(appStore);
                 writer.print("{success:true,msg:'上传成功!'}");
             }

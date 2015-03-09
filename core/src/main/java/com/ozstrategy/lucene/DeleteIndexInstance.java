@@ -49,6 +49,27 @@ public class DeleteIndexInstance {
             luceneInstance.closeAll();
         }
     }
+    synchronized public void deleteIndexById(Long id,Long projectId){
+        BooleanQuery query = new BooleanQuery();
+        if (projectId != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("toId", projectId, projectId, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        if (id != null) {
+            NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange("id", id, id, true, true);
+            query.add(numericRangeQuery, BooleanClause.Occur.MUST);
+        }
+        try{
+            IndexWriter indexWriter = luceneInstance.getWriter();
+            indexWriter.deleteDocuments(query);
+            indexWriter.commit();
+
+        }catch (Exception e){
+
+        }finally {
+            luceneInstance.closeAll();
+        }
+    }
 
     public LuceneInstance getLuceneInstance() {
         return luceneInstance;
